@@ -28,7 +28,11 @@ import {
   FILTER_IS_IN_INBOX,
 } from 'src/app/data/filter-rule-type'
 import { Tag } from 'src/app/data/tag'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  SETTINGS_KEYS,
+  SidebarSectionID,
+  normalizeSidebarSectionOrder,
+} from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -110,6 +114,7 @@ export class RedesignSidebarComponent implements OnInit {
 
   readonly PermissionAction = PermissionAction
   readonly PermissionType = PermissionType
+  readonly SidebarSectionID = SidebarSectionID
 
   readonly tags = signal<Tag[]>([])
   readonly correspondents = signal<Correspondent[]>([])
@@ -132,6 +137,14 @@ export class RedesignSidebarComponent implements OnInit {
     this.settingsService.getSignal<boolean>(SETTINGS_KEYS.DARK_MODE_ENABLED)
   private readonly darkModeUseSystemSetting =
     this.settingsService.getSignal<boolean>(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)
+  private readonly sidebarSectionOrderSetting =
+    this.settingsService.getSignal<string[]>(
+      SETTINGS_KEYS.SIDEBAR_SECTION_ORDER
+    )
+
+  readonly orderedSections = computed<SidebarSectionID[]>(() =>
+    normalizeSidebarSectionOrder(this.sidebarSectionOrderSetting())
+  )
 
   ngOnInit(): void {
     this.loadTaxonomies()

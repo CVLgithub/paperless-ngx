@@ -432,6 +432,87 @@
 
       </ng-template>
     </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.Customize">
+      <a ngbNavLink>Anpassen</a>
+      <ng-template ngbNavContent>
+        <div class="rd-customize-section">
+          <div class="rd-customize-card">
+            <div class="rd-customize-card__header">
+              <div class="rd-customize-card__title-group">
+                <span class="rd-customize-card__icon" aria-hidden="true">
+                  <pngx-bs-icon name="sliders" width="1rem" height="1rem"></pngx-bs-icon>
+                </span>
+                <div>
+                  <h5 class="rd-customize-card__title">Reihenfolge der Seitenleiste</h5>
+                  <p class="rd-customize-card__subtitle">
+                    Ziehe die Bereiche per Drag &amp; Drop in die gewünschte Reihenfolge oder nutze die Pfeiltasten.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="rd-customize-reset-btn"
+                [disabled]="isDefaultSidebarSectionOrder"
+                (click)="resetSidebarSectionOrder()"
+              >
+                <pngx-bs-icon name="arrow-counterclockwise" width="0.85rem" height="0.85rem"></pngx-bs-icon>
+                <span>Standardreihenfolge</span>
+              </button>
+            </div>
+
+            <ul
+              class="rd-customize-list"
+              cdkDropList
+              [cdkDropListData]="sidebarSectionOrder"
+              (cdkDropListDropped)="onSidebarSectionDrop($event)"
+              aria-label="Reihenfolge der Seitenleiste"
+            >
+              @for (sectionId of sidebarSectionOrder; track sectionId; let idx = $index; let isFirst = $first; let isLast = $last) {
+                @let meta = getSidebarSectionMeta(sectionId);
+                <li class="rd-customize-item" cdkDrag>
+                  <span class="rd-customize-item__grip" aria-hidden="true">
+                    <pngx-bs-icon name="grip-vertical" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+                  </span>
+                  <span class="rd-customize-item__index" aria-hidden="true">{{ idx + 1 }}</span>
+                  <span class="rd-customize-item__icon" aria-hidden="true">
+                    <pngx-bs-icon [name]="meta.icon" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+                  </span>
+                  <div class="rd-customize-item__copy">
+                    <span class="rd-customize-item__label">{{ meta.label }}</span>
+                    <span class="rd-customize-item__desc">{{ meta.description }}</span>
+                  </div>
+                  <div class="rd-customize-item__actions">
+                    <button
+                      type="button"
+                      class="rd-customize-move-btn"
+                      [disabled]="isFirst"
+                      (mousedown)="$event.stopPropagation()"
+                      (click)="moveSidebarSection(idx, -1)"
+                      [attr.aria-label]="meta.label + ' nach oben verschieben'"
+                      title="Nach oben"
+                    >
+                      <pngx-bs-icon name="arrow-up" width="0.85rem" height="0.85rem"></pngx-bs-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="rd-customize-move-btn"
+                      [disabled]="isLast"
+                      (mousedown)="$event.stopPropagation()"
+                      (click)="moveSidebarSection(idx, 1)"
+                      [attr.aria-label]="meta.label + ' nach unten verschieben'"
+                      title="Nach unten"
+                    >
+                      <pngx-bs-icon name="arrow-down" width="0.85rem" height="0.85rem"></pngx-bs-icon>
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      </ng-template>
+    </li>
   </ul>
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>

@@ -1,3 +1,9 @@
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 import { AsyncPipe, ViewportScroller } from '@angular/common'
 import {
   AfterViewInit,
@@ -40,11 +46,14 @@ import {
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
 import {
+  DEFAULT_SIDEBAR_SECTION_ORDER,
   GlobalSearchType,
   HIDEABLE_SIDEBAR_ITEM_IDS,
   HideableSidebarItemID,
   SETTINGS_KEYS,
+  SidebarSectionID,
   SuggestionSource,
+  normalizeSidebarSectionOrder,
 } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -81,6 +90,41 @@ enum SettingsNavIDs {
   Documents = 2,
   Permissions = 3,
   Notifications = 4,
+  Customize = 5,
+}
+
+interface SidebarSectionMeta {
+  id: SidebarSectionID
+  label: string
+  description: string
+  icon: string
+}
+
+const SIDEBAR_SECTION_META: Record<SidebarSectionID, SidebarSectionMeta> = {
+  [SidebarSectionID.SavedViews]: {
+    id: SidebarSectionID.SavedViews,
+    label: 'Favoriten',
+    description: 'Gespeicherte Ansichten in der Seitenleiste',
+    icon: 'bookmark',
+  },
+  [SidebarSectionID.Tags]: {
+    id: SidebarSectionID.Tags,
+    label: 'Tags',
+    description: 'Farbige Schlagwörter zum schnellen Filtern',
+    icon: 'tags',
+  },
+  [SidebarSectionID.Correspondents]: {
+    id: SidebarSectionID.Correspondents,
+    label: 'Korrespondenten',
+    description: 'Absender, Personen und Organisationen',
+    icon: 'people',
+  },
+  [SidebarSectionID.DocumentTypes]: {
+    id: SidebarSectionID.DocumentTypes,
+    label: 'Dokumenttypen',
+    description: 'Kategorien wie Rechnungen, Verträge und Bescheide',
+    icon: 'file-earmark',
+  },
 }
 
 const systemLanguage = { code: '', name: $localize`Use system language` }
@@ -136,6 +180,8 @@ const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
     NgbNavModule,
     NgbPopoverModule,
     BootstrapIconComponent,
+    CdkDropList,
+    CdkDrag,
   ],
 })
 export class SettingsComponent
@@ -165,6 +211,9 @@ export class SettingsComponent
     documentListItemPerPage: new FormControl(null),
     slimSidebarEnabled: new FormControl(null),
     sidebarHiddenItems: new FormControl<HideableSidebarItemID[]>([]),
+    sidebarSectionOrder: new FormControl<SidebarSectionID[]>([
+      ...DEFAULT_SIDEBAR_SECTION_ORDER,
+    ]),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
@@ -311,7 +360,7 @@ export class SettingsComponent
       let navID = SettingsNavIDs.General
       if (section) {
         const navIDKey: string = Object.keys(SettingsNavIDs).find(
-          (navID) => navID.toLowerCase() == section
+          (navID) => navID.toLowerCase() == section.toLowerCase()
         )
         if (navIDKey) {
           navID = SettingsNavIDs[navIDKey]
@@ -347,6 +396,9 @@ export class SettingsComponent
       ),
       slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
       sidebarHiddenItems: this.settings.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS),
+      sidebarSectionOrder: normalizeSidebarSectionOrder(
+        this.settings.get(SETTINGS_KEYS.SIDEBAR_SECTION_ORDER)
+      ),
       darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
       darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
       darkModeInvertThumbs: this.settings.get(
@@ -498,6 +550,56 @@ export class SettingsComponent
     this.settings.updateSidebarItemVisibility(item, checked)
   }
 
+  get sidebarSectionOrder(): SidebarSectionID[] {
+    return normalizeSidebarSectionOrder(
+      this.settingsForm.controls.sidebarSectionOrder.value
+    )
+  }
+
+  get isDefaultSidebarSectionOrder(): boolean {
+    const current = this.sidebarSectionOrder
+    return (
+      current.length === DEFAULT_SIDEBAR_SECTION_ORDER.length &&
+      current.every((id, index) => id === DEFAULT_SIDEBAR_SECTION_ORDER[index])
+    )
+  }
+
+  getSidebarSectionMeta(sectionId: SidebarSectionID): SidebarSectionMeta {
+    return SIDEBAR_SECTION_META[sectionId]
+  }
+
+  onSidebarSectionDrop(event: CdkDragDrop<SidebarSectionID[]>): void {
+    if (event.previousIndex === event.currentIndex) {
+      return
+    }
+    const updated = [...this.sidebarSectionOrder]
+    moveItemInArray(updated, event.previousIndex, event.currentIndex)
+    this.settingsForm.controls.sidebarSectionOrder.setValue(updated)
+    this.settingsForm.controls.sidebarSectionOrder.markAsDirty()
+  }
+
+  moveSidebarSection(index: number, direction: -1 | 1): void {
+    const current = this.sidebarSectionOrder
+    const targetIndex = index + direction
+    if (targetIndex < 0 || targetIndex >= current.length) {
+      return
+    }
+    const updated = [...current]
+    moveItemInArray(updated, index, targetIndex)
+    this.settingsForm.controls.sidebarSectionOrder.setValue(updated)
+    this.settingsForm.controls.sidebarSectionOrder.markAsDirty()
+  }
+
+  resetSidebarSectionOrder(): void {
+    if (this.isDefaultSidebarSectionOrder) {
+      return
+    }
+    this.settingsForm.controls.sidebarSectionOrder.setValue([
+      ...DEFAULT_SIDEBAR_SECTION_ORDER,
+    ])
+    this.settingsForm.controls.sidebarSectionOrder.markAsDirty()
+  }
+
   public saveSettings() {
     this.savePending = true
     const reloadRequired =
@@ -526,6 +628,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
       this.settingsForm.value.sidebarHiddenItems
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SIDEBAR_SECTION_ORDER,
+      this.sidebarSectionOrder
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
@@ -642,7 +748,10 @@ export class SettingsComponent
       .pipe(tap(() => (this.savePending = false)))
       .subscribe({
         next: () => {
-          this.store.next(this.settingsForm.value)
+          this.store.next({
+            ...this.settingsForm.value,
+            sidebarSectionOrder: [...this.sidebarSectionOrder],
+          })
           this.settings.updateAppearanceSettings()
           this.settings.initializeDisplayFields()
           let savedToast: Toast = {
@@ -684,7 +793,13 @@ export class SettingsComponent
   }
 
   reset() {
-    this.settingsForm.patchValue(this.store.getValue())
+    const stored = this.store.getValue()
+    this.settingsForm.patchValue({
+      ...stored,
+      sidebarSectionOrder: normalizeSidebarSectionOrder(
+        stored?.sidebarSectionOrder
+      ),
+    })
     if (this.settings.organizingSidebarItems()) {
       this.settings.sidebarHiddenItemsEditing.set([
         ...this.settingsForm.controls.sidebarHiddenItems.value,

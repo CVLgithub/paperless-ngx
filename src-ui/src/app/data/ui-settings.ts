@@ -41,6 +41,45 @@ export enum HideableSidebarItemID {
 
 export const HIDEABLE_SIDEBAR_ITEM_IDS = Object.values(HideableSidebarItemID)
 
+export enum SidebarSectionID {
+  SavedViews = 'saved_views',
+  Tags = 'tags',
+  Correspondents = 'correspondents',
+  DocumentTypes = 'document_types',
+}
+
+export const DEFAULT_SIDEBAR_SECTION_ORDER: SidebarSectionID[] = [
+  SidebarSectionID.SavedViews,
+  SidebarSectionID.Tags,
+  SidebarSectionID.Correspondents,
+  SidebarSectionID.DocumentTypes,
+]
+
+const VALID_SIDEBAR_SECTION_IDS = new Set<string>(DEFAULT_SIDEBAR_SECTION_ORDER)
+
+export function normalizeSidebarSectionOrder(
+  order: readonly string[] | null | undefined
+): SidebarSectionID[] {
+  const normalized: SidebarSectionID[] = []
+  if (Array.isArray(order)) {
+    for (const item of order) {
+      if (
+        typeof item === 'string' &&
+        VALID_SIDEBAR_SECTION_IDS.has(item) &&
+        !normalized.includes(item as SidebarSectionID)
+      ) {
+        normalized.push(item as SidebarSectionID)
+      }
+    }
+  }
+  for (const defaultId of DEFAULT_SIDEBAR_SECTION_ORDER) {
+    if (!normalized.includes(defaultId)) {
+      normalized.push(defaultId)
+    }
+  }
+  return normalized
+}
+
 export const PAPERLESS_GREEN_HEX = '#17541f'
 
 export const SETTINGS_KEYS = {
@@ -70,6 +109,7 @@ export const SETTINGS_KEYS = {
   AUDITLOG_ENABLED: 'general-settings:auditlog-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
   SIDEBAR_HIDDEN_ITEMS: 'general-settings:sidebar:hidden-items',
+  SIDEBAR_SECTION_ORDER: 'general-settings:sidebar:section-order',
   ATTRIBUTES_SECTIONS_COLLAPSED:
     'general-settings:attributes-sections-collapsed',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
@@ -147,6 +187,11 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
     type: 'array',
     default: [],
+  },
+  {
+    key: SETTINGS_KEYS.SIDEBAR_SECTION_ORDER,
+    type: 'array',
+    default: DEFAULT_SIDEBAR_SECTION_ORDER,
   },
   {
     key: SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,

@@ -321,7 +321,9 @@
 }
 
 .rd-sidebar__section {
-  margin-top: 16px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rd-border-subtle);
 
   &--collapsible {
     margin-top: 14px;
