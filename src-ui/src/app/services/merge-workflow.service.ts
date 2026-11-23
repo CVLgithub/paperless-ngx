@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import {
-  BehaviorSubject,
   Observable,
+  ReplaySubject,
   Subject,
   catchError,
   interval,
@@ -96,12 +96,14 @@ export class MergeWorkflowService {
     const startedAtMs = Date.now() - 5_000
     const deleteOriginals = !!args.delete_originals
 
-    const stateSubject = new BehaviorSubject<MergeWorkflowState>({
+    let currentState: MergeWorkflowState = {
       phase: 'merging',
       progress: 14,
       sourceCount: documentIds.length,
       deleteOriginals,
-    })
+    }
+    const stateSubject = new ReplaySubject<MergeWorkflowState>(1)
+    stateSubject.next(currentState)
 
     const stop$ = new Subject<void>()
     let finished = false
@@ -110,23 +112,27 @@ export class MergeWorkflowService {
 
     const emitState = (partial: Partial<MergeWorkflowState>) => {
       if (finished) return
-      const current = stateSubject.value
-      stateSubject.next({
-        ...current,
+      currentState = {
+        ...currentState,
         ...partial,
-        progress: Math.max(current.progress, partial.progress ?? current.progress),
-      })
+        progress: Math.max(
+          currentState.progress,
+          partial.progress ?? currentState.progress
+        ),
+      }
+      stateSubject.next(currentState)
     }
 
     const completeWithDocument = (documentId: number) => {
       if (finished) return
       finished = true
-      stateSubject.next({
-        ...stateSubject.value,
+      currentState = {
+        ...currentState,
         phase: 'completed',
         progress: 100,
         documentId,
-      })
+      }
+      stateSubject.next(currentState)
       stop$.next()
       stop$.complete()
       stateSubject.complete()
@@ -136,8 +142,7 @@ export class MergeWorkflowService {
 
       if (backgrounded) {
         this.toastService.show({
-          title: $localize`Neues Dokument erstellt`,
-          content: $localize`Aus ${documentIds.length} Dokumenten zusammengeführt.`,
+          content: $localize`Neues Dokument aus ${documentIds.length} Dokumenten erstellt.`,
           delay: 6000,
           actionName: $localize`Öffnen`,
           action: () => {
@@ -159,11 +164,12 @@ export class MergeWorkflowService {
     const failWithMessage = (errorMessage: string) => {
       if (finished) return
       finished = true
-      stateSubject.next({
-        ...stateSubject.value,
+      currentState = {
+        ...currentState,
         phase: 'error',
         errorMessage,
-      })
+      }
+      stateSubject.next(currentState)
       stop$.next()
       stop$.complete()
       stateSubject.complete()
@@ -177,10 +183,11 @@ export class MergeWorkflowService {
       continueInBackground: () => {
         if (finished) return
         backgrounded = true
-        stateSubject.next({
-          ...stateSubject.value,
+        currentState = {
+          ...currentState,
           phase: 'background',
-        })
+        }
+        stateSubject.next(currentState)
       },
       cancelTracking: () => {
         if (finished) return

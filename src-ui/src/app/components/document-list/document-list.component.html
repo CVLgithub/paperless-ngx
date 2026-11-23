@@ -196,10 +196,12 @@
       } @else if (redesignDisplayMode === 'list') {
         @for (group of documentGroups; track group.key) {
           <section class="rd-doc-group">
-            <div class="rd-group-header">
-              <h2 class="rd-group-title">{{ group.label }}</h2>
-              <span class="rd-group-count">{{ group.documents.length }}</span>
-            </div>
+            @if (group.label) {
+              <div class="rd-group-header">
+                <h2 class="rd-group-title">{{ group.label }}</h2>
+                <span class="rd-group-count">{{ group.documents.length }}</span>
+              </div>
+            }
             <div class="rd-doc-list-group">
               @for (doc of group.documents; track doc.id) {
                 <pngx-redesign-document-list-row
@@ -219,17 +221,14 @@
       } @else {
         @for (group of documentGroups; track group.key; let gi = $index) {
           <section class="rd-doc-group">
-            <div class="rd-group-header">
-              <h2 class="rd-group-title">{{ group.label }}</h2>
-              <span class="rd-group-count">{{ group.documents.length }}</span>
-            </div>
+            @if (group.label) {
+              <div class="rd-group-header">
+                <h2 class="rd-group-title">{{ group.label }}</h2>
+                <span class="rd-group-count">{{ group.documents.length }}</span>
+              </div>
+            }
             <div class="rd-doc-grid">
-              @if (
-                gi === 0 &&
-                !selectionMode() &&
-                !list.hasSelection &&
-                permissionService.currentUserCan(PermissionAction.Add, PermissionType.Document)
-              ) {
+              @if (group.showUploadCard) {
                 <button
                   type="button"
                   class="rd-upload-card"

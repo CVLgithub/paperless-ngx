@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 import { Subject, of, throwError } from 'rxjs'
 import {
@@ -31,6 +31,7 @@ describe('MergeWorkflowService', () => {
   let failed$: Subject<FileStatus>
 
   beforeEach(() => {
+    jest.useFakeTimers()
     bulkStatus$ = new Subject()
     detected$ = new Subject()
     finished$ = new Subject()
@@ -77,11 +78,16 @@ describe('MergeWorkflowService', () => {
     service = TestBed.inject(MergeWorkflowService)
   })
 
+  afterEach(() => {
+    jest.clearAllTimers()
+    jest.useRealTimers()
+  })
+
   it('builds expected merged filename matching backend convention', () => {
     expect(buildExpectedMergedFilename([12, 34])).toBe('12_34_merged.pdf')
   })
 
-  it('tracks merge via polling and redirects to the newly created document detail page', fakeAsync(() => {
+  it('tracks merge via polling and redirects to the newly created document detail page', () => {
     documentService.mergeDocuments.mockReturnValue(
       of({ result: 'OK', task_id: 'merge-task-1' })
     )
@@ -130,10 +136,10 @@ describe('MergeWorkflowService', () => {
       .startMerge([10, 20], { delete_originals: false }, { pollIntervalMs: 500 })
       .state$.subscribe((s) => states.push(s))
 
-    tick(0)
+    jest.advanceTimersByTime(0)
     expect(states.some((s) => s.phase === 'ocr')).toBe(true)
 
-    tick(500)
+    jest.advanceTimersByTime(500)
     expect(states[states.length - 1].phase).toBe('completed')
     expect(states[states.length - 1].documentId).toBe(42)
     expect(listService.selectNone).toHaveBeenCalled()
@@ -146,9 +152,9 @@ describe('MergeWorkflowService', () => {
         },
       },
     })
-  }))
+  })
 
-  it('completes via websocket consumption finished event', fakeAsync(() => {
+  it('completes via websocket consumption finished event', () => {
     documentService.mergeDocuments.mockReturnValue(
       of({ result: 'OK', task_id: 'merge-task-ws' })
     )
@@ -158,7 +164,7 @@ describe('MergeWorkflowService', () => {
       .startMerge([5, 6], { delete_originals: true }, { pollIntervalMs: 5000 })
       .state$.subscribe((s) => states.push(s))
 
-    tick(0)
+    jest.advanceTimersByTime(0)
 
     const status = new FileStatus()
     status.filename = '5_6_merged.pdf'
@@ -173,9 +179,9 @@ describe('MergeWorkflowService', () => {
         },
       },
     })
-  }))
+  })
 
-  it('shows toast instead of forcing navigation when continued in background', fakeAsync(() => {
+  it('shows toast instead of forcing navigation when continued in background', () => {
     documentService.mergeDocuments.mockReturnValue(
       of({ result: 'OK', task_id: 'merge-task-bg' })
     )
@@ -190,7 +196,7 @@ describe('MergeWorkflowService', () => {
 
     expect(router.navigate).not.toHaveBeenCalled()
     expect(toastService.show).toHaveBeenCalled()
-  }))
+  })
 
   it('emits error state when merge request fails', () => {
     documentService.mergeDocuments.mockReturnValue(
@@ -204,7 +210,7 @@ describe('MergeWorkflowService', () => {
     expect(states[states.length - 1].errorMessage).toBeTruthy()
   })
 
-  it('emits error state on timeout', fakeAsync(() => {
+  it('emits error state on timeout', () => {
     documentService.mergeDocuments.mockReturnValue(
       of({ result: 'OK', task_id: 'merge-task-timeout' })
     )
@@ -214,8 +220,8 @@ describe('MergeWorkflowService', () => {
       .startMerge([1, 2], {}, { pollIntervalMs: 1000, timeoutMs: 2500 })
       .state$.subscribe((s) => states.push(s))
 
-    tick(2500)
+    jest.advanceTimersByTime(2500)
     expect(states[states.length - 1].phase).toBe('error')
     expect(states[states.length - 1].errorMessage).toContain('Hintergrund')
-  }))
+  })
 })

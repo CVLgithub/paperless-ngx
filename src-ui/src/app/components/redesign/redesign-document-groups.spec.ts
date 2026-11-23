@@ -10,20 +10,31 @@ describe('groupDocumentsByRecency', () => {
       { id: 3, title: 'Älter', added: new Date('2026-09-01T09:00:00Z') },
     ]
 
-    const groups = groupDocumentsByRecency(docs, now)
+    const groups = groupDocumentsByRecency(docs, 'created', false, now)
     expect(groups.map((g) => g.key)).toEqual(['today', 'week', 'older'])
     expect(groups[0].documents.map((d) => d.id)).toEqual([1])
     expect(groups[1].documents.map((d) => d.id)).toEqual([2])
     expect(groups[2].documents.map((d) => d.id)).toEqual([3])
   })
 
-  it('omits empty groups', () => {
+  it('omits empty groups when upload card is disabled', () => {
     const now = new Date('2026-11-20T14:00:00Z')
     const docs: Document[] = [
       { id: 10, title: 'Alt', added: new Date('2025-01-01T00:00:00Z') },
     ]
-    const groups = groupDocumentsByRecency(docs, now)
+    const groups = groupDocumentsByRecency(docs, 'created', false, now)
     expect(groups.length).toBe(1)
     expect(groups[0].key).toBe('older')
+  })
+
+  it('returns flat group when sorting by non-date field', () => {
+    const docs: Document[] = [
+      { id: 1, title: 'Alpha' },
+      { id: 2, title: 'Beta' },
+    ]
+    const groups = groupDocumentsByRecency(docs, 'title', true)
+    expect(groups.length).toBe(1)
+    expect(groups[0].key).toBe('all')
+    expect(groups[0].showUploadCard).toBe(true)
   })
 })

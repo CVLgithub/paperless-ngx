@@ -296,7 +296,16 @@ export class DocumentListComponent
   }
 
   get documentGroups(): DocumentTimeGroup[] {
-    return groupDocumentsByRecency(this.list.documents || [])
+    return groupDocumentsByRecency(
+      this.list.documents || [],
+      this.list.sortField,
+      !this.selectionMode() &&
+        !this.list.hasSelection &&
+        this.permissionService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.Document
+        )
+    )
   }
 
   get activeSortSegment(): 'date' | 'name' | 'type' {

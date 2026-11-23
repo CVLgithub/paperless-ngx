@@ -129,7 +129,7 @@ export class RedesignSidebarComponent implements OnInit {
       .subscribe(() => this.loadTaxonomies(true))
 
     this.websocketStatusService
-      .onDocumentsDeleted()
+      .onDocumentDeleted()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadTaxonomies(true))
   }

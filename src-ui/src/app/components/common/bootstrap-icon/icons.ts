@@ -10,6 +10,7 @@ import arrowReturnLeft from 'bootstrap-icons/icons/arrow-return-left.svg'
 import arrowRightShort from 'bootstrap-icons/icons/arrow-right-short.svg'
 import arrowRight from 'bootstrap-icons/icons/arrow-right.svg'
 import arrowUpRight from 'bootstrap-icons/icons/arrow-up-right.svg'
+import arrowUp from 'bootstrap-icons/icons/arrow-up.svg'
 import asterisk from 'bootstrap-icons/icons/asterisk.svg'
 import bank from 'bootstrap-icons/icons/bank.svg'
 import basket from 'bootstrap-icons/icons/basket.svg'
@@ -44,6 +45,8 @@ import check2All from 'bootstrap-icons/icons/check2-all.svg'
 import chevronDoubleLeft from 'bootstrap-icons/icons/chevron-double-left.svg'
 import chevronDoubleRight from 'bootstrap-icons/icons/chevron-double-right.svg'
 import chevronDown from 'bootstrap-icons/icons/chevron-down.svg'
+import chevronExpand from 'bootstrap-icons/icons/chevron-expand.svg'
+import chevronLeft from 'bootstrap-icons/icons/chevron-left.svg'
 import chevronRight from 'bootstrap-icons/icons/chevron-right.svg'
 import chevronUp from 'bootstrap-icons/icons/chevron-up.svg'
 import circle from 'bootstrap-icons/icons/circle.svg'
@@ -67,6 +70,7 @@ import exclamationCircleFill from 'bootstrap-icons/icons/exclamation-circle-fill
 import exclamationTriangleFill from 'bootstrap-icons/icons/exclamation-triangle-fill.svg'
 import exclamationTriangle from 'bootstrap-icons/icons/exclamation-triangle.svg'
 import eye from 'bootstrap-icons/icons/eye.svg'
+import fileEarmarkArrowDown from 'bootstrap-icons/icons/file-earmark-arrow-down.svg'
 import fileEarmarkArrowUp from 'bootstrap-icons/icons/file-earmark-arrow-up.svg'
 import fileEarmarkCheck from 'bootstrap-icons/icons/file-earmark-check.svg'
 import fileEarmarkDiff from 'bootstrap-icons/icons/file-earmark-diff.svg'
@@ -78,6 +82,7 @@ import fileEarmarkPerson from 'bootstrap-icons/icons/file-earmark-person.svg'
 import fileEarmarkPlus from 'bootstrap-icons/icons/file-earmark-plus.svg'
 import fileEarmarkRichtext from 'bootstrap-icons/icons/file-earmark-richtext.svg'
 import fileEarmarkSpreadsheet from 'bootstrap-icons/icons/file-earmark-spreadsheet.svg'
+import fileEarmarkText from 'bootstrap-icons/icons/file-earmark-text.svg'
 import fileEarmark from 'bootstrap-icons/icons/file-earmark.svg'
 import fileText from 'bootstrap-icons/icons/file-text.svg'
 import files from 'bootstrap-icons/icons/files.svg'
@@ -85,6 +90,8 @@ import filter from 'bootstrap-icons/icons/filter.svg'
 import floppy from 'bootstrap-icons/icons/floppy.svg'
 import folderFill from 'bootstrap-icons/icons/folder-fill.svg'
 import folder from 'bootstrap-icons/icons/folder.svg'
+import fullscreenExit from 'bootstrap-icons/icons/fullscreen-exit.svg'
+import fullscreen from 'bootstrap-icons/icons/fullscreen.svg'
 import funnel from 'bootstrap-icons/icons/funnel.svg'
 import gear from 'bootstrap-icons/icons/gear.svg'
 import globe2 from 'bootstrap-icons/icons/globe2.svg'
@@ -99,13 +106,18 @@ import inbox from 'bootstrap-icons/icons/inbox.svg'
 import infoCircle from 'bootstrap-icons/icons/info-circle.svg'
 import journalBookmarkFill from 'bootstrap-icons/icons/journal-bookmark-fill.svg'
 import journals from 'bootstrap-icons/icons/journals.svg'
+import layers from 'bootstrap-icons/icons/layers.svg'
+import layoutSidebarReverse from 'bootstrap-icons/icons/layout-sidebar-reverse.svg'
+import layoutSidebar from 'bootstrap-icons/icons/layout-sidebar.svg'
 import lightbulb from 'bootstrap-icons/icons/lightbulb.svg'
+import link45deg from 'bootstrap-icons/icons/link-45deg.svg'
 import link from 'bootstrap-icons/icons/link.svg'
 import listNested from 'bootstrap-icons/icons/list-nested.svg'
 import listTask from 'bootstrap-icons/icons/list-task.svg'
 import listUl from 'bootstrap-icons/icons/list-ul.svg'
 import list from 'bootstrap-icons/icons/list.svg'
 import microsoft from 'bootstrap-icons/icons/microsoft.svg'
+import moonStars from 'bootstrap-icons/icons/moon-stars.svg'
 import newspaper from 'bootstrap-icons/icons/newspaper.svg'
 import nodePlus from 'bootstrap-icons/icons/node-plus.svg'
 import paperclip from 'bootstrap-icons/icons/paperclip.svg'
@@ -121,6 +133,7 @@ import person from 'bootstrap-icons/icons/person.svg'
 import playCircle from 'bootstrap-icons/icons/play-circle.svg'
 import playFill from 'bootstrap-icons/icons/play-fill.svg'
 import plusCircle from 'bootstrap-icons/icons/plus-circle.svg'
+import plusLg from 'bootstrap-icons/icons/plus-lg.svg'
 import plus from 'bootstrap-icons/icons/plus.svg'
 import printer from 'bootstrap-icons/icons/printer.svg'
 import questionCircle from 'bootstrap-icons/icons/question-circle.svg'
@@ -130,12 +143,15 @@ import scissors from 'bootstrap-icons/icons/scissors.svg'
 import search from 'bootstrap-icons/icons/search.svg'
 import send from 'bootstrap-icons/icons/send.svg'
 import shop from 'bootstrap-icons/icons/shop.svg'
+import signMergeRight from 'bootstrap-icons/icons/sign-merge-right.svg'
 import slashCircle from 'bootstrap-icons/icons/slash-circle.svg'
 import sliders2Vertical from 'bootstrap-icons/icons/sliders2-vertical.svg'
+import sliders from 'bootstrap-icons/icons/sliders.svg'
 import sortAlphaDown from 'bootstrap-icons/icons/sort-alpha-down.svg'
 import sortAlphaUpAlt from 'bootstrap-icons/icons/sort-alpha-up-alt.svg'
 import stack from 'bootstrap-icons/icons/stack.svg'
 import stars from 'bootstrap-icons/icons/stars.svg'
+import sun from 'bootstrap-icons/icons/sun.svg'
 import tagFill from 'bootstrap-icons/icons/tag-fill.svg'
 import tag from 'bootstrap-icons/icons/tag.svg'
 import tags from 'bootstrap-icons/icons/tags.svg'
@@ -149,6 +165,7 @@ import truck from 'bootstrap-icons/icons/truck.svg'
 import uiRadios from 'bootstrap-icons/icons/ui-radios.svg'
 import unlock from 'bootstrap-icons/icons/unlock.svg'
 import upcScan from 'bootstrap-icons/icons/upc-scan.svg'
+import upload from 'bootstrap-icons/icons/upload.svg'
 import wallet2 from 'bootstrap-icons/icons/wallet2.svg'
 import windowStack from 'bootstrap-icons/icons/window-stack.svg'
 import xCircle from 'bootstrap-icons/icons/x-circle.svg'
@@ -171,6 +188,7 @@ export const icons: Record<string, string> = {
   arrowReturnLeft,
   arrowRight,
   arrowRightShort,
+  arrowUp,
   arrowUpRight,
   asterisk,
   bank,
@@ -205,6 +223,8 @@ export const icons: Record<string, string> = {
   chevronDoubleLeft,
   chevronDoubleRight,
   chevronDown,
+  chevronExpand,
+  chevronLeft,
   chevronRight,
   chevronUp,
   circle,
@@ -230,6 +250,7 @@ export const icons: Record<string, string> = {
   exclamationTriangleFill,
   eye,
   fileEarmark,
+  fileEarmarkArrowDown,
   fileEarmarkArrowUp,
   fileEarmarkCheck,
   fileEarmarkDiff,
@@ -241,12 +262,15 @@ export const icons: Record<string, string> = {
   fileEarmarkPlus,
   fileEarmarkRichtext,
   fileEarmarkSpreadsheet,
+  fileEarmarkText,
   files,
   fileText,
   filter,
   floppy,
   folder,
   folderFill,
+  fullscreen,
+  fullscreenExit,
   funnel,
   gear,
   globe2,
@@ -261,13 +285,18 @@ export const icons: Record<string, string> = {
   infoCircle,
   journalBookmarkFill,
   journals,
+  layers,
+  layoutSidebar,
+  layoutSidebarReverse,
   lightbulb,
   link,
+  link45deg,
   list,
   listNested,
   listTask,
   listUl,
   microsoft,
+  moonStars,
   newspaper,
   nodePlus,
   pencil,
@@ -284,6 +313,7 @@ export const icons: Record<string, string> = {
   playFill,
   plus,
   plusCircle,
+  plusLg,
   printer,
   questionCircle,
   receipt,
@@ -293,11 +323,14 @@ export const icons: Record<string, string> = {
   send,
   slashCircle,
   shop,
+  signMergeRight,
+  sliders,
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
   stack,
   stars,
+  sun,
   tagFill,
   tag,
   tags,
@@ -311,6 +344,7 @@ export const icons: Record<string, string> = {
   uiRadios,
   unlock,
   upcScan,
+  upload,
   wallet2,
   windowStack,
   x,
