@@ -1,25 +1,91 @@
-:host ::ng-deep pngx-bs-icon svg {
-  margin-top: -3px;
+:host {
+  display: block;
 }
 
-.btn-outline-dark {
-  --bs-btn-border-color: var(--bs-border-color-translucent);
-  border-style: dashed;
-  border-width: 1px;
-  min-height: 5.25rem;
-  background: color-mix(in srgb, var(--bs-primary) 4%, var(--bs-light)) !important;
+.rd-upload-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
-  &:hover,
-  &:focus {
-    border-color: var(--bs-primary);
-    background: color-mix(in srgb, var(--bs-primary) 9%, var(--bs-light)) !important;
+.rd-upload-card-btn {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 20px 16px;
+  border-radius: var(--rd-radius-lg);
+  border: 1.5px dashed var(--rd-border-medium);
+  background: var(--rd-bg-surface);
+  box-shadow: var(--rd-shadow-card);
+  color: var(--rd-text-primary);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 140ms ease;
+
+  &:hover {
+    border-color: var(--rd-accent);
+    background: color-mix(in srgb, var(--rd-accent-soft) 55%, var(--rd-bg-surface));
+    box-shadow: var(--rd-shadow-card-hover);
+    transform: translateY(-1px);
+
+    .rd-upload-icon-circle {
+      background: var(--rd-accent);
+      color: #ffffff;
+    }
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--rd-accent);
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
   }
 }
 
-.smaller {
-  font-size: 0.75rem;
+.rd-upload-icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 4px;
+  border-radius: var(--rd-radius-pill);
+  background: var(--rd-accent-soft);
+  color: var(--rd-accent);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.rd-upload-title {
+  font-size: var(--rd-text-body);
+  font-weight: 600;
+  color: var(--rd-text-primary);
+  line-height: 1.3;
+}
+
+.rd-upload-subtitle {
+  font-size: var(--rd-text-meta);
+  color: var(--rd-text-secondary);
+  line-height: 1.3;
 }
 
 ::ng-deep .ngx-file-drop__drop-zone--over {
-  background-color: var(--pngx-primary-faded) !important;
+  background-color: var(--rd-bg-drop-overlay) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-upload-card-btn,
+  .rd-upload-icon-circle {
+    transition: none;
+  }
 }

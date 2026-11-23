@@ -5,16 +5,12 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  QueryList,
   signal,
-  ViewChildren,
 } from '@angular/core'
 import { Router, RouterModule } from '@angular/router'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, takeUntil } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
-import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { TagComponent } from 'src/app/components/common/tag/tag.component'
 import { DocumentCardLargeComponent } from 'src/app/components/document-list/document-card-large/document-card-large.component'
 import { DocumentCardSmallComponent } from 'src/app/components/document-list/document-card-small/document-card-small.component'
@@ -66,7 +62,6 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
     CustomFieldDisplayComponent,
     DocumentCardSmallComponent,
     DocumentCardLargeComponent,
-    PreviewPopupComponent,
     TagComponent,
     WidgetFrameComponent,
     IfPermissionsDirective,
@@ -110,12 +105,6 @@ export class SavedViewWidgetComponent
   readonly documents = signal<Document[]>([])
 
   unsubscribeNotifier: Subject<any> = new Subject()
-
-  @ViewChildren('popover') popovers: QueryList<NgbPopover>
-  popover: NgbPopover
-
-  mouseOnPreview = false
-  popoverHidden = true
 
   readonly displayMode = signal<DisplayMode>(null)
 
@@ -311,6 +300,10 @@ export class SavedViewWidgetComponent
   openDocumentDetail(document: Document) {
     this.activateViewForNavigation()
     this.router.navigate(['documents', document.id])
+  }
+
+  getPreviewUrl(document: Document): string {
+    return this.documentService.getPreviewUrl(document.id)
   }
 
   getDownloadUrl(document: Document): string {

@@ -15,11 +15,12 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view-widget.component'
-import { StatisticsWidgetComponent } from './widgets/statistics-widget/statistics-widget.component'
-import { UploadFileWidgetComponent } from './widgets/upload-file-widget/upload-file-widget.component'
+import {
+  Statistics,
+  StatisticsWidgetComponent,
+} from './widgets/statistics-widget/statistics-widget.component'
 import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.component'
 
 @Component({
@@ -27,10 +28,8 @@ import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   imports: [
-    PageHeaderComponent,
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
-    UploadFileWidgetComponent,
     WelcomeWidgetComponent,
     IfPermissionsDirective,
     DragDropModule,
@@ -46,12 +45,22 @@ export class DashboardComponent extends ComponentWithPermissions {
   private toastService = inject(ToastService)
 
   readonly dashboardViews = signal<SavedView[]>([])
+  readonly totalDocuments = signal<number | null>(null)
+
   constructor() {
     super()
 
     this.savedViewService.listAll().subscribe(() => {
       this.dashboardViews.set(this.savedViewService.dashboardViews)
     })
+  }
+
+  onStatisticsChange(statistics: Statistics) {
+    this.totalDocuments.set(
+      typeof statistics?.documents_total === 'number'
+        ? statistics.documents_total
+        : null
+    )
   }
 
   get subtitle() {

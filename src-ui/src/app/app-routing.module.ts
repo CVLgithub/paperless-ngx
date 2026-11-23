@@ -27,7 +27,7 @@ import {
 } from './services/permissions.service'
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'documents', pathMatch: 'full' },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: '',
     component: AppFrameComponent,

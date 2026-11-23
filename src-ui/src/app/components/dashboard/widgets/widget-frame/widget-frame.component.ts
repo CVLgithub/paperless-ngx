@@ -22,6 +22,8 @@ export class WidgetFrameComponent implements AfterViewInit {
 
   cardless = input(false)
 
+  flushBody = input(false)
+
   badge = input<string | number>(null)
 
   ngAfterViewInit(): void {

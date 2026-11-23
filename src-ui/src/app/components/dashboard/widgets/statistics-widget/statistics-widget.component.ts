@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit, output, signal } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import * as mimeTypeNames from 'mime-names'
@@ -57,6 +57,7 @@ export class StatisticsWidgetComponent
 
   readonly loading = signal(false)
   readonly statistics = signal<Statistics>({})
+  readonly statisticsChange = output<Statistics>()
 
   subscription: Subscription
   private unsubscribeNotifer: Subject<any> = new Subject()
@@ -85,6 +86,7 @@ export class StatisticsWidgetComponent
           })
         }
         this.statistics.set(statistics)
+        this.statisticsChange.emit(statistics)
       })
   }
 

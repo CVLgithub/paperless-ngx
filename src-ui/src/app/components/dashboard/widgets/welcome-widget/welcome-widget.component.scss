@@ -1,16 +1,54 @@
-.welcome-widget {
-  border-color: color-mix(in srgb, var(--bs-primary) 50%, transparent);
+:host {
+  display: block;
+}
 
-  hr {
-    border-top-color: color-mix(in srgb, var(--bs-primary) 25%, transparent);
-  }
+.welcome-widget {
+  display: block;
+  margin-bottom: 0;
+  padding: 20px 22px;
+  border-radius: var(--rd-radius-lg);
+  background: var(--rd-bg-surface);
+  border: 1px solid rgba(var(--rd-accent-rgb), 0.25);
+  box-shadow: var(--rd-shadow-card);
+  color: var(--rd-text-primary);
+}
+
+.welcome-brand-icon,
+.welcome-watermark {
+  color: var(--rd-accent);
+}
+
+.welcome-heading {
+  margin: 0 0 8px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--rd-accent);
 }
 
 .welcome-copy {
   max-width: 68ch;
+  font-size: var(--rd-text-body);
+  color: var(--rd-text-primary);
+
+  p {
+    margin-bottom: 6px;
+  }
+}
+
+.welcome-divider {
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--rd-border-subtle);
+  opacity: 1;
+}
+
+.welcome-thanks {
+  font-size: var(--rd-text-meta);
+  color: var(--rd-text-secondary);
 }
 
 .welcome-watermark {
-  right: -6rem;
-  opacity: .07;
+  right: -5rem;
+  opacity: 0.06;
 }
