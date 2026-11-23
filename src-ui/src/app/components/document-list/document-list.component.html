@@ -113,42 +113,74 @@
   </header>
 
   @if (allDocumentTypes().length > 0 || allCorrespondents().length > 0) {
-    <div class="rd-filter-pills" role="toolbar" aria-label="Schnellfilter" i18n-aria-label>
-      <button
-        type="button"
-        class="rd-filter-pill"
-        [class.is-active]="!hasQuickPillFilter"
-        (click)="clearQuickPillFilters()"
-        i18n
-      >Alle</button>
+    <div class="rd-filter-pills-stack" role="toolbar" aria-label="Schnellfilter" i18n-aria-label>
+      @if (allDocumentTypes().length > 0) {
+        <div class="rd-filter-pills-row" role="group" aria-label="Dokumenttypen" i18n-aria-label>
+          <button
+            type="button"
+            class="rd-filter-pill"
+            [class.is-active]="activeDocumentTypeFilterIds.size === 0"
+            [attr.aria-pressed]="activeDocumentTypeFilterIds.size === 0"
+            (click)="clearQuickDocumentTypes()"
+            i18n
+          >Alle Typen</button>
 
-      @for (dt of allDocumentTypes(); track dt.id) {
-        <button
-          type="button"
-          class="rd-filter-pill"
-          [class.is-active]="activeDocumentTypeFilterId === dt.id"
-          (click)="toggleQuickDocumentType(dt.id)"
-        >{{ dt.name }}</button>
+          @for (dt of allDocumentTypes(); track dt.id) {
+            <button
+              type="button"
+              class="rd-filter-pill"
+              [class.is-active]="isQuickDocumentTypeActive(dt.id)"
+              [attr.aria-pressed]="isQuickDocumentTypeActive(dt.id)"
+              (click)="toggleQuickDocumentType(dt.id)"
+            >{{ dt.name }}</button>
+          }
+        </div>
       }
 
-      @if (allDocumentTypes().length > 0 && allCorrespondents().length > 0) {
-        <span class="rd-pills-divider" aria-hidden="true"></span>
-      }
+      @if (allCorrespondents().length > 0) {
+        <div class="rd-filter-pills-row" role="group" aria-label="Korrespondenten" i18n-aria-label>
+          <button
+            type="button"
+            class="rd-filter-pill"
+            [class.is-active]="activeCorrespondentFilterIds.size === 0"
+            [attr.aria-pressed]="activeCorrespondentFilterIds.size === 0"
+            (click)="clearQuickCorrespondents()"
+            i18n
+          >Alle Korrespondenten</button>
 
-      @for (corr of allCorrespondents().slice(0, 5); track corr.id) {
-        <button
-          type="button"
-          class="rd-filter-pill rd-filter-pill-correspondent"
-          [class.is-active]="activeCorrespondentFilterId === corr.id"
-          (click)="toggleQuickCorrespondent(corr.id)"
-        >
-          <span
-            class="rd-pill-dot"
-            [style.background-color]="getCorrespondentColor(corr.id)"
-            aria-hidden="true"
-          ></span>
-          <span>{{ corr.name }}</span>
-        </button>
+          @for (corr of visibleQuickCorrespondents; track corr.id) {
+            <button
+              type="button"
+              class="rd-filter-pill rd-filter-pill-correspondent"
+              [class.is-active]="isQuickCorrespondentActive(corr.id)"
+              [attr.aria-pressed]="isQuickCorrespondentActive(corr.id)"
+              (click)="toggleQuickCorrespondent(corr.id)"
+            >
+              <span
+                class="rd-pill-dot"
+                [style.background-color]="getCorrespondentColor(corr.id)"
+                aria-hidden="true"
+              ></span>
+              <span>{{ corr.name }}</span>
+            </button>
+          }
+
+          @if (hiddenQuickCorrespondentsCount > 0) {
+            <button
+              type="button"
+              class="rd-filter-pill rd-filter-pill-more"
+              (click)="showAllQuickCorrespondents.set(true)"
+              i18n
+            >+{{ hiddenQuickCorrespondentsCount }} weitere</button>
+          } @else if (showAllQuickCorrespondents() && allCorrespondents().length > maxCollapsedQuickCorrespondents) {
+            <button
+              type="button"
+              class="rd-filter-pill rd-filter-pill-more"
+              (click)="showAllQuickCorrespondents.set(false)"
+              i18n
+            >Weniger</button>
+          }
+        </div>
       }
     </div>
   }

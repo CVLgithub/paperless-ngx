@@ -46,6 +46,8 @@ import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
   FILTER_FULLTEXT_MORELIKE,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_IS_IN_INBOX,
 } from 'src/app/data/filter-rule-type'
@@ -277,11 +279,19 @@ export class DocumentListComponent
           const tag = this.tagMap.get(Number(rule.value))
           if (tag) return tag.name
         }
-        if (rule.rule_type === FILTER_CORRESPONDENT && rule.value) {
+        if (
+          (rule.rule_type === FILTER_CORRESPONDENT ||
+            rule.rule_type === FILTER_HAS_CORRESPONDENT_ANY) &&
+          rule.value
+        ) {
           const corr = this.correspondentMap.get(Number(rule.value))
           if (corr) return corr.name
         }
-        if (rule.rule_type === FILTER_DOCUMENT_TYPE && rule.value) {
+        if (
+          (rule.rule_type === FILTER_DOCUMENT_TYPE ||
+            rule.rule_type === FILTER_HAS_DOCUMENT_TYPE_ANY) &&
+          rule.value
+        ) {
           const dt = this.documentTypeMap.get(Number(rule.value))
           if (dt) return dt.name
         }
@@ -334,70 +344,151 @@ export class DocumentListComponent
     }
   }
 
-  get activeDocumentTypeFilterId(): number | null {
-    const rule = (this.list.filterRules || []).find(
-      (r) => r.rule_type === FILTER_DOCUMENT_TYPE && r.value
-    )
-    return rule ? Number(rule.value) : null
+  readonly showAllQuickCorrespondents = signal(false)
+  readonly maxCollapsedQuickCorrespondents = 8
+
+  get activeDocumentTypeFilterIds(): Set<number> {
+    const ids = new Set<number>()
+    for (const rule of this.list.filterRules || []) {
+      if (
+        (rule.rule_type === FILTER_DOCUMENT_TYPE ||
+          rule.rule_type === FILTER_HAS_DOCUMENT_TYPE_ANY) &&
+        rule.value !== null &&
+        rule.value !== ''
+      ) {
+        const parsed = Number(rule.value)
+        if (Number.isFinite(parsed) && parsed > 0) {
+          ids.add(parsed)
+        }
+      }
+    }
+    return ids
   }
 
-  get activeCorrespondentFilterId(): number | null {
-    const rule = (this.list.filterRules || []).find(
-      (r) => r.rule_type === FILTER_CORRESPONDENT && r.value
+  get activeCorrespondentFilterIds(): Set<number> {
+    const ids = new Set<number>()
+    for (const rule of this.list.filterRules || []) {
+      if (
+        (rule.rule_type === FILTER_CORRESPONDENT ||
+          rule.rule_type === FILTER_HAS_CORRESPONDENT_ANY) &&
+        rule.value !== null &&
+        rule.value !== ''
+      ) {
+        const parsed = Number(rule.value)
+        if (Number.isFinite(parsed) && parsed > 0) {
+          ids.add(parsed)
+        }
+      }
+    }
+    return ids
+  }
+
+  get visibleQuickCorrespondents(): Correspondent[] {
+    const all = this.allCorrespondents()
+    if (
+      this.showAllQuickCorrespondents() ||
+      all.length <= this.maxCollapsedQuickCorrespondents
+    ) {
+      return all
+    }
+    const activeIds = this.activeCorrespondentFilterIds
+    const visible = all.slice(0, this.maxCollapsedQuickCorrespondents)
+    const visibleIds = new Set(visible.map((c) => c.id))
+    for (const corr of all) {
+      if (activeIds.has(corr.id) && !visibleIds.has(corr.id)) {
+        visible.push(corr)
+      }
+    }
+    return visible
+  }
+
+  get hiddenQuickCorrespondentsCount(): number {
+    return Math.max(
+      0,
+      this.allCorrespondents().length - this.visibleQuickCorrespondents.length
     )
-    return rule ? Number(rule.value) : null
+  }
+
+  isQuickDocumentTypeActive(documentTypeId: number): boolean {
+    return this.activeDocumentTypeFilterIds.has(documentTypeId)
+  }
+
+  isQuickCorrespondentActive(correspondentId: number): boolean {
+    return this.activeCorrespondentFilterIds.has(correspondentId)
   }
 
   get hasQuickPillFilter(): boolean {
     return (
-      this.activeDocumentTypeFilterId !== null ||
-      this.activeCorrespondentFilterId !== null
+      this.activeDocumentTypeFilterIds.size > 0 ||
+      this.activeCorrespondentFilterIds.size > 0
     )
+  }
+
+  clearQuickDocumentTypes(): void {
+    const remaining = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_DOCUMENT_TYPE &&
+        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY
+    )
+    this.list.setFilterRules(remaining)
+  }
+
+  clearQuickCorrespondents(): void {
+    const remaining = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_CORRESPONDENT &&
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY
+    )
+    this.list.setFilterRules(remaining)
   }
 
   clearQuickPillFilters(): void {
     const remaining = (this.list.filterRules || []).filter(
       (r) =>
         r.rule_type !== FILTER_DOCUMENT_TYPE &&
-        r.rule_type !== FILTER_CORRESPONDENT
+        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY &&
+        r.rule_type !== FILTER_CORRESPONDENT &&
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY
     )
     this.list.setFilterRules(remaining)
   }
 
   toggleQuickDocumentType(documentTypeId: number): void {
-    const isActive = this.activeDocumentTypeFilterId === documentTypeId
-    const withoutType = (this.list.filterRules || []).filter(
-      (r) => r.rule_type !== FILTER_DOCUMENT_TYPE
-    )
-    if (isActive) {
-      this.list.setFilterRules(withoutType)
+    const nextIds = new Set(this.activeDocumentTypeFilterIds)
+    if (nextIds.has(documentTypeId)) {
+      nextIds.delete(documentTypeId)
     } else {
-      this.list.setFilterRules([
-        ...withoutType,
-        {
-          rule_type: FILTER_DOCUMENT_TYPE,
-          value: documentTypeId.toString(),
-        },
-      ])
+      nextIds.add(documentTypeId)
     }
+    const withoutType = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_DOCUMENT_TYPE &&
+        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY
+    )
+    const typeRules: FilterRule[] = Array.from(nextIds).map((id) => ({
+      rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
+      value: id.toString(),
+    }))
+    this.list.setFilterRules([...withoutType, ...typeRules])
   }
 
   toggleQuickCorrespondent(correspondentId: number): void {
-    const isActive = this.activeCorrespondentFilterId === correspondentId
-    const withoutCorr = (this.list.filterRules || []).filter(
-      (r) => r.rule_type !== FILTER_CORRESPONDENT
-    )
-    if (isActive) {
-      this.list.setFilterRules(withoutCorr)
+    const nextIds = new Set(this.activeCorrespondentFilterIds)
+    if (nextIds.has(correspondentId)) {
+      nextIds.delete(correspondentId)
     } else {
-      this.list.setFilterRules([
-        ...withoutCorr,
-        {
-          rule_type: FILTER_CORRESPONDENT,
-          value: correspondentId.toString(),
-        },
-      ])
+      nextIds.add(correspondentId)
     }
+    const withoutCorr = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_CORRESPONDENT &&
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY
+    )
+    const corrRules: FilterRule[] = Array.from(nextIds).map((id) => ({
+      rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+      value: id.toString(),
+    }))
+    this.list.setFilterRules([...withoutCorr, ...corrRules])
   }
 
   getCorrespondentColor(id: number): string {

@@ -133,12 +133,18 @@
   min-width: 210px;
 }
 
-.rd-filter-pills {
+.rd-filter-pills-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.rd-filter-pills-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 22px;
+  gap: 7px;
 }
 
 .rd-filter-pill {
@@ -168,18 +174,22 @@
   }
 }
 
+.rd-filter-pill-more {
+  background: transparent;
+  border: 1px dashed var(--rd-border-medium);
+  color: var(--rd-text-secondary);
+
+  &:hover {
+    background: var(--rd-bg-pill);
+    color: var(--rd-text-primary);
+  }
+}
+
 .rd-pill-dot {
   width: 8px;
   height: 8px;
   border-radius: 2.5px;
   flex-shrink: 0;
-}
-
-.rd-pills-divider {
-  width: 1px;
-  height: 16px;
-  margin: 0 2px;
-  background: var(--rd-border-medium);
 }
 
 .rd-advanced-filter-panel {
