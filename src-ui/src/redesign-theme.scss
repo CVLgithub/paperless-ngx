@@ -812,3 +812,65 @@ body {
     }
   }
 }
+
+// ============================================================================
+// Document Detail Topbar Utilities (Save/Discard Action Group & Preview Link)
+// ============================================================================
+@keyframes rd-topbar-action-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rd-detail-save-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  animation: rd-topbar-action-in 160ms var(--rd-sidebar-ease, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.rd-topbar-action-btn {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--rd-radius-pill);
+  font-size: 0.8125rem;
+  line-height: 1;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .spinner-border-sm {
+    width: 0.78rem;
+    height: 0.78rem;
+    border-width: 0.14em;
+  }
+}
+
+a.rd-detail-pill__btn {
+  text-decoration: none;
+  color: var(--rd-text-secondary);
+
+  &:visited {
+    color: var(--rd-text-secondary);
+  }
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+    background: var(--rd-bg-pill);
+    color: var(--rd-text-primary);
+  }
+}

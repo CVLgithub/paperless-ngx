@@ -253,28 +253,13 @@
   @if (inspectorOpen()) {
     <aside class="rd-inspector-panel" aria-label="Dokument-Inspektor" i18n-aria-label>
       <form [formGroup]="documentForm" (ngSubmit)="save()" class="rd-inspector-form">
-        @let isDirty = (isDirty$ | async) === true;
-        @if (isDirty && userCanEdit) {
-          <div class="rd-save-bar">
-            <button
-              type="button"
-              class="rd-save-discard"
-              (click)="discard()"
-              [disabled]="networkActive()"
-              i18n
-            >Verwerfen</button>
-            <button
-              type="submit"
-              class="rd-save-primary"
-              [disabled]="networkActive()"
-            >
-              @if (networkActive()) {
-                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-              }
-              <span i18n>Speichern</span>
-            </button>
-          </div>
-        }
+        <button
+          type="submit"
+          class="visually-hidden"
+          tabindex="-1"
+          aria-hidden="true"
+          [disabled]="!isDirtySignal() || !userCanEdit || networkActive()"
+        ></button>
 
         @if (inspectorSection() !== 'details') {
           <div class="rd-inspector-subnav">
@@ -425,30 +410,105 @@
                 }
 
                 @if (userCanEdit) {
-                  <div ngbDropdown placement="bottom-start" class="d-inline-block">
+                  <div
+                    ngbDropdown
+                    #tagDropdown="ngbDropdown"
+                    [autoClose]="'outside'"
+                    placement="bottom-start"
+                    (openChange)="onTagPickerOpenChange($event)"
+                    class="d-inline-block"
+                  >
                     <button type="button" class="rd-add-tag-btn" ngbDropdownToggle>
                       <pngx-bs-icon name="plus" width="13" height="13"></pngx-bs-icon>
                       <span i18n>Tag</span>
                     </button>
                     <div ngbDropdownMenu class="rd-tag-picker-menu">
-                      @for (tag of availableTagsToAdd; track tag.id) {
-                        <button type="button" ngbDropdownItem (click)="addTagToDocument(tag.id)">
-                          <span
-                            class="rd-tag-dot me-2"
-                            [style.background-color]="tag.color || '#0671e3'"
-                          ></span>
-                          <span>{{ tag.name }}</span>
-                        </button>
-                      }
-                      @if (availableTagsToAdd.length === 0) {
-                        <div class="dropdown-item-text small text-muted" i18n>Alle Tags zugewiesen</div>
-                      }
+                      <div class="rd-tag-picker-search" (click)="$event.stopPropagation()">
+                        <div class="rd-tag-search-box">
+                          <pngx-bs-icon
+                            class="rd-tag-search-icon"
+                            name="search"
+                            width="12"
+                            height="12"
+                          ></pngx-bs-icon>
+                          <input
+                            #tagSearchInput
+                            type="text"
+                            class="rd-tag-search-input"
+                            [value]="tagPickerQuery()"
+                            (input)="onTagPickerInput($event)"
+                            (keydown)="onTagPickerKeydown($event, tagDropdown)"
+                            (click)="$event.stopPropagation()"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="Tag suchen …"
+                            i18n-placeholder
+                            aria-label="Tag suchen"
+                            i18n-aria-label
+                          />
+                          @if (tagPickerQuery()) {
+                            <button
+                              type="button"
+                              class="rd-tag-search-clear"
+                              (click)="clearTagPickerQuery($event)"
+                              aria-label="Suche leeren"
+                              i18n-aria-label
+                            >
+                              <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                            </button>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="rd-tag-picker-list" #tagPickerList role="listbox" aria-label="Verfügbare Tags" i18n-aria-label>
+                        @let filteredTags = filteredTagsToAdd;
+                        @for (tag of filteredTags; track tag.id; let idx = $index) {
+                          <button
+                            type="button"
+                            ngbDropdownItem
+                            role="option"
+                            class="rd-tag-picker-option"
+                            [class.is-highlighted]="idx === tagPickerActiveIndex()"
+                            [attr.aria-selected]="idx === tagPickerActiveIndex()"
+                            [attr.data-tag-option-index]="idx"
+                            (mouseenter)="tagPickerActiveIndex.set(idx)"
+                            (click)="selectTagFromPicker(tag.id, tagDropdown)"
+                          >
+                            <span
+                              class="rd-tag-dot"
+                              [style.background-color]="tag.color || '#0671e3'"
+                              aria-hidden="true"
+                            ></span>
+                            <span class="rd-tag-picker-option-name">{{ tag.name }}</span>
+                          </button>
+                        }
+                        @if (availableTagsToAdd.length === 0) {
+                          <div class="rd-tag-picker-empty" (click)="$event.stopPropagation()" i18n>
+                            Alle Tags zugewiesen
+                          </div>
+                        } @else if (filteredTags.length === 0) {
+                          <div class="rd-tag-picker-empty" (click)="$event.stopPropagation()" i18n>
+                            Keine passenden Tags gefunden
+                          </div>
+                        }
+                      </div>
+
                       @if (!createDisabled(DataType.Tag)) {
-                        <div class="dropdown-divider"></div>
-                        <button type="button" ngbDropdownItem (click)="createTag()">
-                          <pngx-bs-icon name="plus" class="me-1" width="13" height="13"></pngx-bs-icon>
-                          <span i18n>Neues Tag erstellen …</span>
-                        </button>
+                        <div class="rd-tag-picker-footer">
+                          <button
+                            type="button"
+                            ngbDropdownItem
+                            class="rd-tag-picker-create"
+                            (click)="createTagFromPicker(tagDropdown)"
+                          >
+                            <pngx-bs-icon name="plus" width="13" height="13"></pngx-bs-icon>
+                            @if (tagPickerQuery().trim()) {
+                              <span i18n>„{{ tagPickerQuery().trim() }}“ erstellen …</span>
+                            } @else {
+                              <span i18n>Neues Tag erstellen …</span>
+                            }
+                          </button>
+                        </div>
                       }
                     </div>
                   </div>

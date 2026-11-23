@@ -17,11 +17,17 @@ export interface RedesignDetailTopbarConfig {
   hasPrevious: boolean
   hasNext: boolean
   inspectorOpen: boolean
+  canEdit: boolean
+  isDirty: boolean
+  isSaving: boolean
+  previewUrl: string | null
   canDelete: boolean
   canShare: boolean
   onBackToList: () => void
   onPrevious: () => void
   onNext: () => void
+  onSave: () => void
+  onDiscard: () => void
   onDownload: () => void
   onShare: () => void
   onDelete: () => void

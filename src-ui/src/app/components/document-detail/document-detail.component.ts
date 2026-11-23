@@ -2,12 +2,14 @@ import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import {
   Component,
+  effect,
   ElementRef,
   inject,
   OnDestroy,
   OnInit,
   signal,
   TemplateRef,
+  viewChild,
   ViewChild,
 } from '@angular/core'
 import {
@@ -20,6 +22,7 @@ import {
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbDateStruct,
+  NgbDropdown,
   NgbDropdownModule,
   NgbModal,
   NgbModalRef,
@@ -269,18 +272,24 @@ export class DocumentDetailComponent
   readonly inspectorOpen = signal(true)
   readonly inspectorSection = signal<'details' | 'content' | 'metadata' | 'permissions'>('details')
   readonly allTags = signal<Tag[]>([])
+  readonly tagPickerQuery = signal('')
+  readonly tagPickerActiveIndex = signal(0)
+  readonly tagSearchInput = viewChild<ElementRef<HTMLInputElement>>('tagSearchInput')
+  readonly tagPickerList = viewChild<ElementRef<HTMLElement>>('tagPickerList')
   readonly newNoteText = signal('')
   readonly savingNote = signal(false)
   readonly historyEntries = signal<AuditLogEntry[]>([])
   readonly mergedBanner = signal<{ count: number; deleteOriginals: boolean } | null>(null)
   readonly isFullscreen = signal(false)
+  readonly isDirtySignal = signal<boolean>(false)
+  private readonly topbarTemplateVersion = signal(0)
 
   detailMoreActionsTemplate?: TemplateRef<any>
 
   @ViewChild('detailMoreActions')
   set detailMoreActions(tpl: TemplateRef<any> | undefined) {
     this.detailMoreActionsTemplate = tpl
-    this.syncTopbarConfig()
+    this.topbarTemplateVersion.update((v) => v + 1)
   }
 
   @ViewChild('viewerStage')
@@ -393,6 +402,17 @@ export class DocumentDetailComponent
 
   DocumentDetailNavIDs = DocumentDetailNavIDs
   readonly activeNavID = signal<number>(undefined)
+
+  private readonly topbarSyncEffect = effect(() => {
+    this.isDirtySignal()
+    this.networkActive()
+    this.documentId()
+    this.document()
+    this.title()
+    this.inspectorOpen()
+    this.topbarTemplateVersion()
+    this.syncTopbarConfig()
+  })
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
@@ -569,17 +589,19 @@ export class DocumentDetailComponent
         takeUntil(this.unsubscribeNotifier),
         takeUntil(this.docChangeNotifier)
       )
-      .subscribe((dirty) =>
+      .subscribe((dirty) => {
+        this.isDirtySignal.set(dirty)
         this.openDocumentService.setDirty(
           currentDocument,
           dirty,
           this.getChangedFields()
         )
-      )
+      })
   }
 
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
     let redirectedToRoot = false
+    this.isDirtySignal.set(false)
     this.closeIncomingUpdateModal()
     this.pendingIncomingUpdate = null
     this.selectedVersionId.set(documentId)
@@ -1217,7 +1239,7 @@ export class DocumentDetailComponent
       })
   }
 
-  createTag(newName: string) {
+  createTag(newName?: string) {
     var modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
     })
@@ -1244,8 +1266,13 @@ export class DocumentDetailComponent
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe(({ newTag, tags }) => {
-        this.tagsInput.tags = tags.results
-        this.tagsInput.addTag(newTag.id)
+        this.allTags.set(tags.results ?? [])
+        if (this.tagsInput) {
+          this.tagsInput.tags = tags.results
+          this.tagsInput.addTag(newTag.id)
+        } else {
+          this.addTagToDocument(newTag.id)
+        }
       })
   }
 
@@ -1379,6 +1406,7 @@ export class DocumentDetailComponent
           this.documentForm.patchValue(doc)
           this.documentForm.markAsPristine()
           this.openDocumentService.setDirty(doc, false)
+          this.isDirtySignal.set(false)
         },
         error: () => {
           this.router.navigate(['404'], {
@@ -1424,6 +1452,7 @@ export class DocumentDetailComponent
           newValues.custom_fields = [...docValues.custom_fields]
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document(), false)
+          this.isDirtySignal.set(false)
           this.openDocumentService.save()
           this.toastService.showSuccess(
             $localize`Document "${newValues.title}" saved successfully.`
@@ -1453,6 +1482,7 @@ export class DocumentDetailComponent
           if (!canEdit) {
             // document was 'given away'
             this.openDocumentService.setDirty(this.document(), false)
+            this.isDirtySignal.set(false)
             this.toastService.showSuccess(
               $localize`Document "${this.document().title}" saved successfully.`
             )
@@ -1487,6 +1517,7 @@ export class DocumentDetailComponent
         switchMap(({ nextDocId, updateResult }) => {
           if (nextDocId && updateResult) {
             this.openDocumentService.setDirty(this.document(), false)
+            this.isDirtySignal.set(false)
             return this.openDocumentService
               .closeDocument(this.document())
               .pipe(
@@ -2280,12 +2311,17 @@ export class DocumentDetailComponent
     const parentLabel =
       this.documentListViewService.activeSavedViewTitle ||
       $localize`Alle Dokumente`
+    const doc = this.document()
     this.topbar.setDetailConfig({
       breadcrumbParent: parentLabel,
-      breadcrumbTitle: this.title() || this.document()?.title || '',
-      hasPrevious: this.hasPrevious(),
-      hasNext: this.hasNext(),
+      breadcrumbTitle: this.title() || doc?.title || '',
+      hasPrevious: !!this.hasPrevious(),
+      hasNext: !!this.hasNext(),
       inspectorOpen: this.inspectorOpen(),
+      canEdit: this.userCanEdit,
+      isDirty: this.isDirtySignal(),
+      isSaving: this.networkActive(),
+      previewUrl: doc?.id ? this.documentsService.getPreviewUrl(doc.id) : null,
       canDelete:
         this.userIsOwner &&
         this.permissionsService.currentUserCan(
@@ -2300,6 +2336,8 @@ export class DocumentDetailComponent
       onBackToList: () => this.close(),
       onPrevious: () => this.previousDoc(),
       onNext: () => this.nextDoc(),
+      onSave: () => this.save(),
+      onDiscard: () => this.discard(),
       onDownload: () => this.download(),
       onShare: () => {
         if (
@@ -2387,6 +2425,119 @@ export class DocumentDetailComponent
   get availableTagsToAdd(): Tag[] {
     const current = new Set<number>(this.documentForm.get('tags')?.value || [])
     return this.allTags().filter((t) => !current.has(t.id))
+  }
+
+  get filteredTagsToAdd(): Tag[] {
+    const query = this.tagPickerQuery().trim().toLowerCase()
+    const available = this.availableTagsToAdd
+    if (!query) return available
+
+    const prefixMatches: Tag[] = []
+    const containsMatches: Tag[] = []
+    for (const tag of available) {
+      const name = (tag.name || '').toLowerCase()
+      if (name.startsWith(query)) {
+        prefixMatches.push(tag)
+      } else if (name.includes(query)) {
+        containsMatches.push(tag)
+      }
+    }
+    return [...prefixMatches, ...containsMatches]
+  }
+
+  onTagPickerOpenChange(open: boolean): void {
+    this.tagPickerQuery.set('')
+    this.tagPickerActiveIndex.set(0)
+    if (open) {
+      setTimeout(() => {
+        this.tagSearchInput()?.nativeElement?.focus()
+      })
+    }
+  }
+
+  onTagPickerInput(event: Event): void {
+    const input = event.target as HTMLInputElement | null
+    this.onTagPickerQueryChange(input?.value ?? '')
+  }
+
+  onTagPickerQueryChange(value: string): void {
+    this.tagPickerQuery.set(value)
+    this.tagPickerActiveIndex.set(0)
+  }
+
+  clearTagPickerQuery(event: Event): void {
+    event.preventDefault()
+    event.stopPropagation()
+    this.tagPickerQuery.set('')
+    this.tagPickerActiveIndex.set(0)
+    this.tagSearchInput()?.nativeElement?.focus()
+  }
+
+  onTagPickerKeydown(event: KeyboardEvent, dropdown: NgbDropdown): void {
+    const tags = this.filteredTagsToAdd
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      event.stopPropagation()
+      if (tags.length > 0) {
+        const nextIndex = (this.tagPickerActiveIndex() + 1) % tags.length
+        this.tagPickerActiveIndex.set(nextIndex)
+        this.scrollActiveTagOptionIntoView(nextIndex)
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      event.stopPropagation()
+      if (tags.length > 0) {
+        const prevIndex =
+          (this.tagPickerActiveIndex() - 1 + tags.length) % tags.length
+        this.tagPickerActiveIndex.set(prevIndex)
+        this.scrollActiveTagOptionIntoView(prevIndex)
+      }
+    } else if (event.key === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+      const activeIdx = Math.min(
+        Math.max(this.tagPickerActiveIndex(), 0),
+        Math.max(tags.length - 1, 0)
+      )
+      const activeTag = tags[activeIdx]
+      if (activeTag) {
+        this.selectTagFromPicker(activeTag.id, dropdown)
+      } else {
+        const query = this.tagPickerQuery().trim()
+        if (query && !this.createDisabled(DataType.Tag)) {
+          dropdown.close()
+          this.createTag(query)
+        }
+      }
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      dropdown.close()
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.stopPropagation()
+    }
+  }
+
+  selectTagFromPicker(tagId: number, dropdown: NgbDropdown): void {
+    this.addTagToDocument(tagId)
+    this.tagPickerQuery.set('')
+    this.tagPickerActiveIndex.set(0)
+    dropdown.close()
+  }
+
+  createTagFromPicker(dropdown: NgbDropdown): void {
+    const query = this.tagPickerQuery().trim()
+    dropdown.close()
+    this.createTag(query || undefined)
+  }
+
+  private scrollActiveTagOptionIntoView(index: number): void {
+    const listEl = this.tagPickerList()?.nativeElement
+    if (!listEl) return
+    const item = listEl.querySelector<HTMLElement>(
+      `[data-tag-option-index="${index}"]`
+    )
+    item?.scrollIntoView({ block: 'nearest' })
   }
 
   addTagToDocument(tagId: number): void {
