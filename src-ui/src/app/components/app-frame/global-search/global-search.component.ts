@@ -131,6 +131,11 @@ export class GlobalSearchComponent implements OnInit {
       .subscribe(() => {
         this.searchInput.nativeElement.focus()
       })
+    this.hotkeyService
+      .addShortcut({ keys: 'control.k', description: $localize`Global search` })
+      .subscribe(() => {
+        this.searchInput.nativeElement.focus()
+      })
   }
 
   private search(query: string) {

@@ -1,4 +1,5 @@
 import { Component, HostListener, inject, signal } from '@angular/core'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   PermissionAction,
   PermissionsService,
@@ -12,7 +13,7 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
   selector: 'pngx-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [],
+  imports: [BootstrapIconComponent],
 })
 export class FileDropComponent {
   private settings = inject(SettingsService)

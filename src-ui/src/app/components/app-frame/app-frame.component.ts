@@ -5,10 +5,11 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { NgClass } from '@angular/common'
+import { Location, NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
   inject,
   OnInit,
@@ -70,6 +71,8 @@ import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { RedesignSidebarComponent } from '../redesign/redesign-sidebar/redesign-sidebar.component'
+import { RedesignTopbarService } from '../redesign/redesign-topbar.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
@@ -90,6 +93,7 @@ const SCROLL_THRESHOLD = 16
     ChatComponent,
     RouterModule,
     NgClass,
+    NgTemplateOutlet,
     NgbDropdownModule,
     NgbPopoverModule,
     NgbCollapseModule,
@@ -100,6 +104,7 @@ const SCROLL_THRESHOLD = 16
     FormsModule,
     SwitchComponent,
     UploadStatusTrayComponent,
+    RedesignSidebarComponent,
   ],
 })
 export class AppFrameComponent
@@ -108,7 +113,9 @@ export class AppFrameComponent
 {
   private destroyRef = inject(DestroyRef)
   private documentList = inject(DocumentListViewService)
+  private location = inject(Location)
   router = inject(Router)
+  topbar = inject(RedesignTopbarService)
   private activatedRoute = inject(ActivatedRoute)
   private openDocumentsService = inject(OpenDocumentsService)
   savedViewService = inject(SavedViewService)
@@ -124,6 +131,8 @@ export class AppFrameComponent
   private websocketStatusService = inject(WebsocketStatusService)
 
   private readonly uploadStatusTray = viewChild(UploadStatusTrayComponent)
+  private readonly fileUploadInput =
+    viewChild<ElementRef<HTMLInputElement>>('fileUpload')
 
   readonly appRemoteVersion = signal<AppRemoteVersion>(null)
   readonly isMenuCollapsed = signal(true)
@@ -235,6 +244,12 @@ export class AppFrameComponent
           break
       }
     })
+
+    this.topbar.uploadRequested$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.fileUploadInput()?.nativeElement.click()
+      })
   }
 
   toggleSlimSidebar(): void {
@@ -579,6 +594,23 @@ export class AppFrameComponent
 
   get uploadsInProgress(): number {
     return this.websocketStatusService.getConsumerStatusNotCompleted().length
+  }
+
+  get uploadsProgressPercent(): number {
+    const active = this.websocketStatusService.getConsumerStatusNotCompleted()
+    if (!active.length) return 0
+    const avg =
+      active.reduce((sum, item) => sum + (item.getProgress?.() ?? 0), 0) /
+      active.length
+    return Math.min(99, Math.max(1, Math.round(avg * 100)))
+  }
+
+  goBack(): void {
+    this.location.back()
+  }
+
+  goForward(): void {
+    this.location.forward()
   }
 
   showUploadStatus() {

@@ -1,14 +1,69 @@
 .global-dropzone-overlay {
-    opacity: 0;
-    transition: opacity 0.25s ease-in-out;
-    background-color: hsla(var(--pngx-primary), var(--pngx-primary-lightness), .8);
-    z-index: 1200;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  background: var(--rd-bg-drop-overlay);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 1200;
+  padding: 12px;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
 
-    h2 {
-        color: var(--pngx-primary-text-contrast)
-    }
+  &.active {
+    opacity: 1;
+  }
+}
 
-    &.active {
-        opacity: 1;
-    }
+.rd-dropzone-frame {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--rd-accent);
+  border-radius: 20px;
+}
+
+.rd-dropzone-card {
+  width: min(380px, 90vw);
+  padding: 32px 28px;
+  border-radius: var(--rd-radius-xl);
+  background: var(--rd-bg-glass-strong);
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-modal), inset 0 1px 0 var(--rd-border-glass);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.rd-dropzone-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: var(--rd-accent);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(var(--rd-accent-rgb), 0.35);
+  margin-bottom: 4px;
+}
+
+.rd-dropzone-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--rd-text-primary);
+}
+
+.rd-dropzone-card__subtitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--rd-text-secondary);
 }

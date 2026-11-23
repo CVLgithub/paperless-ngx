@@ -1,9 +1,9 @@
 
 <div ngbDropdown #resultsDropdown="ngbDropdown" (openChange)="onDropdownOpenChange">
-    <form class="form-inline position-relative">
-        <pngx-bs-icon width="1em" height="1em" name="search"></pngx-bs-icon>
+    <form class="form-inline position-relative rd-search-form">
+        <pngx-bs-icon class="rd-search-icon" width="0.92rem" height="0.92rem" name="search"></pngx-bs-icon>
         <div class="input-group">
-            <div class="form-control form-control-sm">
+            <div class="form-control form-control-sm rd-search-control">
                 <input class="bg-transparent border-0 w-100 h-100" #searchInput type="text" name="query"
                     placeholder="Search" aria-label="Search" i18n-placeholder
                     autocomplete="off"
@@ -12,14 +12,16 @@
                     (ngModelChange)="onQueryChange($event)"
                     (keydown)="searchInputKeyDown($event)"
                     ngbDropdownAnchor>
-                <div class="position-absolute top-50 end-0 translate-middle">
+                <div class="rd-search-trailing">
                     @if (loading()) {
-                        <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
+                        <div class="spinner-border spinner-border-sm text-muted"></div>
+                    } @else if (!query()) {
+                        <kbd class="rd-search-kbd">Ctrl K</kbd>
                     }
                 </div>
             </div>
             @if (query()) {
-                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="runFullSearch()">
+                <button class="btn btn-sm rd-search-submit" type="button" (click)="runFullSearch()">
                     @if (useAdvancedForFullSearch) {
                         <ng-container i18n>Advanced search</ng-container>
                     } @else {

@@ -1,93 +1,116 @@
-form {
+:host {
+  display: block;
+  width: 260px;
+  max-width: 100%;
+}
+
+.rd-search-form {
   position: relative;
 
-  > pngx-bs-icon[name="search"] {
+  .rd-search-icon {
     position: absolute;
-    left: 0.6rem;
-    top: .25rem;
-    color: rgba(255, 255, 255, 0.6);
-
-    @media screen and (min-width: 768px) {
-      // adjust for smaller font size on non-mobile
-      top: .15rem;
-    }
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--rd-text-tertiary);
+    z-index: 4;
+    pointer-events: none;
+    display: inline-flex;
   }
 
-  &:focus-within {
-    pngx-bs-icon[name="search"],
-    .badge {
-      display: none !important;
-    }
-
-    .form-control::placeholder {
-      color: rgba(255, 255, 255, 0);
-    }
+  .input-group {
+    flex-wrap: nowrap;
   }
 
-  .badge {
-    font-size: 0.8rem;
-  }
+  .rd-search-control {
+    display: flex;
+    align-items: center;
+    height: 34px;
+    min-height: 34px;
+    padding: 0 10px 0 34px;
+    border-radius: var(--rd-radius-pill) !important;
+    background: var(--rd-bg-glass);
+    backdrop-filter: var(--rd-blur-md);
+    -webkit-backdrop-filter: var(--rd-blur-md);
+    border: 1px solid var(--rd-border-subtle);
+    box-shadow: var(--rd-shadow-pill), inset 0 1px 0 var(--rd-border-glass);
+    color: var(--rd-text-primary);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 
-  .input-group .btn {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: var(--pngx-primary-text-contrast);
-    padding-top: .15rem;
-    padding-bottom: .15rem;
-    min-height: calc(1.3em + 0.5rem + calc(var(--bs-border-width) * 2)) !important;
-  }
-
-  .form-control {
-    min-height: 2.25rem;
-    color: rgba(255, 255, 255, 0.55);
-    background-color: rgba(0, 0, 0, 0.16);
-    padding-left: 1.8rem;
-    border-color: rgba(255, 255, 255, 0.2);
-    transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
     > input {
       outline: none;
-      color: var(--pngx-primary-text-contrast);
+      font-size: 0.8125rem;
+      color: var(--rd-text-primary);
 
       &::placeholder {
-        color: rgba(255, 255, 255, 0.4);
+        color: var(--rd-text-tertiary);
       }
     }
 
     &:focus-within {
-      background-color: rgba(0, 0, 0, 0.26);
-      color: var(--bs-light);
-      flex-grow: 1;
-      padding-left: 0.5rem;
+      background: var(--rd-bg-surface);
+      border-color: var(--rd-accent);
+      box-shadow: 0 0 0 3px var(--rd-accent-ring);
     }
   }
 
-}
+  .rd-search-trailing {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    flex-shrink: 0;
+  }
 
-* {
-  --pngx-focus-alpha: 0;
+  .rd-search-kbd {
+    font-family: var(--rd-font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--rd-text-tertiary);
+    background: var(--rd-bg-pill);
+    border: 1px solid var(--rd-border-subtle);
+    border-radius: 6px;
+    padding: 1px 5px;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .rd-search-submit {
+    margin-left: 6px;
+    border-radius: var(--rd-radius-pill) !important;
+    background: var(--rd-bg-pill);
+    border: 1px solid var(--rd-border-subtle);
+    color: var(--rd-text-primary);
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0 10px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+
+    &:hover {
+      background: var(--rd-bg-pill-hover);
+    }
+  }
 }
 
 .mh-75 {
   max-height: 75vh;
 }
 
-.dropdown.show {
-  // Hide the search icon when the dropdown is shown
-  pngx-bs-icon[name="search"] {
-    display: none !important;
-  }
-
-  .form-control {
-    padding-left: 0.5rem;
-  }
+.dropdown-menu {
+  min-width: 360px;
+  right: 0 !important;
+  left: auto !important;
 }
 
 .dropdown-item {
   &:has(button:focus) {
-    background-color: var(--pngx-bg-darker);
+    background-color: var(--rd-bg-pill);
   }
 
   & button {
-    transition: all 0.3s ease, color 0.15s ease;
+    transition: all 0.25s ease, color 0.15s ease;
     max-width: 2rem;
     overflow: hidden;
   }

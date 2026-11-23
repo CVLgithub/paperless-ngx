@@ -1,0 +1,306 @@
+<aside class="rd-sidebar" [class.rd-sidebar--collapsed]="collapsed" aria-label="Hauptnavigation">
+  <!-- Brand Header -->
+  <div class="rd-sidebar__header">
+    <a class="rd-sidebar__brand" routerLink="/documents" (click)="openAllDocuments()" [title]="appTitle">
+      <span class="rd-sidebar__brand-icon" aria-hidden="true">
+        <pngx-bs-icon name="file-earmark-text" width="1rem" height="1rem"></pngx-bs-icon>
+      </span>
+      @if (!collapsed) {
+        <span class="rd-sidebar__brand-name">{{ appTitle }}</span>
+      }
+    </a>
+    <button
+      type="button"
+      class="rd-sidebar__collapse-btn"
+      (click)="toggleCollapse.emit()"
+      [attr.aria-label]="collapsed ? 'Seitenleiste einblenden' : 'Seitenleiste ausblenden'"
+      [title]="collapsed ? 'Seitenleiste einblenden' : 'Seitenleiste ausblenden'"
+    >
+      <pngx-bs-icon name="layout-sidebar" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+    </button>
+  </div>
+
+  <!-- Scrollable Navigation Area -->
+  <div class="rd-sidebar__scroll">
+    <!-- Primary Navigation -->
+    <ul class="rd-nav-list" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+      <li>
+        <button
+          type="button"
+          class="rd-nav-item"
+          [class.rd-nav-item--active]="isInboxActive"
+          (click)="openInbox()"
+          [ngbTooltip]="collapsed ? 'Posteingang' : null"
+          placement="end"
+          container="body"
+        >
+          <pngx-bs-icon class="rd-nav-item__icon" name="inbox" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+          @if (!collapsed) {
+            <span class="rd-nav-item__label">Posteingang</span>
+            @if (inboxCount() > 0) {
+              <span class="rd-nav-item__count">{{ inboxCount() }}</span>
+            }
+          }
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="rd-nav-item"
+          [class.rd-nav-item--active]="isAllDocumentsActive"
+          (click)="openAllDocuments()"
+          [ngbTooltip]="collapsed ? 'Alle Dokumente' : null"
+          placement="end"
+          container="body"
+        >
+          <pngx-bs-icon class="rd-nav-item__icon" name="files" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+          @if (!collapsed) {
+            <span class="rd-nav-item__label">Alle Dokumente</span>
+          }
+        </button>
+      </li>
+    </ul>
+
+    <!-- Favoriten (Gespeicherte Ansichten) -->
+    @if (!collapsed && savedViewService.sidebarViews?.length > 0) {
+      <div class="rd-sidebar__section" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+        <div class="rd-sidebar__section-label">Favoriten</div>
+        <ul class="rd-nav-list">
+          @for (view of savedViewService.sidebarViews; track view.id) {
+            <li>
+              <a
+                class="rd-nav-item"
+                [routerLink]="['/view', view.id]"
+                routerLinkActive="rd-nav-item--active"
+                (click)="itemSelected.emit()"
+              >
+                <pngx-bs-icon class="rd-nav-item__icon" [name]="view.icon || 'bookmark'" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+                <span class="rd-nav-item__label">{{ view.name }}</span>
+                @if (savedViewService.getDocumentCount(view) !== null && savedViewService.getDocumentCount(view) !== undefined) {
+                  <span class="rd-nav-item__count">{{ savedViewService.getDocumentCount(view) }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <!-- Tags -->
+    @if (!collapsed) {
+      <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
+        <button
+          type="button"
+          class="rd-sidebar__collapse-header"
+          (click)="tagsExpanded.set(!tagsExpanded())"
+          [attr.aria-expanded]="tagsExpanded()"
+        >
+          <span>Tags</span>
+          <pngx-bs-icon [name]="tagsExpanded() ? 'chevron-down' : 'chevron-right'" width="0.72rem" height="0.72rem"></pngx-bs-icon>
+        </button>
+        @if (tagsExpanded()) {
+          <ul class="rd-nav-list rd-nav-list--compact">
+            @for (tag of visibleTags(); track tag.id) {
+              <li>
+                <button
+                  type="button"
+                  class="rd-nav-item rd-nav-item--taxonomy"
+                  [class.rd-nav-item--active]="isTagActive(tag.id)"
+                  (click)="filterByTag(tag)"
+                >
+                  <span class="rd-color-dot" [style.background-color]="tag.color || '#6b7280'" aria-hidden="true"></span>
+                  <span class="rd-nav-item__label">{{ tag.name }}</span>
+                  @if (tag.document_count !== undefined && tag.document_count !== null) {
+                    <span class="rd-nav-item__count">{{ tag.document_count }}</span>
+                  }
+                </button>
+              </li>
+            }
+            @if (visibleTags().length === 0) {
+              <li class="rd-sidebar__empty">Keine Tags</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Korrespondenten -->
+      <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
+        <button
+          type="button"
+          class="rd-sidebar__collapse-header"
+          (click)="correspondentsExpanded.set(!correspondentsExpanded())"
+          [attr.aria-expanded]="correspondentsExpanded()"
+        >
+          <span>Korrespondenten</span>
+          <pngx-bs-icon [name]="correspondentsExpanded() ? 'chevron-down' : 'chevron-right'" width="0.72rem" height="0.72rem"></pngx-bs-icon>
+        </button>
+        @if (correspondentsExpanded()) {
+          <ul class="rd-nav-list rd-nav-list--compact">
+            @for (correspondent of correspondents(); track correspondent.id) {
+              <li>
+                <button
+                  type="button"
+                  class="rd-nav-item rd-nav-item--taxonomy"
+                  [class.rd-nav-item--active]="isCorrespondentActive(correspondent.id)"
+                  (click)="filterByCorrespondent(correspondent)"
+                >
+                  <span class="rd-color-dot" [style.background-color]="getCorrespondentColor(correspondent.id)" aria-hidden="true"></span>
+                  <span class="rd-nav-item__label">{{ correspondent.name }}</span>
+                  @if (correspondent.document_count !== undefined && correspondent.document_count !== null) {
+                    <span class="rd-nav-item__count">{{ correspondent.document_count }}</span>
+                  }
+                </button>
+              </li>
+            }
+            @if (correspondents().length === 0) {
+              <li class="rd-sidebar__empty">Keine Korrespondenten</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Dokumenttypen -->
+      <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
+        <button
+          type="button"
+          class="rd-sidebar__collapse-header"
+          (click)="documentTypesExpanded.set(!documentTypesExpanded())"
+          [attr.aria-expanded]="documentTypesExpanded()"
+        >
+          <span>Dokumenttypen</span>
+          <pngx-bs-icon [name]="documentTypesExpanded() ? 'chevron-down' : 'chevron-right'" width="0.72rem" height="0.72rem"></pngx-bs-icon>
+        </button>
+        @if (documentTypesExpanded()) {
+          <ul class="rd-nav-list rd-nav-list--compact">
+            @for (docType of documentTypes(); track docType.id) {
+              <li>
+                <button
+                  type="button"
+                  class="rd-nav-item rd-nav-item--taxonomy"
+                  [class.rd-nav-item--active]="isDocumentTypeActive(docType.id)"
+                  (click)="filterByDocumentType(docType)"
+                >
+                  <pngx-bs-icon class="rd-nav-item__icon" name="file-earmark" width="0.82rem" height="0.82rem"></pngx-bs-icon>
+                  <span class="rd-nav-item__label">{{ docType.name }}</span>
+                  @if (docType.document_count !== undefined && docType.document_count !== null) {
+                    <span class="rd-nav-item__count">{{ docType.document_count }}</span>
+                  }
+                </button>
+              </li>
+            }
+            @if (documentTypes().length === 0) {
+              <li class="rd-sidebar__empty">Keine Dokumenttypen</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Bottom User & Settings Footer -->
+  <div class="rd-sidebar__footer" ngbDropdown placement="top-start" container="body">
+    <div class="rd-sidebar__user" ngbDropdownToggle role="button" tabindex="0" aria-label="Benutzer- und Verwaltungsmenü">
+      <span class="rd-sidebar__avatar" aria-hidden="true">{{ userInitials }}</span>
+      @if (!collapsed) {
+        <span class="rd-sidebar__username">{{ userDisplayName }}</span>
+        <span class="rd-sidebar__settings-icon" aria-hidden="true">
+          <pngx-bs-icon name="sliders" width="0.92rem" height="0.92rem"></pngx-bs-icon>
+        </span>
+      }
+    </div>
+
+    <div ngbDropdownMenu class="rd-sidebar-menu">
+      <!-- Dunkelmodus-Schnellschalter (synchron mit Paperless-Einstellung) -->
+      <button type="button" ngbDropdownItem class="rd-sidebar-menu__item rd-sidebar-menu__item--toggle" (click)="toggleDarkMode($event)">
+        <span class="d-flex align-items-center gap-2">
+          <pngx-bs-icon [name]="isDarkMode ? 'sun' : 'moon-stars'" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+          <span>{{ isDarkMode ? 'Hellmodus aktivieren' : 'Dunkelmodus aktivieren' }}</span>
+        </span>
+      </button>
+      <div class="dropdown-divider"></div>
+
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/settings" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }">
+        <pngx-bs-icon name="gear" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Settings</span>
+      </a>
+      <button type="button" ngbDropdownItem class="rd-sidebar-menu__item" (click)="editProfileClicked.emit()">
+        <pngx-bs-icon name="person" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>My Profile</span>
+      </button>
+
+      <div class="dropdown-divider"></div>
+
+      @if (canManageAttributes) {
+        <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/attributes" (click)="itemSelected.emit()">
+          <pngx-bs-icon name="stack" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+          <span i18n>Attributes</span>
+        </a>
+      }
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/savedviews" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+        <pngx-bs-icon name="window-stack" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Saved Views</span>
+      </a>
+      @if (canManageShareLinks) {
+        <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/share-links" (click)="itemSelected.emit()">
+          <pngx-bs-icon name="link" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+          <span i18n>Share links</span>
+        </a>
+      }
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/workflows" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }">
+        <pngx-bs-icon name="boxes" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Workflows</span>
+      </a>
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/mail" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
+        <pngx-bs-icon name="envelope" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Mail</span>
+      </a>
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/trash" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
+        <pngx-bs-icon name="trash" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Trash</span>
+      </a>
+
+      <div class="dropdown-divider"></div>
+
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/tasks" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }">
+        <pngx-bs-icon name="list-task" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span class="flex-grow-1" i18n>Tasks</span>
+        @if (tasksService.needsAttentionTasksCount > 0) {
+          <span class="badge bg-danger rounded-pill">{{ tasksService.needsAttentionTasksCount }}</span>
+        }
+      </a>
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/config" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.AppConfig }">
+        <pngx-bs-icon name="sliders2-vertical" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Configuration</span>
+      </a>
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/usersgroups" (click)="itemSelected.emit()"
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+        <pngx-bs-icon name="people" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Users & Groups</span>
+      </a>
+      @if (permissionsService.isAdmin()) {
+        <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/logs" (click)="itemSelected.emit()">
+          <pngx-bs-icon name="text-left" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+          <span i18n>Logs</span>
+        </a>
+      }
+      <a ngbDropdownItem class="rd-sidebar-menu__item" routerLink="/dashboard" (click)="itemSelected.emit()">
+        <pngx-bs-icon name="house" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Dashboard</span>
+      </a>
+
+      <div class="dropdown-divider"></div>
+
+      <a ngbDropdownItem class="rd-sidebar-menu__item text-danger" href="accounts/logout/" (click)="logoutClicked.emit()">
+        <pngx-bs-icon name="door-open" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+        <span i18n>Logout</span>
+      </a>
+    </div>
+  </div>
+</aside>

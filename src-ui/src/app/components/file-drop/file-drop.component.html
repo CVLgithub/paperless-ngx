@@ -1,7 +1,17 @@
 <div [class.pe-none]="fileIsOver()">
-    <ng-content select="[content]"></ng-content>
+  <ng-content select="[content]"></ng-content>
 </div>
 
-<div class="global-dropzone-overlay position-fixed top-0 start-0 bottom-0 end-0 text-center pe-none" [class.active]="fileIsOver() && !hidden()">
-    <h2 class="pe-none position-absolute top-50 start-50 translate-middle" i18n>Drop files to begin upload</h2>
+<div class="global-dropzone-overlay position-fixed top-0 start-0 bottom-0 end-0 pe-none" [class.active]="fileIsOver() && !hidden()">
+  <div class="rd-dropzone-frame">
+    <div class="rd-dropzone-card">
+      <div class="rd-dropzone-card__icon" aria-hidden="true">
+        <pngx-bs-icon name="file-earmark-plus" width="1.6rem" height="1.6rem"></pngx-bs-icon>
+      </div>
+      <h2 class="rd-dropzone-card__title" i18n>Zum Hochladen loslassen</h2>
+      <p class="rd-dropzone-card__subtitle" i18n>
+        PDF, PNG, JPG, TIFF oder E-Mails. Die Dokumente werden erkannt und automatisch zugeordnet.
+      </p>
+    </div>
+  </div>
 </div>
