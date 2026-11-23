@@ -286,7 +286,7 @@ export class DocumentListComponent
           if (dt) return dt.name
         }
       }
-      title = $localize`All Documents`
+      title = $localize`Alle Dokumente`
     }
     return title
   }

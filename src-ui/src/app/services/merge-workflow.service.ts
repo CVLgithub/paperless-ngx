@@ -277,6 +277,7 @@ export class MergeWorkflowService {
       .subscribe((fileStatus) => {
         if (fileStatus.filename !== expectedFilename) return
         if (fileStatus.documentId) {
+          this.websocketStatusService.dismiss?.(fileStatus)
           emitState({ phase: 'archiving', progress: 94 })
           completeWithDocument(fileStatus.documentId)
         }

@@ -199,7 +199,20 @@
               </button>
             }
             @if (detail.moreActionsTemplate) {
-              <ng-container [ngTemplateOutlet]="detail.moreActionsTemplate"></ng-container>
+              <div ngbDropdown placement="bottom-end" container="body" class="d-inline-flex">
+                <button
+                  type="button"
+                  class="rd-detail-pill__btn"
+                  ngbDropdownToggle
+                  title="Weitere Aktionen"
+                  aria-label="Weitere Aktionen"
+                >
+                  <pngx-bs-icon name="three-dots" width="0.92rem" height="0.92rem"></pngx-bs-icon>
+                </button>
+                <div ngbDropdownMenu class="rd-sidebar-menu">
+                  <ng-container [ngTemplateOutlet]="detail.moreActionsTemplate"></ng-container>
+                </div>
+              </div>
             }
           </div>
 

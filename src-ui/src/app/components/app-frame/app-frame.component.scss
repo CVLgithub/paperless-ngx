@@ -136,6 +136,10 @@
   }
 }
 
+.rd-detail-pill__btn.dropdown-toggle::after {
+  display: none;
+}
+
 .rd-inspector-toggle {
   display: inline-flex;
   align-items: center;
