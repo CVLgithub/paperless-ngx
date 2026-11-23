@@ -1,11 +1,224 @@
-.dropdown-toggle-split {
-    --bs-border-radius: .45rem;
+:host {
+  display: block;
 }
 
-.dropdown-menu{
-    --bs-dropdown-min-width: 12rem;
+.rd-bulk-bar-anchor {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 1030;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
 }
 
-.btn-group .btn {
+@media (min-width: 992px) {
+  .rd-bulk-bar-anchor {
+    left: calc(50% + 116px);
+  }
+}
+
+.rd-bulk-bar {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 8px 16px;
+  border-radius: 20px;
+  background: var(--rd-bg-glass-bar);
+  backdrop-filter: var(--rd-blur-md);
+  -webkit-backdrop-filter: var(--rd-blur-md);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-floating);
   white-space: nowrap;
+}
+
+.rd-bulk-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  padding-right: 4px;
+}
+
+.rd-bulk-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--rd-text-primary);
+}
+
+.rd-bulk-select-all {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-top: 1px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--rd-accent);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.rd-bulk-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--rd-border-subtle);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.rd-bulk-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.rd-bulk-action {
+  height: 34px;
+  padding: 0 11px;
+  border-radius: var(--rd-radius-sm);
+  border: 0;
+  background: transparent;
+  color: var(--rd-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--rd-bg-pill);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.rd-bulk-merge-btn {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--rd-radius-pill);
+  border: 0;
+  background: var(--rd-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: background-color 140ms ease, opacity 140ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--rd-accent-hover);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.rd-bulk-delete-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--rd-radius-pill);
+  border: 1px solid var(--rd-danger-border);
+  background: var(--rd-danger-soft);
+  color: var(--rd-danger);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--rd-danger-soft-hover);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.rd-bulk-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--rd-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+
+  &::after {
+    display: none;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--rd-bg-pill);
+    color: var(--rd-text-primary);
+  }
+}
+
+.rd-bulk-overflow-menu {
+  min-width: 240px;
+}
+
+:host ::ng-deep .rd-bulk-dropdown {
+  .btn {
+    height: 34px;
+    padding: 0 10px;
+    border-radius: var(--rd-radius-sm) !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--rd-text-primary) !important;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    &:hover:not(:disabled) {
+      background: var(--rd-bg-pill) !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+:host ::ng-deep .rd-overflow-subdropdown {
+  display: block;
+  width: 100%;
+
+  .btn {
+    width: 100%;
+    justify-content: flex-start;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--rd-text-primary) !important;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 8px !important;
+
+    &:hover {
+      background: var(--rd-bg-pill) !important;
+    }
+  }
 }

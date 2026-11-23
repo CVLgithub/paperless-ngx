@@ -1,0 +1,92 @@
+<div class="rd-merge-progress">
+  @if (state().phase === 'error') {
+    <div class="rd-progress-icon is-error" aria-hidden="true">
+      <pngx-bs-icon name="exclamation-triangle" width="24" height="24"></pngx-bs-icon>
+    </div>
+
+    <h3 class="rd-progress-title" i18n>Zusammenführen fehlgeschlagen</h3>
+    <p class="rd-progress-subtitle rd-progress-error-text">
+      {{ state().errorMessage }}
+    </p>
+
+    <div class="rd-progress-actions">
+      <button type="button" class="rd-progress-pill-btn" (click)="closeOnError()" i18n>
+        Schließen
+      </button>
+    </div>
+  } @else {
+    <div class="rd-doc-illustration" aria-hidden="true">
+      <div class="rd-doc-sheet">
+        <span class="rd-sheet-logo"></span>
+        <span class="rd-sheet-line is-short"></span>
+        <span class="rd-sheet-line"></span>
+        <span class="rd-sheet-line"></span>
+        <span class="rd-sheet-line is-mid"></span>
+      </div>
+      <span class="rd-doc-spinner-badge">
+        <span class="rd-spinner-ring"></span>
+      </span>
+    </div>
+
+    <h3 class="rd-progress-title" i18n>Dokument wird erstellt …</h3>
+    <p class="rd-progress-subtitle" i18n>
+      Sobald es fertig ist, öffnet sich das neue Dokument automatisch.
+    </p>
+
+    <div
+      class="rd-progress-track"
+      role="progressbar"
+      [attr.aria-valuenow]="state().progress"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <div class="rd-progress-fill" [style.width.%]="state().progress"></div>
+    </div>
+
+    <ul class="rd-progress-steps">
+      <li class="rd-progress-step" [class]="'is-' + getStepStatus(0)">
+        <span class="rd-step-indicator" aria-hidden="true">
+          @if (getStepStatus(0) === 'done') {
+            <pngx-bs-icon name="check" width="12" height="12"></pngx-bs-icon>
+          } @else if (getStepStatus(0) === 'active') {
+            <span class="rd-step-dot"></span>
+          }
+        </span>
+        <span class="rd-step-label" i18n>Seiten werden zusammengefügt</span>
+      </li>
+
+      <li class="rd-progress-step" [class]="'is-' + getStepStatus(1)">
+        <span class="rd-step-indicator" aria-hidden="true">
+          @if (getStepStatus(1) === 'done') {
+            <pngx-bs-icon name="check" width="12" height="12"></pngx-bs-icon>
+          } @else if (getStepStatus(1) === 'active') {
+            <span class="rd-step-dot"></span>
+          }
+        </span>
+        <span class="rd-step-label" i18n>Text wird erkannt (OCR)</span>
+      </li>
+
+      <li class="rd-progress-step" [class]="'is-' + getStepStatus(2)">
+        <span class="rd-step-indicator" aria-hidden="true">
+          @if (getStepStatus(2) === 'done') {
+            <pngx-bs-icon name="check" width="12" height="12"></pngx-bs-icon>
+          } @else if (getStepStatus(2) === 'active') {
+            <span class="rd-step-dot"></span>
+          }
+        </span>
+        <span class="rd-step-label" i18n>Vorschau und Archivversion werden erstellt</span>
+      </li>
+    </ul>
+
+    <div class="rd-progress-actions">
+      <button
+        type="button"
+        class="rd-progress-pill-btn"
+        (click)="continueInBackground()"
+        i18n
+      >
+        Im Hintergrund fortsetzen
+      </button>
+    </div>
+  }
+</div>

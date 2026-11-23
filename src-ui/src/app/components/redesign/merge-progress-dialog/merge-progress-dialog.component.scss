@@ -1,0 +1,223 @@
+:host {
+  display: block;
+}
+
+.rd-merge-progress {
+  padding: 28px 26px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.rd-doc-illustration {
+  position: relative;
+  width: 60px;
+  height: 74px;
+  margin-bottom: 18px;
+}
+
+.rd-doc-sheet {
+  width: 56px;
+  height: 70px;
+  border-radius: 10px;
+  background: var(--rd-bg-surface);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-card);
+  padding: 9px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rd-sheet-logo {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: #16a34a;
+  margin-bottom: 3px;
+}
+
+.rd-sheet-line {
+  height: 3.5px;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--rd-border-medium);
+
+  &.is-short {
+    width: 60%;
+  }
+
+  &.is-mid {
+    width: 78%;
+  }
+}
+
+.rd-doc-spinner-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--rd-bg-surface);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rd-spinner-ring {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--rd-border-medium);
+  border-top-color: var(--rd-accent);
+  animation: rd-spin 0.85s linear infinite;
+}
+
+@keyframes rd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rd-progress-icon.is-error {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--rd-danger-soft);
+  color: var(--rd-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.rd-progress-title {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--rd-text-primary);
+}
+
+.rd-progress-subtitle {
+  margin: 0 0 20px;
+  max-width: 310px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--rd-text-secondary);
+}
+
+.rd-progress-error-text {
+  color: var(--rd-text-primary);
+}
+
+.rd-progress-track {
+  width: 100%;
+  height: 4px;
+  border-radius: var(--rd-radius-pill);
+  background: var(--rd-bg-surface-subtle);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.rd-progress-fill {
+  height: 100%;
+  border-radius: var(--rd-radius-pill);
+  background: var(--rd-accent);
+  transition: width 360ms ease;
+}
+
+.rd-progress-steps {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.rd-progress-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--rd-text-tertiary);
+  transition: color 180ms ease;
+
+  &.is-done,
+  &.is-active {
+    color: var(--rd-text-primary);
+    font-weight: 500;
+  }
+}
+
+.rd-step-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rd-border-medium);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 180ms ease, border-color 180ms ease;
+
+  .rd-progress-step.is-done & {
+    background: var(--rd-accent);
+    border-color: var(--rd-accent);
+    color: #ffffff;
+  }
+
+  .rd-progress-step.is-active & {
+    border-color: var(--rd-accent);
+    background: var(--rd-accent-soft);
+  }
+}
+
+.rd-step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rd-accent);
+  animation: rd-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes rd-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
+}
+
+.rd-progress-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.rd-progress-pill-btn {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: var(--rd-radius-pill);
+  border: 1px solid var(--rd-border-subtle);
+  background: var(--rd-bg-pill);
+  color: var(--rd-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+
+  &:hover {
+    background: var(--rd-bg-pill-hover);
+  }
+}

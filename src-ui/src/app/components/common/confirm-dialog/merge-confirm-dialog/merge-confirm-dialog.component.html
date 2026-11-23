@@ -1,65 +1,140 @@
-<div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
-    </button>
-</div>
-<div class="modal-body">
-    <p>{{message}}</p>
-    <div class="form-group">
-        <label class="form-label" for="metadataDocumentID" i18n>Documents:</label>
-        <ul class="list-group"
-            cdkDropList
-            [cdkDropListData]="documentIDs()"
-            (cdkDropListDropped)="onDrop($event)">
-            @for (documentID of documentIDs(); track documentID) {
-              @let document = getDocument(documentID);
-              @if (document) {
-                <li class="list-group-item d-flex align-items-center" cdkDrag>
-                    <pngx-bs-icon name="grip-vertical" class="me-2"></pngx-bs-icon>
-                    <div class="d-flex flex-column">
-                        <div>
-                          @if (document.correspondent) {
-                            <b>{{document.correspondent | correspondentName | async}}: </b>
-                          }{{document.title}}
-                        </div>
-                        <small class="text-muted">
-                          {{document.created | customDate:'mediumDate'}}
-                          @if (document.page_count) {
-                            | {document.page_count, plural, =1 {One page} other {{{document.page_count}} pages}}
-                          }
-                        </small>
-                    </div>
-                </li>
-              }
-            }
-        </ul>
-        </div>
-    <div class="form-group mt-4">
-        <label class="form-label" for="metadataDocumentID" i18n>Use metadata from:</label>
-        <select id="metadataDocumentID" class="form-select" [ngModel]="metadataDocumentID()" (ngModelChange)="metadataDocumentID.set($event)">
-            <option [ngValue]="-1" i18n>Regenerate all metadata</option>
-            @for (document of documents(); track document.id) {
-              <option [ngValue]="document.id">{{document.title}}</option>
-            }
-        </select>
+<div class="rd-merge-dialog">
+  <div class="rd-merge-header">
+    <h4 class="rd-merge-title" id="modal-basic-title">
+      {{ title || (documentIDs().length + ' Dokumente zusammenführen') }}
+    </h4>
+    <p class="rd-merge-subtitle" i18n>
+      Die Seiten werden in dieser Reihenfolge zu einem neuen PDF zusammengefügt.
+    </p>
+  </div>
+
+  <div class="rd-merge-section">
+    <div class="rd-merge-section-head">
+      <span class="rd-merge-label" i18n>Reihenfolge</span>
+      @if (documentIDs().length > 1) {
+        <button
+          type="button"
+          class="rd-reverse-btn"
+          (click)="reverseOrder()"
+        >
+          <pngx-bs-icon name="arrow-down-up" width="12" height="12"></pngx-bs-icon>
+          <span i18n>Umkehren</span>
+        </button>
+      }
     </div>
-    <div class="form-check form-switch mt-4">
-      <input class="form-check-input" type="checkbox" role="switch" id="archiveFallbackSwitch" [ngModel]="archiveFallback()" (ngModelChange)="archiveFallback.set($event)">
-      <label class="form-check-label" for="archiveFallbackSwitch" i18n>Try to include archive version in merge for non-PDF files</label>
+
+    <ul
+      class="rd-merge-list"
+      cdkDropList
+      [cdkDropListData]="documentIDs()"
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      @for (documentID of documentIDs(); track documentID; let idx = $index) {
+        @let document = getDocument(documentID);
+        @if (document) {
+          <li class="rd-merge-item" cdkDrag>
+            <span class="rd-merge-grip" aria-hidden="true">
+              <pngx-bs-icon name="grip-vertical" width="14" height="14"></pngx-bs-icon>
+            </span>
+
+            <div class="rd-merge-thumb">
+              <img [src]="getThumbUrl(document.id)" [alt]="document.title" />
+            </div>
+
+            <div class="rd-merge-info">
+              <div class="rd-merge-item-title">{{ document.title }}</div>
+              <div class="rd-merge-item-meta">
+                @if (document.page_count) {
+                  <span i18n>{document.page_count, plural, =1 {1 Seite} other {{{ document.page_count }} Seiten}}</span>
+                  <span class="rd-meta-dot">·</span>
+                }
+                <span>{{ document.created | customDate:'mediumDate' }}</span>
+                @if (document.correspondent) {
+                  <span class="rd-meta-dot">·</span>
+                  <span>{{ document.correspondent | correspondentName | async }}</span>
+                }
+              </div>
+            </div>
+
+            <span class="rd-merge-index">{{ idx + 1 }}</span>
+          </li>
+        }
+      }
+    </ul>
+  </div>
+
+  <div class="rd-merge-section">
+    <label class="rd-merge-label mb-2" for="metadataDocumentID" i18n>
+      Metadaten übernehmen von
+    </label>
+    <select
+      id="metadataDocumentID"
+      class="form-select rd-merge-select"
+      [ngModel]="metadataDocumentID()"
+      (ngModelChange)="metadataDocumentID.set($event)"
+    >
+      <option [ngValue]="-1" i18n>Alle Metadaten neu generieren</option>
+      @for (document of documents(); track document.id) {
+        <option [ngValue]="document.id">{{ document.title }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="rd-merge-switch-card">
+    <div class="rd-merge-switch-copy">
+      <label class="rd-merge-switch-title" for="deleteOriginalsSwitch" i18n>
+        Originale danach löschen
+      </label>
+      <div class="rd-merge-switch-sub" i18n>
+        Die Ausgangsdokumente landen im Papierkorb.
+      </div>
     </div>
-    <div class="form-check form-switch mt-2">
-      <input class="form-check-input" type="checkbox" role="switch" id="deleteOriginalsSwitch" [ngModel]="deleteOriginals()" (ngModelChange)="deleteOriginals.set($event)" [disabled]="!userOwnsAllDocuments">
-      <label class="form-check-label" for="deleteOriginalsSwitch" i18n>Delete original documents after successful merge</label>
+    <div class="form-check form-switch m-0">
+      <input
+        class="form-check-input rd-merge-switch"
+        type="checkbox"
+        role="switch"
+        id="deleteOriginalsSwitch"
+        [ngModel]="deleteOriginals()"
+        (ngModelChange)="deleteOriginals.set($event)"
+        [disabled]="!userOwnsAllDocuments"
+      />
     </div>
-    @if (!archiveFallback()) {
-      <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be included.</p>
-    }
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">
-        <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+  </div>
+
+  <div class="rd-merge-fallback-row">
+    <div class="form-check form-switch m-0">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="archiveFallbackSwitch"
+        [ngModel]="archiveFallback()"
+        (ngModelChange)="archiveFallback.set($event)"
+      />
+      <label class="form-check-label rd-merge-fallback-label" for="archiveFallbackSwitch" i18n>
+        Archivversion für Nicht-PDF-Dateien einbeziehen
+      </label>
+    </div>
+  </div>
+
+  <div class="rd-merge-footer">
+    <button
+      type="button"
+      class="rd-btn-cancel"
+      (click)="cancel()"
+      [disabled]="!buttonsEnabled()"
+    >
+      {{ cancelBtnCaption || 'Abbrechen' }}
     </button>
-    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled()">
-        {{btnCaption}}
+    <button
+      type="button"
+      class="rd-btn-confirm"
+      (click)="confirm()"
+      [disabled]="!confirmButtonEnabled || !buttonsEnabled()"
+    >
+      <pngx-bs-icon name="sign-merge-right" width="14" height="14"></pngx-bs-icon>
+      <span>{{ btnCaption || 'Zusammenführen' }}</span>
     </button>
+  </div>
 </div>

@@ -428,12 +428,14 @@ body {
 }
 
 // Custom modal class for Redesign Merge & Progress Dialogs
+.modal-dialog.rd-glass-modal,
 .rd-glass-modal .modal-dialog {
   max-width: 480px;
 }
 
+.modal-dialog.rd-glass-modal-sm,
 .rd-progress-modal .modal-dialog {
-  max-width: 440px;
+  max-width: 420px;
 }
 
 // Ensure crisp dark mode document thumbnails without inverting crisp white document sheets

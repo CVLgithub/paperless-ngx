@@ -61,8 +61,16 @@ export class MergeConfirmDialogComponent
     this.documentIDs.set(documentIDs)
   }
 
+  reverseOrder(): void {
+    this.documentIDs.set([...this.documentIDs()].reverse())
+  }
+
   getDocument(documentID: number): Document {
     return this.documents().find((d) => d.id === documentID)
+  }
+
+  getThumbUrl(documentID: number): string {
+    return this.documentService.getThumbUrl(documentID)
   }
 
   get userOwnsAllDocuments(): boolean {

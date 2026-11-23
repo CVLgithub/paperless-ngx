@@ -79,6 +79,8 @@ import {
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
+import { MergeProgressDialogComponent } from '../../redesign/merge-progress-dialog/merge-progress-dialog.component'
+import { MergeWorkflowService } from 'src/app/services/merge-workflow.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -115,6 +117,7 @@ export class BulkEditorComponent
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
   private readonly workflowService = inject(WorkflowService)
   private readonly router = inject(Router)
+  private readonly mergeWorkflowService = inject(MergeWorkflowService)
 
   public manualWorkflows: Workflow[] = []
 
@@ -1066,15 +1069,30 @@ export class BulkEditorComponent
       })
   }
 
+  selectAllDocuments(): void {
+    if (this.list.allSelected) {
+      this.list.selectNone()
+    } else {
+      this.list.selectPage()
+    }
+  }
+
   mergeSelected() {
-    let modal = this.modalService.open(MergeConfirmDialogComponent, {
+    const selectedIds = Array.from(this.list.selected)
+    const modal = this.modalService.open(MergeConfirmDialogComponent, {
       backdrop: 'static',
+      centered: true,
+      modalDialogClass: 'rd-glass-modal',
     })
     const mergeDialog = modal.componentInstance as MergeConfirmDialogComponent
-    mergeDialog.title = $localize`Merge confirm`
-    mergeDialog.messageBold = $localize`This operation will merge ${this.getSelectionSize()} selected documents into a new document.`
-    mergeDialog.btnCaption = $localize`Proceed`
-    mergeDialog.documentIDs.set(Array.from(this.list.selected))
+    mergeDialog.title = $localize`${this.getSelectionSize()} Dokumente zusammenführen`
+    mergeDialog.messageBold = $localize`Die Seiten werden in dieser Reihenfolge zu einem neuen PDF zusammengefügt.`
+    mergeDialog.btnCaption = $localize`Zusammenführen`
+    mergeDialog.cancelBtnCaption = $localize`Abbrechen`
+    mergeDialog.documentIDs.set(selectedIds)
+    if (selectedIds.length > 0) {
+      mergeDialog.metadataDocumentID.set(selectedIds[0])
+    }
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
@@ -1088,12 +1106,23 @@ export class BulkEditorComponent
         if (mergeDialog.archiveFallback()) {
           args.archive_fallback = true
         }
+        const orderedIds = mergeDialog.documentIDs()
         mergeDialog.buttonsEnabled.set(false)
-        this.executeDocumentAction(
-          modal,
-          'merge',
-          this.documentService.mergeDocuments(mergeDialog.documentIDs(), args)
+        modal.close()
+
+        const handle = this.mergeWorkflowService.startMerge(orderedIds, args)
+        const progressModal = this.modalService.open(
+          MergeProgressDialogComponent,
+          {
+            backdrop: 'static',
+            keyboard: false,
+            centered: true,
+            modalDialogClass: 'rd-glass-modal rd-glass-modal-sm',
+          }
         )
+        const progressDialog =
+          progressModal.componentInstance as MergeProgressDialogComponent
+        progressDialog.attach(handle)
       })
   }
 
