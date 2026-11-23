@@ -17,7 +17,7 @@
           <context context-type="linenumber">386,393</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </target>
+        <target state="translated"> Slaids <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> no <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -275,7 +275,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Dokuments <x id="PH" equiv-text="status.filename"/> ir pievienots Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -311,7 +311,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="translated">Nevarēja pievienot <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
+        <target state="translated">Neizdevās pievienot <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -369,7 +369,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
@@ -427,7 +427,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage &gt; Saved Views once you have created some.</target>
+        <target state="translated">Infopanelī var attēlot saglabātos skatus, piemēram, “Iesūtne”. Kad būsiet izveidojis kādu skatu, tos varēsiet atrast sadaļā Pārvaldīt &gt; Saglabātie skati.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -435,7 +435,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
+        <target state="translated">Velciet un nometiet dokumentus šeit, vai ievietojiet tos ielādes mapē, lai sāktu augšupielādi. Dokumentus var vilkt un nomest arī jebkurā citā lietotnes lapā. Tiklīdz to izdarīsiet, Paperless-ngx sāks apmācīt savus mašīnmācīšanās algoritmus.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -443,7 +443,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</target>
+        <target state="translated">Dokumentu sarakstā ir redzami visi jūsu dokumenti, kur tos iespējams filtrēt un masveidā rediģēt. Ir pieejami trīs dažādi skata stili: saraksts, mazas kartītes un lielas kartītes. Sānu joslā ir redzami dokumenti, kas pašlaik atvērti rediģēšanai.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
@@ -451,7 +451,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</target>
+        <target state="translated">Filtrēšanas rīki ļauj ātri atrast dokumentus, izmantojot dažādus meklējumus, datumus, birkas u. c.</target>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
@@ -459,7 +459,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.</target>
+        <target state="translated">Jebkuru filtru kombināciju var saglabāta kā atsevišķu skatu, ko pēc tam attēlot infopanelī un/vai sānu joslā.</target>
       </trans-unit>
       <trans-unit id="5010312032259162639" datatype="html">
         <source>Attributes like tags, correspondents, document types, storage paths and custom fields can all be managed here. They can also be created from the document edit view.</source>
@@ -467,7 +467,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="needs-translation">Attributes like tags, correspondents, document types, storage paths and custom fields can all be managed here. They can also be created from the document edit view.</target>
+        <target state="translated">Šeit var pārvaldīt tādus atribūtus kā birkas, korespondentus, dokumentu veidus, glabāšanas ceļus un pielāgotos laukus. Tos var izveidot arī dokumenta rediģēšanas skatā.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -479,7 +479,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">Pārvaldīt e-pasta kontus un nosacījumus automātiskai dokumentu importēšanai.</target>
       </trans-unit>
       <trans-unit id="2258659358902319601" datatype="html">
         <source>Workflows give you more control over the document pipeline.</source>
@@ -487,7 +487,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="needs-translation">Workflows give you more control over the document pipeline.</target>
+        <target state="translated">Darbplūsmas sniedz lielāku kontroli pār dokumentu apstrādes procesu.</target>
       </trans-unit>
       <trans-unit id="2685141468866020893" datatype="html">
         <source>Tasks helps you track background work, what needs attention, and what recently completed.</source>
@@ -495,7 +495,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Tasks helps you track background work, what needs attention, and what recently completed.</target>
+        <target state="translated">Uzdevumi palīdz sekot līdzi fonā notiekošajiem procesiem, to problēmām un izpildes statusam.</target>
       </trans-unit>
       <trans-unit id="2755033621682206902" datatype="html">
         <source>Check out the settings for various tweaks to the web app.</source>
@@ -503,7 +503,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app.</target>
+        <target state="translated">Apskatiet iestatījumus dažādiem lietotnes pielāgojumiem.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -519,7 +519,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn't cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</target>
+        <target state="translated">Ir &lt;em&gt;daudzas&lt;/em&gt; citas funkcijas, ko šeit neapskatījām, taču ar šo pietiks, lai sāktu. Ieskaties dokumentācijā vai projekta GitHub vietnē, lai uzzinātu vairāk vai noziņotu problēmas.</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
@@ -527,7 +527,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">214</context>
         </context-group>
-        <target state="needs-translation">Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</target>
+        <target state="translated">Visbeidzot, visu projekta izstrādātāju vārdā — paldies, ka izmantojat Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="9063918187161876141" datatype="html">
         <source>Application Configuration</source>
@@ -535,7 +535,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">2,3</context>
         </context-group>
-        <target state="needs-translation">Application Configuration</target>
+        <target state="translated">Lietotnes konfigurācija</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
         <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
@@ -543,7 +543,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <target state="translated">Globālie lietotnes iestatījumi, kas attiecas uz &lt;strong&gt;katru&lt;/strong&gt; šīs Paperless-ngx instalācijas lietotāju. Tos var norādīt arī vides mainīgajos vai konfigurācijas failā, bet šeit iestatītā vērtība vienmēr būs noteicošā.</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -551,7 +551,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Read the documentation about this setting</target>
+        <target state="translated">Lasīt dokumentāciju par šo iestatījumu</target>
       </trans-unit>
       <trans-unit id="7057826840809102816" datatype="html">
         <source>This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</source>
@@ -559,7 +559,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</target>
+        <target state="translated">Vērtība pārraksta <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, kas ievadīta ārpus Paperless.</target>
       </trans-unit>
       <trans-unit id="7221396516204435584" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</source>
@@ -567,7 +567,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> ir ievadīta ārpus Paperless. Ievadi vērtību šeit lai to pārrakstītu.</target>
       </trans-unit>
       <trans-unit id="8318849619178340389" datatype="html">
         <source>Use the externally configured value</source>
@@ -575,7 +575,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Use the externally configured value</target>
+        <target state="translated">Izmantot ārēji ievadīto vērtību</target>
       </trans-unit>
       <trans-unit id="6032629623003430385" datatype="html">
         <source>Reset to external</source>
@@ -583,7 +583,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Reset to external</target>
+        <target state="translated">Atiestatīt uz ārējo vērtību</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
@@ -611,6 +611,10 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">125</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">34,35</context>
+        </context-group>
         <target state="translated">Iespējot</target>
       </trans-unit>
       <trans-unit id="2159130950882492111" datatype="html">
@@ -621,7 +625,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">439,440</context>
+          <context context-type="linenumber">445,446</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
@@ -701,7 +705,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">440,441</context>
+          <context context-type="linenumber">446,447</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -775,7 +779,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="needs-translation">Error retrieving config</target>
+        <target state="translated">Kļūda iegūstot konfigurāciju</target>
       </trans-unit>
       <trans-unit id="1172622527269118932" datatype="html">
         <source>Invalid JSON</source>
@@ -799,7 +803,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">An error occurred updating configuration</target>
+        <target state="translated">Radās kļūda atjaunojot konfigurāciju</target>
       </trans-unit>
       <trans-unit id="2653081282186526824" datatype="html">
         <source>File successfully updated</source>
@@ -839,7 +843,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Review the log files for the application and for email checking.</target>
+        <target state="translated">Pārskatiet notikumu žurnālu priekš lietotnes vai e-pasta pārbaudes.</target>
       </trans-unit>
       <trans-unit id="8461842260159597706" datatype="html">
         <source>Show</source>
@@ -859,7 +863,7 @@
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Show</target>
+        <target state="translated">Pārādīt</target>
       </trans-unit>
       <trans-unit id="5724363929304709833" datatype="html">
         <source>lines</source>
@@ -867,7 +871,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">18,19</context>
         </context-group>
-        <target state="needs-translation">lines</target>
+        <target state="translated">līnijas</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html">
         <source>Auto refresh</source>
@@ -995,7 +999,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">63,64</context>
         </context-group>
-        <target state="needs-translation">Jump to bottom</target>
+        <target state="translated">Pārlekt uz beigām</target>
       </trans-unit>
       <trans-unit id="1255048712725285892" datatype="html">
         <source>Options to customize appearance, notifications and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</source>
@@ -1003,7 +1007,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Options to customize appearance, notifications and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</target>
+        <target state="translated">Iestatījumi lai pielāgotu izskatu, paziņojumus un citas lietas. Izmaiņas tiek veiktas &lt;strong&gt;tikai šim lietotājam&lt;/strong&gt;.</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -1011,7 +1015,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Start tour</target>
+        <target state="translated">Sākt apskati</target>
       </trans-unit>
       <trans-unit id="3276228498925657259" datatype="html">
         <source>System Status</source>
@@ -1031,7 +1035,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Open Django Admin</target>
+        <target state="translated">Atvērt Django administrēšanas paneli</target>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
         <source>General</source>
@@ -1063,7 +1067,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">62,63</context>
         </context-group>
-        <target state="needs-translation">You need to reload the page after applying a new language.</target>
+        <target state="translated">Atjaunojiet lapu lai iestatītu jauno valodu.</target>
       </trans-unit>
       <trans-unit id="3766032098416558788" datatype="html">
         <source>Date display</source>
@@ -1087,7 +1091,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">93,94</context>
         </context-group>
-        <target state="needs-translation">Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Kompakts: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="6290748171049664628" datatype="html">
         <source>Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;mediumDate&apos;:null:computedDateLocale}}"/></source>
@@ -1095,7 +1099,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">97,98</context>
         </context-group>
-        <target state="needs-translation">Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Standarta: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="7189855711197998347" datatype="html">
         <source>Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;longDate&apos;:null:computedDateLocale}}"/></source>
@@ -1103,7 +1107,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">101,102</context>
         </context-group>
-        <target state="needs-translation">Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Izplests: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="3982403428275430291" datatype="html">
         <source>Sidebar</source>
@@ -1111,7 +1115,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">109,110</context>
         </context-group>
-        <target state="needs-translation">Sidebar</target>
+        <target state="translated">Sānu josla</target>
       </trans-unit>
       <trans-unit id="4608457133854405683" datatype="html">
         <source>Use &apos;slim&apos; sidebar (icons only)</source>
@@ -1119,7 +1123,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Use 'slim' sidebar (icons only)</target>
+        <target state="translated">Izmanto 'šauro' sānu joslu (ikonas)</target>
       </trans-unit>
       <trans-unit id="8002734935094514106" datatype="html">
         <source>Sidebar items to show:</source>
@@ -1127,7 +1131,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">115,116</context>
         </context-group>
-        <target state="needs-translation">Sidebar items to show:</target>
+        <target state="translated">Lietas, ko rādīt sānu joslā:</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -1159,7 +1163,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Invert thumbnails in dark mode</target>
+        <target state="translated">Pārvērst sīktēlu tumšajā režīmā</target>
       </trans-unit>
       <trans-unit id="7983234071833154796" datatype="html">
         <source>Theme Color</source>
@@ -1167,7 +1171,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">147,148</context>
         </context-group>
-        <target state="needs-translation">Theme Color</target>
+        <target state="translated">Motīva krāsa</target>
       </trans-unit>
       <trans-unit id="6760166989231109310" datatype="html">
         <source>Global search</source>
@@ -1179,7 +1183,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Global search</target>
+        <target state="translated">Globāla meklēšana</target>
       </trans-unit>
       <trans-unit id="2818183879511244335" datatype="html">
         <source>Do not include advanced search results</source>
@@ -1187,7 +1191,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Do not include advanced search results</target>
+        <target state="translated">Neiekļaut padziļinātos meklēšanas rezultātus</target>
       </trans-unit>
       <trans-unit id="3969258421469113318" datatype="html">
         <source>Full search links to</source>
@@ -1195,7 +1199,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">169,170</context>
         </context-group>
-        <target state="needs-translation">Full search links to</target>
+        <target state="translated">Pilnā meklēšana atver</target>
       </trans-unit>
       <trans-unit id="6631288852577115923" datatype="html">
         <source>Title and content search</source>
@@ -1203,7 +1207,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">173,174</context>
         </context-group>
-        <target state="needs-translation">Title and content search</target>
+        <target state="translated">Virsraksta un satura meklēšana</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
@@ -1227,7 +1231,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">179,180</context>
         </context-group>
-        <target state="needs-translation">Update checking</target>
+        <target state="translated">Atjauninājumu pārbaude</target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -1315,7 +1319,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="needs-translation">Show document counts in sidebar saved views</target>
+        <target state="translated">Rādīt dokumentu skaitu sānu joslā</target>
       </trans-unit>
       <trans-unit id="8939587804990976924" datatype="html">
         <source>Items per page</source>
@@ -1325,11 +1329,27 @@
         </context-group>
         <target state="translated">Vienības lapā</target>
       </trans-unit>
+      <trans-unit id="130759489795382425" datatype="html">
+        <source>Show nested tags with their parents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+        <target state="needs-translation">Show nested tags with their parents</target>
+      </trans-unit>
+      <trans-unit id="3479844904527277181" datatype="html">
+        <source>Child tags are shown together with their parent tags, instead of separately.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+        <target state="needs-translation">Child tags are shown together with their parent tags, instead of separately.</target>
+      </trans-unit>
       <trans-unit id="908152367861642592" datatype="html">
         <source>Document editing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">230,231</context>
+          <context context-type="linenumber">236,237</context>
         </context-group>
         <target state="needs-translation">Document editing</target>
       </trans-unit>
@@ -1337,7 +1357,7 @@
         <source>Use PDF viewer provided by the browser</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="needs-translation">Use PDF viewer provided by the browser</target>
       </trans-unit>
@@ -1345,7 +1365,7 @@
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="needs-translation">This is usually faster for displaying large PDF documents, but it might not work on some browsers.</target>
       </trans-unit>
@@ -1353,7 +1373,7 @@
         <source>Default zoom</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">239,240</context>
+          <context context-type="linenumber">245,246</context>
         </context-group>
         <target state="needs-translation">Default zoom</target>
       </trans-unit>
@@ -1361,7 +1381,7 @@
         <source>Fit width</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">243,244</context>
+          <context context-type="linenumber">249,250</context>
         </context-group>
         <target state="needs-translation">Fit width</target>
       </trans-unit>
@@ -1369,7 +1389,7 @@
         <source>Fit page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">244,245</context>
+          <context context-type="linenumber">250,251</context>
         </context-group>
         <target state="needs-translation">Fit page</target>
       </trans-unit>
@@ -1377,7 +1397,7 @@
         <source>Only applies to the Paperless-ngx PDF viewer.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">246,247</context>
+          <context context-type="linenumber">252,253</context>
         </context-group>
         <target state="needs-translation">Only applies to the Paperless-ngx PDF viewer.</target>
       </trans-unit>
@@ -1385,7 +1405,7 @@
         <source>Automatically remove inbox tag(s) on save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">258</context>
         </context-group>
         <target state="needs-translation">Automatically remove inbox tag(s) on save</target>
       </trans-unit>
@@ -1393,7 +1413,7 @@
         <source>Suggestions default to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">259,260</context>
+          <context context-type="linenumber">265,266</context>
         </context-group>
         <target state="needs-translation">Suggestions default to</target>
       </trans-unit>
@@ -1401,7 +1421,7 @@
         <source>Both</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">264</context>
+          <context context-type="linenumber">270</context>
         </context-group>
         <target state="needs-translation">Both</target>
       </trans-unit>
@@ -1409,7 +1429,7 @@
         <source>ML only</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <target state="needs-translation">ML only</target>
       </trans-unit>
@@ -1417,7 +1437,7 @@
         <source>AI only</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">274</context>
         </context-group>
         <target state="needs-translation">AI only</target>
       </trans-unit>
@@ -1425,7 +1445,7 @@
         <source>Automatically request suggestions for inbox documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <target state="needs-translation">Automatically request suggestions for inbox documents</target>
       </trans-unit>
@@ -1433,7 +1453,7 @@
         <source>If un-checked, suggestions must be requested via the Suggest button.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <target state="needs-translation">If un-checked, suggestions must be requested via the Suggest button.</target>
       </trans-unit>
@@ -1441,7 +1461,7 @@
         <source>Show document thumbnail during loading</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="needs-translation">Show document thumbnail during loading</target>
       </trans-unit>
@@ -1449,7 +1469,7 @@
         <source>Built-in fields to show:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">288,289</context>
+          <context context-type="linenumber">294,295</context>
         </context-group>
         <target state="needs-translation">Built-in fields to show:</target>
       </trans-unit>
@@ -1457,7 +1477,7 @@
         <source>Uncheck fields to hide them on the document details page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">300,301</context>
+          <context context-type="linenumber">306,307</context>
         </context-group>
         <target state="needs-translation">Uncheck fields to hide them on the document details page.</target>
       </trans-unit>
@@ -1465,7 +1485,7 @@
         <source>Bulk editing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">306,307</context>
+          <context context-type="linenumber">312,313</context>
         </context-group>
         <target state="needs-translation">Bulk editing</target>
       </trans-unit>
@@ -1473,7 +1493,7 @@
         <source>Show confirmation dialogs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">309</context>
+          <context context-type="linenumber">315</context>
         </context-group>
         <target state="needs-translation">Show confirmation dialogs</target>
       </trans-unit>
@@ -1481,7 +1501,7 @@
         <source>Apply on close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">310</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <target state="needs-translation">Apply on close</target>
       </trans-unit>
@@ -1489,7 +1509,7 @@
         <source>PDF Editor</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">314,315</context>
+          <context context-type="linenumber">320,321</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1505,7 +1525,7 @@
         <source>Default editing mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">317,318</context>
+          <context context-type="linenumber">323,324</context>
         </context-group>
         <target state="needs-translation">Default editing mode</target>
       </trans-unit>
@@ -1513,7 +1533,7 @@
         <source>Create new document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">321,322</context>
+          <context context-type="linenumber">327,328</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
@@ -1525,7 +1545,7 @@
         <source>Add document version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">322,323</context>
+          <context context-type="linenumber">328,329</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
@@ -1537,7 +1557,7 @@
         <source>Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">327,328</context>
+          <context context-type="linenumber">333,334</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1557,7 +1577,7 @@
         <source>Enable notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">330</context>
+          <context context-type="linenumber">336</context>
         </context-group>
         <target state="translated">Ieslēgt piezīmes</target>
       </trans-unit>
@@ -1565,7 +1585,7 @@
         <source>Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">339,340</context>
+          <context context-type="linenumber">345,346</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.html</context>
@@ -1625,7 +1645,7 @@
         <source>Default Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">342,344</context>
+          <context context-type="linenumber">348,350</context>
         </context-group>
         <target state="translated">Noklusētās atļaujas</target>
       </trans-unit>
@@ -1633,7 +1653,7 @@
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </target>
       </trans-unit>
@@ -1641,7 +1661,7 @@
         <source>Default Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">353,354</context>
+          <context context-type="linenumber">359,360</context>
         </context-group>
         <target state="translated">Noklusētais īpašnieks</target>
       </trans-unit>
@@ -1649,7 +1669,7 @@
         <source>Objects without an owner can be viewed and edited by all users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">357,358</context>
+          <context context-type="linenumber">363,364</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -1661,7 +1681,7 @@
         <source>Default View Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">362,363</context>
+          <context context-type="linenumber">368,369</context>
         </context-group>
         <target state="translated">Noklusētās skata atļaujas</target>
       </trans-unit>
@@ -1669,11 +1689,11 @@
         <source>Users:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">367,368</context>
+          <context context-type="linenumber">373,374</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">394,395</context>
+          <context context-type="linenumber">400,401</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -1705,11 +1725,11 @@
         <source>Groups:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">377,378</context>
+          <context context-type="linenumber">383,384</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">404,405</context>
+          <context context-type="linenumber">410,411</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -1741,7 +1761,7 @@
         <source>Default Edit Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">389,390</context>
+          <context context-type="linenumber">395,396</context>
         </context-group>
         <target state="translated">Noklusētās rediģēšanas atļaujas</target>
       </trans-unit>
@@ -1749,7 +1769,7 @@
         <source>Edit permissions also grant viewing permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">413,414</context>
+          <context context-type="linenumber">419,420</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -1769,7 +1789,7 @@
         <source>Notifications</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">421,422</context>
+          <context context-type="linenumber">427,428</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/toasts-dropdown/toasts-dropdown.component.html</context>
@@ -1785,7 +1805,7 @@
         <source>Document processing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">424,426</context>
+          <context context-type="linenumber">430,432</context>
         </context-group>
         <target state="translated">Dokumenta apstrāde</target>
       </trans-unit>
@@ -1793,7 +1813,7 @@
         <source>Add notifications when document processing completes successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">428</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <target state="needs-translation">Add notifications when document processing completes successfully</target>
       </trans-unit>
@@ -1801,7 +1821,7 @@
         <source>These are added to the notifications menu without a popup, processing progress is shown at the bottom of the screen.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">428</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <target state="needs-translation">These are added to the notifications menu without a popup, processing progress is shown at the bottom of the screen.</target>
       </trans-unit>
@@ -1809,7 +1829,7 @@
         <source>Show notifications when document processing fails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">429</context>
+          <context context-type="linenumber">435</context>
         </context-group>
         <target state="needs-translation">Show notifications when document processing fails</target>
       </trans-unit>
@@ -1961,7 +1981,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
@@ -2073,15 +2093,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">366,367</context>
+          <context context-type="linenumber">367,368</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="translated">Dokumentācija</target>
       </trans-unit>
@@ -2089,7 +2109,7 @@
         <source>Error retrieving users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">285</context>
+          <context context-type="linenumber">286</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2113,7 +2133,7 @@
         <source>Error retrieving groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">305</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2133,7 +2153,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">649</context>
+          <context context-type="linenumber">655</context>
         </context-group>
         <target state="translated">Iestatījumi sekmīgi saglabāti.</target>
       </trans-unit>
@@ -2141,7 +2161,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">656</context>
+          <context context-type="linenumber">662</context>
         </context-group>
         <target state="needs-translation">Settings were saved successfully. Reload is required to apply some changes.</target>
       </trans-unit>
@@ -2149,7 +2169,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">657</context>
+          <context context-type="linenumber">663</context>
         </context-group>
         <target state="needs-translation">Reload now</target>
       </trans-unit>
@@ -2157,19 +2177,19 @@
         <source>An error occurred while saving settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">667</context>
+          <context context-type="linenumber">673</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">256</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">374</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">402</context>
+          <context context-type="linenumber">403</context>
         </context-group>
         <target state="needs-translation">An error occurred while saving settings.</target>
       </trans-unit>
@@ -2688,6 +2708,14 @@
           <context context-type="linenumber">378</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">396</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">396</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">723</context>
         </context-group>
@@ -2749,7 +2777,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <target state="needs-translation">Open</target>
       </trans-unit>
@@ -2875,7 +2903,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Check Workflows</target>
+        <target state="translated">Apskatīt darbplūsmas</target>
       </trans-unit>
       <trans-unit id="2065831805515896240" datatype="html">
         <source>Bulk Update</source>
@@ -4073,35 +4101,43 @@
         </context-group>
         <target state="translated">Konfigurācija</target>
       </trans-unit>
-      <trans-unit id="1534029177398918729" datatype="html">
-        <source>GitHub</source>
+      <trans-unit id="8178404488993731083" datatype="html">
+        <source>See what&apos;s new in this version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">377</context>
         </context-group>
-        <target state="translated">GitHub</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">388</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">394</context>
+        </context-group>
+        <target state="needs-translation">See what's new in this version</target>
       </trans-unit>
-      <trans-unit id="4112664765954374539" datatype="html">
-        <source>is available.</source>
+      <trans-unit id="2518237780867209325" datatype="html">
+        <source>What&apos;s new</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">389</context>
+          <context context-type="linenumber">378</context>
         </context-group>
-        <target state="needs-translation">is available.</target>
+        <target state="needs-translation">What's new</target>
       </trans-unit>
-      <trans-unit id="1175891574282637937" datatype="html">
-        <source>Click to view.</source>
+      <trans-unit id="5280218112746407598" datatype="html">
+        <source>New</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">389</context>
+          <context context-type="linenumber">394,395</context>
         </context-group>
-        <target state="needs-translation">Click to view.</target>
+        <target state="needs-translation">New</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">393</context>
+          <context context-type="linenumber">406</context>
         </context-group>
         <target state="needs-translation">Paperless-ngx can automatically check for updates</target>
       </trans-unit>
@@ -4109,15 +4145,27 @@
         <source> How does this work? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">414</context>
         </context-group>
         <target state="needs-translation"> How does this work? </target>
+      </trans-unit>
+      <trans-unit id="1895149624197784510" datatype="html">
+        <source>Paperless-ngx <x id="INTERPOLATION" equiv-text="{{ appRemoteVersion().version }}"/> is available</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">421,422</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+        <target state="needs-translation">Paperless-ngx <x id="INTERPOLATION" equiv-text="{{ appRemoteVersion().version }}"/> is available</target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">413</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <target state="translated">Pieejams atjauninājums</target>
       </trans-unit>
@@ -4125,7 +4173,7 @@
         <source>Configure update checking</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">418</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="needs-translation">Configure update checking</target>
       </trans-unit>
@@ -4133,23 +4181,23 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">538</context>
+          <context context-type="linenumber">539</context>
         </context-group>
-        <target state="needs-translation">Sidebar views updated</target>
+        <target state="translated">Sānu joslas izskats atjaunots</target>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">542</context>
         </context-group>
-        <target state="needs-translation">Error updating sidebar views</target>
+        <target state="translated">Kļūda atjaunojot sānu joslas izskatu</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">562</context>
+          <context context-type="linenumber">601</context>
         </context-group>
         <target state="needs-translation">An error occurred while saving update checking settings.</target>
       </trans-unit>
@@ -4209,7 +4257,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">154</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
@@ -4319,7 +4367,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">160,161</context>
         </context-group>
-        <target state="needs-translation">Workflows</target>
+        <target state="translated">Darbplūsmas</target>
       </trans-unit>
       <trans-unit id="83507137894716798" datatype="html">
         <source>Successfully updated object.</source>
@@ -4799,7 +4847,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">11,12</context>
         </context-group>
-        <target state="needs-translation">Workflow</target>
+        <target state="translated">Darbplūsma</target>
       </trans-unit>
       <trans-unit id="6185505570283812140" datatype="html">
         <source>Select a workflow</source>
@@ -4807,7 +4855,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">13,14</context>
         </context-group>
-        <target state="needs-translation">Select a workflow</target>
+        <target state="translated">Izvēlies darbplūsmu</target>
       </trans-unit>
       <trans-unit id="261810320774538615" datatype="html">
         <source>Run on this document regardless of trigger filters</source>
@@ -4823,7 +4871,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">23,24</context>
         </context-group>
-        <target state="needs-translation">Ignore the workflow's trigger filters for this document.</target>
+        <target state="translated">Ignorēt darbplūsmas palaišanas filtrus dokumentam</target>
       </trans-unit>
       <trans-unit id="4512110365422311821" datatype="html">
         <source>Run on all selected documents</source>
@@ -4839,7 +4887,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">26,27</context>
         </context-group>
-        <target state="needs-translation">Ignore the workflow's trigger filters and run on every selected document.</target>
+        <target state="translated">Ignorēt darbplūsmas palaišanas filtrus un izpildīt katram atlasītajam dokumentam.</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html">
         <source>View</source>
@@ -5050,6 +5098,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">22,23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">77,78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-dialog/share-link-bundle-dialog.component.ts</context>
@@ -6437,7 +6493,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">56</context>
         </context-group>
         <target state="translated">Izveidot jaunu birku</target>
       </trans-unit>
@@ -6639,7 +6695,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">31,32</context>
         </context-group>
-        <target state="needs-translation">Trigger Workflow On:</target>
+        <target state="translated">Palaist darbplūsmu:</target>
       </trans-unit>
       <trans-unit id="3901427285052969410" datatype="html">
         <source>Add Trigger</source>
@@ -6855,7 +6911,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">195,196</context>
         </context-group>
-        <target state="needs-translation">No advanced workflow filters defined.</target>
+        <target state="translated">Nav definēts neviens papildu darbplūsmas filtrs.</target>
       </trans-unit>
       <trans-unit id="6892734625735572404" datatype="html">
         <source> Complete the custom field query configuration. </source>
@@ -6887,7 +6943,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">Var iekļaut dažus vietturus, skatīt&lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;dokumentāciju&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -7135,7 +7191,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">438</context>
         </context-group>
-        <target state="needs-translation"> One password per line. The workflow will try them in order until one succeeds. </target>
+        <target state="translated"> Pa vienai parolei katrā rindā. Darbplūsma tās mēģinās norādītajā secībā, līdz kāda no tām derēs. </target>
       </trans-unit>
       <trans-unit id="3853121441237751087" datatype="html">
         <source>Passwords</source>
@@ -7159,7 +7215,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">455,456</context>
         </context-group>
-        <target state="needs-translation">The document will be moved to the trash at the end of the workflow run.</target>
+        <target state="translated">Dokuments tiks pārvietots uz atkritni pēc darbplūsmas izpildes.</target>
       </trans-unit>
       <trans-unit id="7532958562244845095" datatype="html">
         <source>The document will be sent to the configured remote OCR service. May incur costs.</source>
@@ -7183,7 +7239,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">470,471</context>
         </context-group>
-        <target state="needs-translation">This action runs in the background, so the suggestions may be applied after the other actions of this workflow have finished.</target>
+        <target state="translated">Šī darbība notiek fonā, tāpēc ieteikumus var piemērot pēc tam, kad pārējās šīs darbplūsmas darbības ir pabeigtas.</target>
       </trans-unit>
       <trans-unit id="3473589590476379802" datatype="html">
         <source>Apply suggestions for</source>
@@ -7503,7 +7559,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="needs-translation">Some workflow options could not be loaded.</target>
+        <target state="translated">Neizdevās ielādēt dažas darbplūsmas opcijas.</target>
       </trans-unit>
       <trans-unit id="3138206142174978019" datatype="html">
         <source>Create new workflow</source>
@@ -7770,7 +7826,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target state="translated">Ieteikumi:</target>
       </trans-unit>
@@ -7907,11 +7963,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
-          <context context-type="linenumber">20,21</context>
+          <context context-type="linenumber">25,26</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
-          <context context-type="linenumber">23,26</context>
+          <context context-type="linenumber">28,31</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/object-name.pipe.ts</context>
@@ -7955,7 +8011,7 @@
         <source>Remove tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/document-operation.ts</context>
@@ -7967,7 +8023,7 @@
         <source>Filter documents with these Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">56,57</context>
+          <context context-type="linenumber">61,62</context>
         </context-group>
         <target state="translated">Filtrēt dokumentus ar šiem tagiem</target>
       </trans-unit>
@@ -8618,6 +8674,130 @@
           <context context-type="linenumber">345</context>
         </context-group>
         <target state="needs-translation">Error deactivating TOTP</target>
+      </trans-unit>
+      <trans-unit id="3571297123964361575" datatype="html">
+        <source>You are running <x id="INTERPOLATION" equiv-text="{{ version }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+        <target state="needs-translation">You are running <x id="INTERPOLATION" equiv-text="{{ version }}"/></target>
+      </trans-unit>
+      <trans-unit id="7006907352030120065" datatype="html">
+        <source>What&apos;s new in Paperless-ngx</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">7,8</context>
+        </context-group>
+        <target state="needs-translation">What's new in Paperless-ngx</target>
+      </trans-unit>
+      <trans-unit id="389072682253988920" datatype="html">
+        <source>Updated from <x id="INTERPOLATION" equiv-text="{{ since() }}"/> to <x id="INTERPOLATION_1" equiv-text="{{ version }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+        <target state="needs-translation">Updated from <x id="INTERPOLATION" equiv-text="{{ since() }}"/> to <x id="INTERPOLATION_1" equiv-text="{{ version }}"/></target>
+      </trans-unit>
+      <trans-unit id="8842508877109723703" datatype="html">
+        <source>Star Paperless-ngx on GitHub</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">Star Paperless-ngx on GitHub</target>
+      </trans-unit>
+      <trans-unit id="6664152940140781978" datatype="html">
+        <source>Star</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">17,18</context>
+        </context-group>
+        <target state="needs-translation">Star</target>
+      </trans-unit>
+      <trans-unit id="8690562446300830265" datatype="html">
+        <source>Stargazers</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Stargazers</target>
+      </trans-unit>
+      <trans-unit id="6915195443416731840" datatype="html">
+        <source>Paperless-ngx can automatically check for updates and show release notes here, fetched from GitHub.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">32,33</context>
+        </context-group>
+        <target state="needs-translation">Paperless-ngx can automatically check for updates and show release notes here, fetched from GitHub.</target>
+      </trans-unit>
+      <trans-unit id="9187855490716817910" datatype="html">
+        <source>Disable</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">35,36</context>
+        </context-group>
+        <target state="needs-translation">Disable</target>
+      </trans-unit>
+      <trans-unit id="848030772962929773" datatype="html">
+        <source>Release notes are fetched from GitHub when update checking is enabled.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+        <target state="needs-translation">Release notes are fetched from GitHub when update checking is enabled.</target>
+      </trans-unit>
+      <trans-unit id="8889343662607906285" datatype="html">
+        <source>Loading release notes...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Loading release notes...</target>
+      </trans-unit>
+      <trans-unit id="3905769796953580006" datatype="html">
+        <source>Release notes could not be loaded.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">47,48</context>
+        </context-group>
+        <target state="needs-translation">Release notes could not be loaded.</target>
+      </trans-unit>
+      <trans-unit id="7123461329735788421" datatype="html">
+        <source>View on GitHub</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <target state="needs-translation">View on GitHub</target>
+      </trans-unit>
+      <trans-unit id="5209375229038355212" datatype="html">
+        <source>All releases</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <target state="needs-translation">All releases</target>
+      </trans-unit>
+      <trans-unit id="8716179943241079117" datatype="html">
+        <source>Need support? Ask in Discussions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <target state="needs-translation">Need support? Ask in Discussions</target>
+      </trans-unit>
+      <trans-unit id="972346719789721379" datatype="html">
+        <source>How to update</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+        <target state="needs-translation">How to update</target>
       </trans-unit>
       <trans-unit id="4452415362871534100" datatype="html">
         <source>Selected documents:</source>
@@ -9703,7 +9883,7 @@
           <context context-type="sourcefile">src/app/utils/document-operation.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Run workflow</target>
+        <target state="translated">Palaist darbplūsmu</target>
       </trans-unit>
       <trans-unit id="7049887240439736400" datatype="html">
         <source>Print</source>
@@ -10331,7 +10511,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1591</context>
         </context-group>
-        <target state="needs-translation">Run a workflow on "<x id="PH" equiv-text="this.document().title"/>".</target>
+        <target state="translated">Palaist darbplūsmu dokumentam "<x id="PH" equiv-text="this.document().title"/>".</target>
       </trans-unit>
       <trans-unit id="3759965007855499397" datatype="html">
         <source>Run</source>
@@ -10351,7 +10531,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1607</context>
         </context-group>
-        <target state="needs-translation">Workflow queued.</target>
+        <target state="translated">Darbplūsma pievienota izpildei.</target>
       </trans-unit>
       <trans-unit id="3321568156074471424" datatype="html">
         <source>Workflow completed.</source>
@@ -10359,7 +10539,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1609</context>
         </context-group>
-        <target state="needs-translation">Workflow completed.</target>
+        <target state="translated">Darbplūsma izpildīta.</target>
       </trans-unit>
       <trans-unit id="6030453331794586802" datatype="html">
         <source>Error downloading document</source>
@@ -10831,7 +11011,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">316</context>
         </context-group>
-        <target state="needs-translation">Run a workflow on <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
+        <target state="translated">Palaist darbplūsmu <x id="PH" equiv-text="this.getSelectionSize()"/> atlasītajiem dokumentiem.</target>
       </trans-unit>
       <trans-unit id="8161885405686762788" datatype="html">
         <source>Workflow will run on the selected documents in the background.</source>
@@ -10839,7 +11019,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">333</context>
         </context-group>
-        <target state="needs-translation">Workflow will run on the selected documents in the background.</target>
+        <target state="translated">Darbplūsma fonā apstrādās atlasītos dokumentus.</target>
       </trans-unit>
       <trans-unit id="6198773644658556874" datatype="html">
         <source>Bulk operation &apos;<x id="PH" equiv-text="label"/>&apos; submitted for processing.</source>
@@ -11257,11 +11437,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">80,81</context>
+          <context context-type="linenumber">81,82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">95,96</context>
+          <context context-type="linenumber">96,97</context>
         </context-group>
         <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document().created | customDate }}"/></target>
       </trans-unit>
@@ -11273,11 +11453,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">81,82</context>
+          <context context-type="linenumber">82,83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">96,97</context>
+          <context context-type="linenumber">97,98</context>
         </context-group>
         <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></target>
       </trans-unit>
@@ -11289,11 +11469,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">82,83</context>
+          <context context-type="linenumber">83,84</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">97,98</context>
+          <context context-type="linenumber">98,99</context>
         </context-group>
         <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document().modified | customDate }}"/></target>
       </trans-unit>
@@ -11305,7 +11485,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 page} other {<x id="INTERPOLATION"/> pages}}</target>
       </trans-unit>
@@ -11317,7 +11497,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">129,130</context>
+          <context context-type="linenumber">130,131</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -11341,7 +11521,7 @@
         <source>Toggle tag filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <target state="needs-translation">Toggle tag filter</target>
       </trans-unit>
@@ -11349,7 +11529,7 @@
         <source>Toggle correspondent filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">48</context>
         </context-group>
         <target state="needs-translation">Toggle correspondent filter</target>
       </trans-unit>
@@ -11357,7 +11537,7 @@
         <source>Toggle document type filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <target state="needs-translation">Toggle document type filter</target>
       </trans-unit>
@@ -11365,7 +11545,7 @@
         <source>Toggle storage path filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target state="needs-translation">Toggle storage path filter</target>
       </trans-unit>
@@ -11413,7 +11593,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">351</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11429,7 +11609,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">346</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11713,7 +11893,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">334</context>
         </context-group>
         <target state="needs-translation">Reset filters / selection</target>
       </trans-unit>
@@ -11721,7 +11901,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">362</context>
         </context-group>
         <target state="needs-translation">Open first [selected] document</target>
       </trans-unit>
@@ -11729,7 +11909,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">376</context>
+          <context context-type="linenumber">378</context>
         </context-group>
         <target state="needs-translation">Previous page</target>
       </trans-unit>
@@ -11737,7 +11917,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">390</context>
         </context-group>
         <target state="needs-translation">Next page</target>
       </trans-unit>
@@ -11745,7 +11925,7 @@
         <source>View &quot;<x id="PH" equiv-text="view.name ?? title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">423</context>
+          <context context-type="linenumber">425</context>
         </context-group>
         <target state="needs-translation">View "<x id="PH" equiv-text="view.name ?? title"/>" saved successfully.</target>
       </trans-unit>
@@ -11753,7 +11933,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="title"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">429</context>
+          <context context-type="linenumber">431</context>
         </context-group>
         <target state="needs-translation">Failed to save view "<x id="PH" equiv-text="title"/>".</target>
       </trans-unit>
@@ -11761,7 +11941,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">498</context>
+          <context context-type="linenumber">500</context>
         </context-group>
         <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully.</target>
       </trans-unit>
@@ -11769,7 +11949,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">504</context>
+          <context context-type="linenumber">506</context>
         </context-group>
         <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully, but could not update visibility settings.</target>
       </trans-unit>
@@ -13283,7 +13463,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Use workflows to customize the behavior of Paperless-ngx when events 'trigger' a workflow.</target>
+        <target state="translated">Izmanto darbplūsmas, lai pielāgotu Paperless-ngx rīcību, kad darbība tās palaiž.</target>
       </trans-unit>
       <trans-unit id="2437630016855517844" datatype="html">
         <source>Add Workflow</source>
@@ -13291,7 +13471,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Add Workflow</target>
+        <target state="translated">Pievienot darbplūsmu</target>
       </trans-unit>
       <trans-unit id="1624023882313260402" datatype="html">
         <source>No workflows defined.</source>
@@ -13299,7 +13479,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">80,82</context>
         </context-group>
-        <target state="needs-translation">No workflows defined.</target>
+        <target state="translated">Nav definēta neviena darbplūsma.</target>
       </trans-unit>
       <trans-unit id="4200688335642457098" datatype="html">
         <source>Saved workflow &quot;<x id="PH" equiv-text="newWorkflow.name"/>&quot;.</source>
@@ -13307,7 +13487,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Saved workflow "<x id="PH" equiv-text="newWorkflow.name"/>".</target>
+        <target state="translated">Saglabāt darbplūsmu "<x id="PH" equiv-text="newWorkflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="7593065565369163325" datatype="html">
         <source>Error saving workflow.</source>
@@ -13315,7 +13495,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Error saving workflow.</target>
+        <target state="translated">Neizdevās saglabāt darbplūsmu.</target>
       </trans-unit>
       <trans-unit id="563460864902055482" datatype="html">
         <source>Confirm delete workflow</source>
@@ -13323,7 +13503,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">Confirm delete workflow</target>
+        <target state="translated">Apstiprināt darbplūsmas dzēšanu</target>
       </trans-unit>
       <trans-unit id="6874008462443189248" datatype="html">
         <source>This operation will permanently delete this workflow.</source>
@@ -13331,7 +13511,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this workflow.</target>
+        <target state="translated">Šī darbība neatgriezeniski izdzēsīs darbplūsmu.</target>
       </trans-unit>
       <trans-unit id="1284828901551483140" datatype="html">
         <source>Deleted workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -13339,7 +13519,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">142</context>
         </context-group>
-        <target state="needs-translation">Deleted workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">Izdzēstā darbplūsma "<x id="PH" equiv-text="workflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="1427555175623563103" datatype="html">
         <source>Error deleting workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -13347,7 +13527,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">149</context>
         </context-group>
-        <target state="needs-translation">Error deleting workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">Neizdevās izdzēst darbplūsmu "<x id="PH" equiv-text="workflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="3737192425004139518" datatype="html">
         <source>Enabled workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;</source>
@@ -13355,7 +13535,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">162</context>
         </context-group>
-        <target state="needs-translation">Enabled workflow "<x id="PH" equiv-text="workflow.name"/>"</target>
+        <target state="translated">Iespējota darbplūsma "<x id="PH" equiv-text="workflow.name"/>"</target>
       </trans-unit>
       <trans-unit id="7404075898344576079" datatype="html">
         <source>Disabled workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;</source>
@@ -13363,7 +13543,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Disabled workflow "<x id="PH" equiv-text="workflow.name"/>"</target>
+        <target state="translated">Atspējota darbplūsma "<x id="PH" equiv-text="workflow.name"/>"</target>
       </trans-unit>
       <trans-unit id="6597823365851861961" datatype="html">
         <source>Error toggling workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -13371,7 +13551,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="needs-translation">Error toggling workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">Neizdevās pārslēgt darbplūsmu "<x id="PH" equiv-text="workflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="2649252321173430744" datatype="html">
         <source>Not Found</source>
@@ -13836,7 +14016,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="needs-translation">Which documents are sent to the remote engine. Use 'workflow_only' to keep remote OCR off unless a workflow enables it for a document.</target>
+        <target state="translated">Kuri dokumenti tiek nosūtīti attālinātajam dzinējam. Izmantojiet “workflow_only”, lai attālinātā teksta atpazīšana (OCR) būtu izslēgta, ja vien kāda darbplūsma to neiespējo konkrētam dokumentam.</target>
       </trans-unit>
       <trans-unit id="7106327322456204362" datatype="html">
         <source>Application Logo</source>
@@ -14754,7 +14934,7 @@
         <source>English (US)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <target state="needs-translation">English (US)</target>
       </trans-unit>
@@ -14762,7 +14942,7 @@
         <source>Afrikaans</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <target state="needs-translation">Afrikaans</target>
       </trans-unit>
@@ -14770,7 +14950,7 @@
         <source>Arabic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <target state="needs-translation">Arabic</target>
       </trans-unit>
@@ -14778,7 +14958,7 @@
         <source>Belarusian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">75</context>
         </context-group>
         <target state="needs-translation">Belarusian</target>
       </trans-unit>
@@ -14786,7 +14966,7 @@
         <source>Bulgarian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <target state="needs-translation">Bulgarian</target>
       </trans-unit>
@@ -14794,7 +14974,7 @@
         <source>Catalan</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <target state="needs-translation">Catalan</target>
       </trans-unit>
@@ -14802,7 +14982,7 @@
         <source>Czech</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <target state="needs-translation">Czech</target>
       </trans-unit>
@@ -14810,7 +14990,7 @@
         <source>Danish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">99</context>
         </context-group>
         <target state="needs-translation">Danish</target>
       </trans-unit>
@@ -14818,7 +14998,7 @@
         <source>German</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="needs-translation">German</target>
       </trans-unit>
@@ -14826,7 +15006,7 @@
         <source>Greek</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="needs-translation">Greek</target>
       </trans-unit>
@@ -14834,7 +15014,7 @@
         <source>English (GB)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <target state="needs-translation">English (GB)</target>
       </trans-unit>
@@ -14842,7 +15022,7 @@
         <source>Spanish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">123</context>
         </context-group>
         <target state="needs-translation">Spanish</target>
       </trans-unit>
@@ -14850,7 +15030,7 @@
         <source>Finnish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="needs-translation">Finnish</target>
       </trans-unit>
@@ -14858,7 +15038,7 @@
         <source>French</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="needs-translation">French</target>
       </trans-unit>
@@ -14866,7 +15046,7 @@
         <source>Hungarian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="needs-translation">Hungarian</target>
       </trans-unit>
@@ -14874,7 +15054,7 @@
         <source>Indonesian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="needs-translation">Indonesian</target>
       </trans-unit>
@@ -14882,7 +15062,7 @@
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="needs-translation">Italian</target>
       </trans-unit>
@@ -14890,7 +15070,7 @@
         <source>Japanese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="needs-translation">Japanese</target>
       </trans-unit>
@@ -14898,7 +15078,7 @@
         <source>Korean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="needs-translation">Korean</target>
       </trans-unit>
@@ -14906,7 +15086,7 @@
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="needs-translation">Luxembourgish</target>
       </trans-unit>
@@ -14914,7 +15094,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="needs-translation">Dutch</target>
       </trans-unit>
@@ -14922,7 +15102,7 @@
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="needs-translation">Norwegian</target>
       </trans-unit>
@@ -14930,7 +15110,7 @@
         <source>Persian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="needs-translation">Persian</target>
       </trans-unit>
@@ -14938,7 +15118,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="needs-translation">Polish</target>
       </trans-unit>
@@ -14946,7 +15126,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="needs-translation">Portuguese (Brazil)</target>
       </trans-unit>
@@ -14954,7 +15134,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="needs-translation">Portuguese</target>
       </trans-unit>
@@ -14962,7 +15142,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="needs-translation">Romanian</target>
       </trans-unit>
@@ -14970,7 +15150,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="needs-translation">Russian</target>
       </trans-unit>
@@ -14978,7 +15158,7 @@
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="needs-translation">Slovak</target>
       </trans-unit>
@@ -14986,7 +15166,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="needs-translation">Slovenian</target>
       </trans-unit>
@@ -14994,7 +15174,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="needs-translation">Serbian</target>
       </trans-unit>
@@ -15002,7 +15182,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="needs-translation">Swedish</target>
       </trans-unit>
@@ -15010,7 +15190,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="needs-translation">Turkish</target>
       </trans-unit>
@@ -15018,7 +15198,7 @@
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="needs-translation">Ukrainian</target>
       </trans-unit>
@@ -15026,7 +15206,7 @@
         <source>Vietnamese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="needs-translation">Vietnamese</target>
       </trans-unit>
@@ -15034,7 +15214,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="needs-translation">Chinese Simplified</target>
       </trans-unit>
@@ -15042,7 +15222,7 @@
         <source>Chinese Traditional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="needs-translation">Chinese Traditional</target>
       </trans-unit>
@@ -15050,7 +15230,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">281</context>
         </context-group>
         <target state="needs-translation">ISO 8601</target>
       </trans-unit>
@@ -15058,7 +15238,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">661</context>
+          <context context-type="linenumber">675</context>
         </context-group>
         <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
       </trans-unit>
@@ -15066,7 +15246,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">662</context>
+          <context context-type="linenumber">676</context>
         </context-group>
         <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
       </trans-unit>
@@ -15074,7 +15254,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">745</context>
+          <context context-type="linenumber">787</context>
         </context-group>
         <target state="needs-translation">You can restart the tour from the settings page.</target>
       </trans-unit>

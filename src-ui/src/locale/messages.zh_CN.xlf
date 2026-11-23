@@ -369,7 +369,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
@@ -611,6 +611,10 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">125</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">34,35</context>
+        </context-group>
         <target state="translated">启用</target>
       </trans-unit>
       <trans-unit id="2159130950882492111" datatype="html">
@@ -621,7 +625,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">439,440</context>
+          <context context-type="linenumber">445,446</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
@@ -701,7 +705,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">440,441</context>
+          <context context-type="linenumber">446,447</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -1325,11 +1329,27 @@
         </context-group>
         <target state="translated">每页显示</target>
       </trans-unit>
+      <trans-unit id="130759489795382425" datatype="html">
+        <source>Show nested tags with their parents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+        <target state="needs-translation">Show nested tags with their parents</target>
+      </trans-unit>
+      <trans-unit id="3479844904527277181" datatype="html">
+        <source>Child tags are shown together with their parent tags, instead of separately.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+        <target state="needs-translation">Child tags are shown together with their parent tags, instead of separately.</target>
+      </trans-unit>
       <trans-unit id="908152367861642592" datatype="html">
         <source>Document editing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">230,231</context>
+          <context context-type="linenumber">236,237</context>
         </context-group>
         <target state="translated">文档编辑</target>
       </trans-unit>
@@ -1337,7 +1357,7 @@
         <source>Use PDF viewer provided by the browser</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">使用浏览器提供的 PDF 查看器</target>
       </trans-unit>
@@ -1345,7 +1365,7 @@
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">显示大型的 PDF 文档通常更快，但在某些浏览器上可能无法使用。</target>
       </trans-unit>
@@ -1353,7 +1373,7 @@
         <source>Default zoom</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">239,240</context>
+          <context context-type="linenumber">245,246</context>
         </context-group>
         <target state="translated">默认缩放设置</target>
       </trans-unit>
@@ -1361,7 +1381,7 @@
         <source>Fit width</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">243,244</context>
+          <context context-type="linenumber">249,250</context>
         </context-group>
         <target state="translated">适应宽度</target>
       </trans-unit>
@@ -1369,7 +1389,7 @@
         <source>Fit page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">244,245</context>
+          <context context-type="linenumber">250,251</context>
         </context-group>
         <target state="translated">适应页面</target>
       </trans-unit>
@@ -1377,7 +1397,7 @@
         <source>Only applies to the Paperless-ngx PDF viewer.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">246,247</context>
+          <context context-type="linenumber">252,253</context>
         </context-group>
         <target state="translated">仅适用于Paperless-ngx PDF 查看器。</target>
       </trans-unit>
@@ -1385,7 +1405,7 @@
         <source>Automatically remove inbox tag(s) on save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">258</context>
         </context-group>
         <target state="translated">保存时自动删除收件箱标签(s)</target>
       </trans-unit>
@@ -1393,7 +1413,7 @@
         <source>Suggestions default to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">259,260</context>
+          <context context-type="linenumber">265,266</context>
         </context-group>
         <target state="needs-translation">Suggestions default to</target>
       </trans-unit>
@@ -1401,7 +1421,7 @@
         <source>Both</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">264</context>
+          <context context-type="linenumber">270</context>
         </context-group>
         <target state="needs-translation">Both</target>
       </trans-unit>
@@ -1409,7 +1429,7 @@
         <source>ML only</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <target state="translated">仅限 ML</target>
       </trans-unit>
@@ -1417,7 +1437,7 @@
         <source>AI only</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">274</context>
         </context-group>
         <target state="translated">仅限 AI</target>
       </trans-unit>
@@ -1425,7 +1445,7 @@
         <source>Automatically request suggestions for inbox documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <target state="needs-translation">Automatically request suggestions for inbox documents</target>
       </trans-unit>
@@ -1433,7 +1453,7 @@
         <source>If un-checked, suggestions must be requested via the Suggest button.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <target state="needs-translation">If un-checked, suggestions must be requested via the Suggest button.</target>
       </trans-unit>
@@ -1441,7 +1461,7 @@
         <source>Show document thumbnail during loading</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="translated">加载时显示文档缩略图</target>
       </trans-unit>
@@ -1449,7 +1469,7 @@
         <source>Built-in fields to show:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">288,289</context>
+          <context context-type="linenumber">294,295</context>
         </context-group>
         <target state="translated">内置显示字段：</target>
       </trans-unit>
@@ -1457,7 +1477,7 @@
         <source>Uncheck fields to hide them on the document details page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">300,301</context>
+          <context context-type="linenumber">306,307</context>
         </context-group>
         <target state="translated">取消勾选字段可在文档详情页面中隐藏这些字段。</target>
       </trans-unit>
@@ -1465,7 +1485,7 @@
         <source>Bulk editing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">306,307</context>
+          <context context-type="linenumber">312,313</context>
         </context-group>
         <target state="translated">批量编辑</target>
       </trans-unit>
@@ -1473,7 +1493,7 @@
         <source>Show confirmation dialogs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">309</context>
+          <context context-type="linenumber">315</context>
         </context-group>
         <target state="translated">显示确认对话框</target>
       </trans-unit>
@@ -1481,7 +1501,7 @@
         <source>Apply on close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">310</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <target state="translated">关闭时应用</target>
       </trans-unit>
@@ -1489,7 +1509,7 @@
         <source>PDF Editor</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">314,315</context>
+          <context context-type="linenumber">320,321</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1505,7 +1525,7 @@
         <source>Default editing mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">317,318</context>
+          <context context-type="linenumber">323,324</context>
         </context-group>
         <target state="translated">默认编辑模式</target>
       </trans-unit>
@@ -1513,7 +1533,7 @@
         <source>Create new document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">321,322</context>
+          <context context-type="linenumber">327,328</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
@@ -1525,7 +1545,7 @@
         <source>Add document version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">322,323</context>
+          <context context-type="linenumber">328,329</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
@@ -1537,7 +1557,7 @@
         <source>Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">327,328</context>
+          <context context-type="linenumber">333,334</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1557,7 +1577,7 @@
         <source>Enable notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">330</context>
+          <context context-type="linenumber">336</context>
         </context-group>
         <target state="translated">启用备注</target>
       </trans-unit>
@@ -1565,7 +1585,7 @@
         <source>Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">339,340</context>
+          <context context-type="linenumber">345,346</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.html</context>
@@ -1625,7 +1645,7 @@
         <source>Default Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">342,344</context>
+          <context context-type="linenumber">348,350</context>
         </context-group>
         <target state="translated">默认权限</target>
       </trans-unit>
@@ -1633,7 +1653,7 @@
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <target state="translated"> 这些设置将应用于通过 Web 界面创建的对象（标签、邮件规则等）。这些设置不适用于文档。 </target>
       </trans-unit>
@@ -1641,7 +1661,7 @@
         <source>Default Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">353,354</context>
+          <context context-type="linenumber">359,360</context>
         </context-group>
         <target state="translated">默认所有者</target>
       </trans-unit>
@@ -1649,7 +1669,7 @@
         <source>Objects without an owner can be viewed and edited by all users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">357,358</context>
+          <context context-type="linenumber">363,364</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -1661,7 +1681,7 @@
         <source>Default View Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">362,363</context>
+          <context context-type="linenumber">368,369</context>
         </context-group>
         <target state="translated">默认查看权限</target>
       </trans-unit>
@@ -1669,11 +1689,11 @@
         <source>Users:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">367,368</context>
+          <context context-type="linenumber">373,374</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">394,395</context>
+          <context context-type="linenumber">400,401</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -1705,11 +1725,11 @@
         <source>Groups:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">377,378</context>
+          <context context-type="linenumber">383,384</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">404,405</context>
+          <context context-type="linenumber">410,411</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -1741,7 +1761,7 @@
         <source>Default Edit Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">389,390</context>
+          <context context-type="linenumber">395,396</context>
         </context-group>
         <target state="translated">默认编辑权限</target>
       </trans-unit>
@@ -1749,7 +1769,7 @@
         <source>Edit permissions also grant viewing permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">413,414</context>
+          <context context-type="linenumber">419,420</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -1769,7 +1789,7 @@
         <source>Notifications</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">421,422</context>
+          <context context-type="linenumber">427,428</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/toasts-dropdown/toasts-dropdown.component.html</context>
@@ -1785,7 +1805,7 @@
         <source>Document processing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">424,426</context>
+          <context context-type="linenumber">430,432</context>
         </context-group>
         <target state="translated">文档处理</target>
       </trans-unit>
@@ -1793,7 +1813,7 @@
         <source>Add notifications when document processing completes successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">428</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <target state="needs-translation">Add notifications when document processing completes successfully</target>
       </trans-unit>
@@ -1801,7 +1821,7 @@
         <source>These are added to the notifications menu without a popup, processing progress is shown at the bottom of the screen.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">428</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <target state="needs-translation">These are added to the notifications menu without a popup, processing progress is shown at the bottom of the screen.</target>
       </trans-unit>
@@ -1809,7 +1829,7 @@
         <source>Show notifications when document processing fails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">429</context>
+          <context context-type="linenumber">435</context>
         </context-group>
         <target state="translated">文件处理失败时显示通知</target>
       </trans-unit>
@@ -1961,7 +1981,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
@@ -2073,15 +2093,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">366,367</context>
+          <context context-type="linenumber">367,368</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="translated">帮助文档</target>
       </trans-unit>
@@ -2089,7 +2109,7 @@
         <source>Error retrieving users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">285</context>
+          <context context-type="linenumber">286</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2113,7 +2133,7 @@
         <source>Error retrieving groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">305</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2133,7 +2153,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">649</context>
+          <context context-type="linenumber">655</context>
         </context-group>
         <target state="translated">设置保存成功</target>
       </trans-unit>
@@ -2141,7 +2161,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">656</context>
+          <context context-type="linenumber">662</context>
         </context-group>
         <target state="translated">设置已成功保存。需要重新加载以应用某些更改。</target>
       </trans-unit>
@@ -2149,7 +2169,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">657</context>
+          <context context-type="linenumber">663</context>
         </context-group>
         <target state="translated">立即重新加载</target>
       </trans-unit>
@@ -2157,19 +2177,19 @@
         <source>An error occurred while saving settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">667</context>
+          <context context-type="linenumber">673</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">256</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">374</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">402</context>
+          <context context-type="linenumber">403</context>
         </context-group>
         <target state="translated">保存设置时发生错误。</target>
       </trans-unit>
@@ -2688,6 +2708,14 @@
           <context context-type="linenumber">378</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">396</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">396</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">723</context>
         </context-group>
@@ -2749,7 +2777,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <target state="translated">打开</target>
       </trans-unit>
@@ -4073,35 +4101,43 @@
         </context-group>
         <target state="translated">配置</target>
       </trans-unit>
-      <trans-unit id="1534029177398918729" datatype="html">
-        <source>GitHub</source>
+      <trans-unit id="8178404488993731083" datatype="html">
+        <source>See what&apos;s new in this version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">377</context>
         </context-group>
-        <target state="translated">GitHub</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">388</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">394</context>
+        </context-group>
+        <target state="needs-translation">See what's new in this version</target>
       </trans-unit>
-      <trans-unit id="4112664765954374539" datatype="html">
-        <source>is available.</source>
+      <trans-unit id="2518237780867209325" datatype="html">
+        <source>What&apos;s new</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">389</context>
+          <context context-type="linenumber">378</context>
         </context-group>
-        <target state="translated">可用</target>
+        <target state="needs-translation">What's new</target>
       </trans-unit>
-      <trans-unit id="1175891574282637937" datatype="html">
-        <source>Click to view.</source>
+      <trans-unit id="5280218112746407598" datatype="html">
+        <source>New</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">389</context>
+          <context context-type="linenumber">394,395</context>
         </context-group>
-        <target state="translated">点击查看</target>
+        <target state="needs-translation">New</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">393</context>
+          <context context-type="linenumber">406</context>
         </context-group>
         <target state="translated">Paperless-ngx 可以自动检查更新</target>
       </trans-unit>
@@ -4109,15 +4145,27 @@
         <source> How does this work? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">414</context>
         </context-group>
         <target state="translated"> 这是如何运作的？ </target>
+      </trans-unit>
+      <trans-unit id="1895149624197784510" datatype="html">
+        <source>Paperless-ngx <x id="INTERPOLATION" equiv-text="{{ appRemoteVersion().version }}"/> is available</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">421,422</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+        <target state="needs-translation">Paperless-ngx <x id="INTERPOLATION" equiv-text="{{ appRemoteVersion().version }}"/> is available</target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">413</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <target state="translated">有可用更新</target>
       </trans-unit>
@@ -4125,7 +4173,7 @@
         <source>Configure update checking</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">418</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="translated">配置更新检查</target>
       </trans-unit>
@@ -4133,7 +4181,7 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">538</context>
+          <context context-type="linenumber">539</context>
         </context-group>
         <target state="translated">侧边栏视图已更新</target>
       </trans-unit>
@@ -4141,7 +4189,7 @@
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">542</context>
         </context-group>
         <target state="translated">更新侧边栏视图时发生错误</target>
       </trans-unit>
@@ -4149,7 +4197,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">562</context>
+          <context context-type="linenumber">601</context>
         </context-group>
         <target state="translated">保存更新检查设置时发生错误。</target>
       </trans-unit>
@@ -4209,7 +4257,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">154</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
@@ -5050,6 +5098,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">22,23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">77,78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-dialog/share-link-bundle-dialog.component.ts</context>
@@ -6437,7 +6493,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">56</context>
         </context-group>
         <target state="translated">创建新标签</target>
       </trans-unit>
@@ -7770,7 +7826,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target state="translated">建议:</target>
       </trans-unit>
@@ -7907,11 +7963,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
-          <context context-type="linenumber">20,21</context>
+          <context context-type="linenumber">25,26</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
-          <context context-type="linenumber">23,26</context>
+          <context context-type="linenumber">28,31</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/object-name.pipe.ts</context>
@@ -7955,7 +8011,7 @@
         <source>Remove tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/document-operation.ts</context>
@@ -7967,7 +8023,7 @@
         <source>Filter documents with these Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">56,57</context>
+          <context context-type="linenumber">61,62</context>
         </context-group>
         <target state="translated">按标签过滤</target>
       </trans-unit>
@@ -8618,6 +8674,130 @@
           <context context-type="linenumber">345</context>
         </context-group>
         <target state="translated">停用TOTP时错误</target>
+      </trans-unit>
+      <trans-unit id="3571297123964361575" datatype="html">
+        <source>You are running <x id="INTERPOLATION" equiv-text="{{ version }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+        <target state="needs-translation">You are running <x id="INTERPOLATION" equiv-text="{{ version }}"/></target>
+      </trans-unit>
+      <trans-unit id="7006907352030120065" datatype="html">
+        <source>What&apos;s new in Paperless-ngx</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">7,8</context>
+        </context-group>
+        <target state="needs-translation">What's new in Paperless-ngx</target>
+      </trans-unit>
+      <trans-unit id="389072682253988920" datatype="html">
+        <source>Updated from <x id="INTERPOLATION" equiv-text="{{ since() }}"/> to <x id="INTERPOLATION_1" equiv-text="{{ version }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+        <target state="needs-translation">Updated from <x id="INTERPOLATION" equiv-text="{{ since() }}"/> to <x id="INTERPOLATION_1" equiv-text="{{ version }}"/></target>
+      </trans-unit>
+      <trans-unit id="8842508877109723703" datatype="html">
+        <source>Star Paperless-ngx on GitHub</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">Star Paperless-ngx on GitHub</target>
+      </trans-unit>
+      <trans-unit id="6664152940140781978" datatype="html">
+        <source>Star</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">17,18</context>
+        </context-group>
+        <target state="needs-translation">Star</target>
+      </trans-unit>
+      <trans-unit id="8690562446300830265" datatype="html">
+        <source>Stargazers</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Stargazers</target>
+      </trans-unit>
+      <trans-unit id="6915195443416731840" datatype="html">
+        <source>Paperless-ngx can automatically check for updates and show release notes here, fetched from GitHub.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">32,33</context>
+        </context-group>
+        <target state="needs-translation">Paperless-ngx can automatically check for updates and show release notes here, fetched from GitHub.</target>
+      </trans-unit>
+      <trans-unit id="9187855490716817910" datatype="html">
+        <source>Disable</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">35,36</context>
+        </context-group>
+        <target state="needs-translation">Disable</target>
+      </trans-unit>
+      <trans-unit id="848030772962929773" datatype="html">
+        <source>Release notes are fetched from GitHub when update checking is enabled.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+        <target state="needs-translation">Release notes are fetched from GitHub when update checking is enabled.</target>
+      </trans-unit>
+      <trans-unit id="8889343662607906285" datatype="html">
+        <source>Loading release notes...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Loading release notes...</target>
+      </trans-unit>
+      <trans-unit id="3905769796953580006" datatype="html">
+        <source>Release notes could not be loaded.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">47,48</context>
+        </context-group>
+        <target state="needs-translation">Release notes could not be loaded.</target>
+      </trans-unit>
+      <trans-unit id="7123461329735788421" datatype="html">
+        <source>View on GitHub</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <target state="needs-translation">View on GitHub</target>
+      </trans-unit>
+      <trans-unit id="5209375229038355212" datatype="html">
+        <source>All releases</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <target state="needs-translation">All releases</target>
+      </trans-unit>
+      <trans-unit id="8716179943241079117" datatype="html">
+        <source>Need support? Ask in Discussions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <target state="needs-translation">Need support? Ask in Discussions</target>
+      </trans-unit>
+      <trans-unit id="972346719789721379" datatype="html">
+        <source>How to update</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/release-notes-dialog/release-notes-dialog.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+        <target state="needs-translation">How to update</target>
       </trans-unit>
       <trans-unit id="4452415362871534100" datatype="html">
         <source>Selected documents:</source>
@@ -11256,11 +11436,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">80,81</context>
+          <context context-type="linenumber">81,82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">95,96</context>
+          <context context-type="linenumber">96,97</context>
         </context-group>
         <target state="translated">已创建：<x id="INTERPOLATION" equiv-text="{{ document().created | customDate }}"/></target>
       </trans-unit>
@@ -11272,11 +11452,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">81,82</context>
+          <context context-type="linenumber">82,83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">96,97</context>
+          <context context-type="linenumber">97,98</context>
         </context-group>
         <target state="translated">已添加： <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></target>
       </trans-unit>
@@ -11288,11 +11468,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">82,83</context>
+          <context context-type="linenumber">83,84</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">97,98</context>
+          <context context-type="linenumber">98,99</context>
         </context-group>
         <target state="translated">已修改: <x id="INTERPOLATION" equiv-text="{{ document().modified | customDate }}"/></target>
       </trans-unit>
@@ -11304,7 +11484,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, =1 {1 页} other {<x id="INTERPOLATION"/> 页}}</target>
       </trans-unit>
@@ -11316,7 +11496,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">129,130</context>
+          <context context-type="linenumber">130,131</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -11340,7 +11520,7 @@
         <source>Toggle tag filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <target state="translated">切换标签筛选器</target>
       </trans-unit>
@@ -11348,7 +11528,7 @@
         <source>Toggle correspondent filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">48</context>
         </context-group>
         <target state="translated">切换往来方筛选器</target>
       </trans-unit>
@@ -11356,7 +11536,7 @@
         <source>Toggle document type filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <target state="translated">切换文档类型筛选器</target>
       </trans-unit>
@@ -11364,7 +11544,7 @@
         <source>Toggle storage path filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target state="translated">切换存储路径筛选。</target>
       </trans-unit>
@@ -11412,7 +11592,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">351</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11428,7 +11608,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">346</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11712,7 +11892,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">334</context>
         </context-group>
         <target state="translated">重置筛选 / 选择</target>
       </trans-unit>
@@ -11720,7 +11900,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">362</context>
         </context-group>
         <target state="translated">打开第一个 [已选中] 文档</target>
       </trans-unit>
@@ -11728,7 +11908,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">376</context>
+          <context context-type="linenumber">378</context>
         </context-group>
         <target state="translated">上一頁</target>
       </trans-unit>
@@ -11736,7 +11916,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">390</context>
         </context-group>
         <target state="translated">下一頁</target>
       </trans-unit>
@@ -11744,7 +11924,7 @@
         <source>View &quot;<x id="PH" equiv-text="view.name ?? title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">423</context>
+          <context context-type="linenumber">425</context>
         </context-group>
         <target state="needs-translation">View "<x id="PH" equiv-text="view.name ?? title"/>" saved successfully.</target>
       </trans-unit>
@@ -11752,7 +11932,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="title"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">429</context>
+          <context context-type="linenumber">431</context>
         </context-group>
         <target state="needs-translation">Failed to save view "<x id="PH" equiv-text="title"/>".</target>
       </trans-unit>
@@ -11760,7 +11940,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">498</context>
+          <context context-type="linenumber">500</context>
         </context-group>
         <target state="translated">视图：<x id="PH" equiv-text="savedView.name"/>创建成功。</target>
       </trans-unit>
@@ -11768,7 +11948,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">504</context>
+          <context context-type="linenumber">506</context>
         </context-group>
         <target state="translated">已成功创建视图“<x id="PH" equiv-text="savedView.name"/>”，但无法更新可见性设置。</target>
       </trans-unit>
@@ -14754,7 +14934,7 @@
         <source>English (US)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <target state="translated">英语(美国)</target>
       </trans-unit>
@@ -14762,7 +14942,7 @@
         <source>Afrikaans</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Afrikaans 荷兰语</target>
       </trans-unit>
@@ -14770,7 +14950,7 @@
         <source>Arabic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <target state="translated">阿拉伯语</target>
       </trans-unit>
@@ -14778,7 +14958,7 @@
         <source>Belarusian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">75</context>
         </context-group>
         <target state="translated">白俄罗斯语</target>
       </trans-unit>
@@ -14786,7 +14966,7 @@
         <source>Bulgarian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <target state="translated">保加利亚语</target>
       </trans-unit>
@@ -14794,7 +14974,7 @@
         <source>Catalan</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <target state="translated">加泰罗尼亚语</target>
       </trans-unit>
@@ -14802,7 +14982,7 @@
         <source>Czech</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <target state="translated">捷克语</target>
       </trans-unit>
@@ -14810,7 +14990,7 @@
         <source>Danish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">99</context>
         </context-group>
         <target state="translated">丹麦语</target>
       </trans-unit>
@@ -14818,7 +14998,7 @@
         <source>German</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">德语</target>
       </trans-unit>
@@ -14826,7 +15006,7 @@
         <source>Greek</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Greek 希腊语</target>
       </trans-unit>
@@ -14834,7 +15014,7 @@
         <source>English (GB)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <target state="translated">英语(英国)</target>
       </trans-unit>
@@ -14842,7 +15022,7 @@
         <source>Spanish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">123</context>
         </context-group>
         <target state="translated">西班牙语</target>
       </trans-unit>
@@ -14850,7 +15030,7 @@
         <source>Finnish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="translated">已完成</target>
       </trans-unit>
@@ -14858,7 +15038,7 @@
         <source>French</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">法语</target>
       </trans-unit>
@@ -14866,7 +15046,7 @@
         <source>Hungarian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">匈牙利语</target>
       </trans-unit>
@@ -14874,7 +15054,7 @@
         <source>Indonesian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">印度尼西亚语</target>
       </trans-unit>
@@ -14882,7 +15062,7 @@
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">意大利语</target>
       </trans-unit>
@@ -14890,7 +15070,7 @@
         <source>Japanese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">日语</target>
       </trans-unit>
@@ -14898,7 +15078,7 @@
         <source>Korean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">韩语</target>
       </trans-unit>
@@ -14906,7 +15086,7 @@
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="translated">卢森堡语</target>
       </trans-unit>
@@ -14914,7 +15094,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="translated">荷兰语</target>
       </trans-unit>
@@ -14922,7 +15102,7 @@
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Norwegian 挪威语</target>
       </trans-unit>
@@ -14930,7 +15110,7 @@
         <source>Persian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">波斯语</target>
       </trans-unit>
@@ -14938,7 +15118,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="translated">波兰语</target>
       </trans-unit>
@@ -14946,7 +15126,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="translated">葡萄牙语 (巴西)</target>
       </trans-unit>
@@ -14954,7 +15134,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">葡萄牙语</target>
       </trans-unit>
@@ -14962,7 +15142,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="translated">罗马尼亚语</target>
       </trans-unit>
@@ -14970,7 +15150,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="translated">俄语</target>
       </trans-unit>
@@ -14978,7 +15158,7 @@
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Slovak 斯洛伐克语</target>
       </trans-unit>
@@ -14986,7 +15166,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">斯洛文尼亚语</target>
       </trans-unit>
@@ -14994,7 +15174,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="translated">塞尔维亚语</target>
       </trans-unit>
@@ -15002,7 +15182,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">瑞典语</target>
       </trans-unit>
@@ -15010,7 +15190,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">土耳其语</target>
       </trans-unit>
@@ -15018,7 +15198,7 @@
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Ukrainian 乌克兰语</target>
       </trans-unit>
@@ -15026,7 +15206,7 @@
         <source>Vietnamese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="translated">越南语</target>
       </trans-unit>
@@ -15034,7 +15214,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">简体中文</target>
       </trans-unit>
@@ -15042,7 +15222,7 @@
         <source>Chinese Traditional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="translated">繁体中文</target>
       </trans-unit>
@@ -15050,7 +15230,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">281</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -15058,7 +15238,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">661</context>
+          <context context-type="linenumber">675</context>
         </context-group>
         <target state="translated">成功完成设置一次性迁移到数据库！</target>
       </trans-unit>
@@ -15066,7 +15246,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">662</context>
+          <context context-type="linenumber">676</context>
         </context-group>
         <target state="translated">无法将设置迁移到数据库，请尝试手动保存。</target>
       </trans-unit>
@@ -15074,7 +15254,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">745</context>
+          <context context-type="linenumber">787</context>
         </context-group>
         <target state="translated">你可以从设置页面重新开始导览。</target>
       </trans-unit>
