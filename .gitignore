@@ -115,3 +115,8 @@ celerybeat-schedule*
 
 # Git worktree local folder
 .worktrees
+
+# Redesign test instance secrets
+/redesign/.env
+/redesign/.env.local
+

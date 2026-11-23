@@ -1,0 +1,47 @@
+# Caddyfile-Snippet für die Paperless-ngx Redesign Test-Instanz (paperless-r.pi)
+#
+# Wichtige Hinweise:
+# - Caddy selbst wird von diesem Projekt NICHT verändert. Diesen Block bei Bedarf
+#   in das bestehende Caddyfile deiner Docker-Caddy-Instanz übernehmen.
+# - Da `.pi` keine öffentliche Domain ist, nutzt der Block `tls internal`
+#   (selbstsigniertes Caddy-CA-Zertifikat).
+# - Die Test-Instanz bindet ausschließlich an `127.0.0.1:8090` und die
+#   Tailscale-IP `100.120.88.96:8090` (nicht `0.0.0.0`).
+# - Netzwerkkonfiguration für Docker-Caddy:
+#   Stelle sicher, dass der Docker-Caddy-Container ausgehende TCP-Verbindungen
+#   zur Tailscale-IP `100.120.88.96:8090` dieses Hosts herstellen kann
+#   (z. B. über Host-Routing / `network_mode: host` oder ein Bridge-Netzwerk
+#   mit ausgehendem Zugriff auf das Tailscale-Subnetz `100.64.0.0/10`).
+# - WebSockets (`/ws/`): Caddy v2 leitet WebSocket-Upgrades (`Connection: Upgrade`,
+#   `Upgrade: websocket`) nativ und transparent an den Upstream weiter. Die
+#   Header `X-Forwarded-Proto` und `Host` werden standardmäßig gesetzt; `flush_interval -1`
+#   sorgt dafür, dass Statusmeldungen ohne Pufferung sofort beim Browser ankommen.
+
+paperless-r.pi {
+	tls internal
+
+	# Ausreichende Upload-Größe für mehrseitige PDFs und Stapel-Uploads
+	request_body {
+		max_size 512MB
+	}
+
+	# WebSocket-Endpunkte (Live-Status für Uploads, OCR & Zusammenführen)
+	@websockets {
+		path /ws/*
+	}
+	reverse_proxy @websockets 100.120.88.96:8090 {
+		flush_interval -1
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	# Regulärer HTTP-/API-Verkehr inkl. statischer Redesign-Oberfläche
+	reverse_proxy 100.120.88.96:8090 {
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

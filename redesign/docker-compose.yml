@@ -1,0 +1,86 @@
+name: paperless-redesign
+
+services:
+  broker:
+    image: docker.io/library/redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: docker.io/library/postgres:17-alpine
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-paperless}
+      POSTGRES_USER: ${POSTGRES_USER:-paperless}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-paperless} -d ${POSTGRES_DB:-paperless}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.5.1
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${REDESIGN_HOST_PORT:-8090}:8000"
+      - "100.120.88.96:${REDESIGN_HOST_PORT:-8090}:8000"
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - export:/usr/src/paperless/export
+      - consume:/usr/src/paperless/consume
+      - ../src/documents/static/frontend:/usr/src/paperless/static/frontend:ro
+    env_file:
+      - .env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBNAME: ${POSTGRES_DB:-paperless}
+      PAPERLESS_DBUSER: ${POSTGRES_USER:-paperless}
+      PAPERLESS_DBPASS: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+
+  ui-builder:
+    image: docker.io/library/node:24-trixie-slim
+    profiles:
+      - build
+    working_dir: /workspace/src-ui
+    volumes:
+      - ..:/workspace
+      - pnpm_store:/root/.local/share/pnpm/store
+      - ui_node_modules:/workspace/src-ui/node_modules
+    environment:
+      CI: "true"
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    entrypoint:
+      - /bin/sh
+      - -lc
+      - |
+        corepack enable && corepack prepare pnpm@latest --activate
+        pnpm install --frozen-lockfile
+        pnpm exec ng build --configuration redesign
+
+volumes:
+  data:
+  media:
+  export:
+  consume:
+  pgdata:
+  redisdata:
+  pnpm_store:
+  ui_node_modules:
