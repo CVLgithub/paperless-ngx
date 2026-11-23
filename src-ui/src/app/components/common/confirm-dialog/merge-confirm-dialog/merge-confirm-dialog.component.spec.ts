@@ -78,4 +78,21 @@ describe('MergeConfirmDialogComponent', () => {
 
     expect(component.getDocument(2)).toEqual({ id: 2, name: 'Document 2' })
   })
+
+  it('defaults to consume mode and toggles quick-view mode cleanly', () => {
+    expect(component.mergeMode()).toBe('consume')
+    expect(
+      fixture.nativeElement.querySelector('#metadataDocumentID')
+    ).not.toBeNull()
+
+    component.mergeMode.set('quick-view')
+    fixture.detectChanges()
+
+    expect(
+      fixture.nativeElement.querySelector('#metadataDocumentID')
+    ).toBeNull()
+    expect(
+      fixture.nativeElement.querySelector('.rd-merge-quick-note')
+    ).not.toBeNull()
+  })
 })

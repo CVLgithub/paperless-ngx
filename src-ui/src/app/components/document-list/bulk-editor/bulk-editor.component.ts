@@ -81,6 +81,7 @@ import { PermissionsDialogComponent } from '../../common/permissions-dialog/perm
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
 import { MergeProgressDialogComponent } from '../../redesign/merge-progress-dialog/merge-progress-dialog.component'
 import { MergeWorkflowService } from 'src/app/services/merge-workflow.service'
+import { QuickPdfMergeService } from 'src/app/services/quick-pdf-merge.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -118,6 +119,7 @@ export class BulkEditorComponent
   private readonly workflowService = inject(WorkflowService)
   private readonly router = inject(Router)
   private readonly mergeWorkflowService = inject(MergeWorkflowService)
+  private readonly quickPdfMergeService = inject(QuickPdfMergeService)
 
   public manualWorkflows: Workflow[] = []
 
@@ -1096,6 +1098,18 @@ export class BulkEditorComponent
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
+        const orderedIds = mergeDialog.documentIDs()
+        if (mergeDialog.mergeMode() === 'quick-view') {
+          const previewTab = this.quickPdfMergeService.openPlaceholderTab()
+          mergeDialog.buttonsEnabled.set(false)
+          modal.close()
+          void this.quickPdfMergeService.mergeAndOpenInNewTab(
+            orderedIds,
+            previewTab
+          )
+          return
+        }
+
         const args: MergeDocumentsRequest = {}
         if (mergeDialog.metadataDocumentID() > -1) {
           args.metadata_document_id = mergeDialog.metadataDocumentID()
@@ -1106,7 +1120,6 @@ export class BulkEditorComponent
         if (mergeDialog.archiveFallback()) {
           args.archive_fallback = true
         }
-        const orderedIds = mergeDialog.documentIDs()
         mergeDialog.buttonsEnabled.set(false)
         modal.close()
 

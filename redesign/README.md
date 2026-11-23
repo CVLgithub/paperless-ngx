@@ -79,7 +79,7 @@ docker compose down -v
 ```bash
 # Unit-Tests für Redesign & Merge-Workflow ausführen
 docker compose --profile build run --rm --entrypoint /bin/sh ui-builder -lc \
-  "corepack enable && pnpm exec jest src/app/services/merge-workflow.service.spec.ts src/app/components/redesign/ src/app/components/common/confirm-dialog/merge-confirm-dialog/"
+  "corepack enable && pnpm exec jest src/app/services/merge-workflow.service.spec.ts src/app/services/quick-pdf-merge.service.spec.ts src/app/components/redesign/ src/app/components/common/confirm-dialog/merge-confirm-dialog/"
 
 # ESLint prüfen
 docker compose --profile build run --rm --entrypoint /bin/sh ui-builder -lc \
@@ -108,6 +108,29 @@ Da das Redesign sauber auf einem Feature-Branch (`feature/redesign`) ab dem stab
    ```bash
    cd redesign
    ./build-ui.sh
+   ```
+
+---
+
+## Backup der Volumes
+
+Alle persistenten Daten liegen in benannten Docker-Volumes mit dem Präfix `paperless-redesign_` (`data`, `media`, `export`, `consume`, `pgdata`, `redisdata`):
+
+1. **Logischer Paperless-Export (empfohlen, versionsunabhängig):**
+   ```bash
+   docker compose exec webserver document_exporter ../export
+   ```
+   Das Ziel-Volume `paperless-redesign_export` kann anschließend archiviert werden.
+2. **PostgreSQL-Dump + Datei-Volumes sichern:**
+   ```bash
+   mkdir -p ./backups/$(date +%F)
+   docker compose exec -T db pg_dump -U paperless paperless > ./backups/$(date +%F)/paperless.sql
+   for vol in data media; do
+     docker run --rm \
+       -v "paperless-redesign_${vol}:/source:ro" \
+       -v "$(pwd)/backups/$(date +%F):/backup" \
+       alpine tar czf "/backup/${vol}.tar.gz" -C /source .
+   done
    ```
 
 ---

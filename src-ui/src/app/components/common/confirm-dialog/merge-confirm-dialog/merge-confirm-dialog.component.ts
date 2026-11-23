@@ -15,6 +15,8 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
 
+export type MergeMode = 'consume' | 'quick-view'
+
 @Component({
   selector: 'pngx-merge-confirm-dialog',
   templateUrl: './merge-confirm-dialog.component.html',
@@ -37,6 +39,7 @@ export class MergeConfirmDialogComponent
   private permissionService = inject(PermissionsService)
 
   readonly documentIDs = signal<number[]>([])
+  readonly mergeMode = signal<MergeMode>('consume')
   readonly archiveFallback = signal(false)
   readonly deleteOriginals = signal(false)
   readonly documents = signal<Document[]>([])

@@ -36,6 +36,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { QuickPdfMergeService } from 'src/app/services/quick-pdf-merge.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -239,6 +240,7 @@ describe('BulkEditorComponent', () => {
   })
 
   it('should allow sending an all-filtered selection that fits on the current page', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(documentListViewService, 'hasSelection', 'get')
       .mockReturnValue(true)
@@ -255,12 +257,17 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
 
     expect(component.canSendSelection).toBe(true)
-    expect(
-      fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
-    ).toBe(false)
+    const sendButtons = fixture.debugElement
+      .queryAll(By.css('.rd-bulk-overflow-menu button'))
+      .filter((btn) =>
+        btn.nativeElement.textContent.includes('Freigabelink-Paket erstellen')
+      )
+    expect(sendButtons.length).toBe(1)
+    expect(sendButtons[0].nativeElement.disabled).toBe(false)
   })
 
   it('should prevent sending an all-filtered selection spanning multiple pages', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(documentListViewService, 'hasSelection', 'get')
       .mockReturnValue(true)
@@ -277,9 +284,13 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
 
     expect(component.canSendSelection).toBe(false)
-    expect(
-      fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
-    ).toBe(true)
+    const sendButtons = fixture.debugElement
+      .queryAll(By.css('.rd-bulk-overflow-menu button'))
+      .filter((btn) =>
+        btn.nativeElement.textContent.includes('Freigabelink-Paket erstellen')
+      )
+    expect(sendButtons.length).toBe(1)
+    expect(sendButtons[0].nativeElement.disabled).toBe(true)
   })
 
   it('should only show permitted share link bundle actions', () => {
@@ -295,38 +306,14 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
 
     expect(fixture.nativeElement.textContent).toContain(
-      'Create a share link bundle'
-    )
-    expect(fixture.nativeElement.textContent).not.toContain(
-      'Manage share link bundles'
-    )
-
-    permissionsService.initialize(
-      [
-        permissionsService.getPermissionCode(
-          PermissionAction.View,
-          PermissionType.ShareLinkBundle
-        ),
-      ],
-      { is_superuser: false } as any
-    )
-    fixture.detectChanges()
-
-    expect(fixture.nativeElement.textContent).not.toContain(
-      'Create a share link bundle'
-    )
-    expect(fixture.nativeElement.textContent).toContain(
-      'Manage share link bundles'
+      'Freigabelink-Paket erstellen'
     )
 
     permissionsService.initialize([], { is_superuser: false } as any)
     fixture.detectChanges()
 
     expect(fixture.nativeElement.textContent).not.toContain(
-      'Create a share link bundle'
-    )
-    expect(fixture.nativeElement.textContent).not.toContain(
-      'Manage share link bundles'
+      'Freigabelink-Paket erstellen'
     )
   })
 
@@ -1512,6 +1499,46 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
+    httpTestingController.match(
+      `${environment.apiBaseUrl}tasks/?page=1&page_size=25&ordering=-date_created`
+    )
+  })
+
+  it('should support quick-view client-side merge without calling backend merge API', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const quickPdfMergeService = TestBed.inject(QuickPdfMergeService)
+    const fakeTab = { closed: false } as unknown as Window
+    const openTabSpy = jest
+      .spyOn(quickPdfMergeService, 'openPlaceholderTab')
+      .mockReturnValue(fakeTab)
+    const mergeOpenSpy = jest
+      .spyOn(quickPdfMergeService, 'mergeAndOpenInNewTab')
+      .mockResolvedValue('blob:quick-view')
+
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [{ id: 3 }, { id: 4 }],
+      })
+    )
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    fixture.detectChanges()
+
+    component.mergeSelected()
+    modal.componentInstance.mergeMode.set('quick-view')
+    modal.componentInstance.confirm()
+
+    expect(openTabSpy).toHaveBeenCalled()
+    expect(mergeOpenSpy).toHaveBeenCalledWith([3, 4], fakeTab)
+    httpTestingController.expectNone(`${environment.apiBaseUrl}documents/merge/`)
   })
 
   it('should support merging documents as versions', () => {
