@@ -1,557 +1,687 @@
-<pngx-page-header [title]="title()" [id]="documentId()">
-  <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" aria-label="Delete" i18n-aria-label>
-    <pngx-bs-icon width="1.2em" height="1.2em" name="trash"></pngx-bs-icon><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+<ng-template #detailMoreActions>
+  @if (metadata()?.has_archive_version) {
+    <button type="button" ngbDropdownItem (click)="download(true)" [disabled]="downloading()">
+      <pngx-bs-icon name="file-earmark-arrow-down" class="me-2" width="14" height="14"></pngx-bs-icon>
+      <span i18n>Original herunterladen</span>
+    </button>
+  }
+  <button type="button" ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
+    <pngx-bs-icon name="printer" class="me-2" width="14" height="14"></pngx-bs-icon>
+    <span i18n>Drucken</span>
   </button>
-
-  <pngx-document-version-dropdown
-    [documentId]="documentId()"
-    [versions]="document()?.versions ?? []"
-    [selectedVersionId]="selectedVersionId()"
-    [userIsOwner]="userIsOwner"
-    [userCanEdit]="userCanEdit"
-    (versionSelected)="onVersionSelected($event)"
-    (versionsUpdated)="onVersionsUpdated($event)"
-  />
-
-  <div class="btn-group ms-md-4">
-    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
-      @if (downloading()) {
-        <div class="spinner-border spinner-border-sm" role="status"></div>
-      } @else {
-        <pngx-bs-icon width="1.2em" height="1.2em" name="download"></pngx-bs-icon>
-      }
-      <span class="d-none d-lg-inline ps-1" i18n>Download</span>
+  <button
+    type="button"
+    ngbDropdownItem
+    (click)="editPdf()"
+    [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF"
+  >
+    <pngx-bs-icon name="pencil" class="me-2" width="14" height="14"></pngx-bs-icon>
+    <span i18n>PDF-Editor</span>
+  </button>
+  <button type="button" ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
+    <pngx-bs-icon name="arrow-repeat" class="me-2" width="14" height="14"></pngx-bs-icon>
+    <span i18n>Neu verarbeiten (OCR)</span>
+  </button>
+  <button type="button" ngbDropdownItem (click)="moreLike()">
+    <pngx-bs-icon name="diagram-3" class="me-2" width="14" height="14"></pngx-bs-icon>
+    <span i18n>Ähnliche Dokumente</span>
+  </button>
+  @if (manualWorkflows().length > 0) {
+    <button type="button" ngbDropdownItem (click)="runWorkflow()" [disabled]="!userCanEdit || !userIsOwner">
+      <pngx-bs-icon name="play-circle" class="me-2" width="14" height="14"></pngx-bs-icon>
+      <span i18n>Workflow ausführen</span>
     </button>
-
-    <div class="btn-group" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading()" ngbDropdownToggle aria-label="Download options" i18n-aria-label></button>
-      <div class="dropdown-menu shadow" ngbDropdownMenu>
-        @if (metadata()?.has_archive_version) {
-          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading()" i18n>Download original</button>
-          <div class="dropdown-divider"></div>
-        }
-        <form class="px-3 py-1">
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="downloadUseFormatting" [(ngModel)]="useFormattedFilename" [ngModelOptions]="{standalone: true}" />
-            <label class="form-check-label" for="downloadUseFormatting" i18n>Use formatted filename</label>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="ms-md-auto" ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
-      <pngx-bs-icon name="three-dots"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
+  }
+  @if (emailEnabled) {
+    <button type="button" ngbDropdownItem (click)="openEmailDocument()">
+      <pngx-bs-icon name="envelope" class="me-2" width="14" height="14"></pngx-bs-icon>
+      <span i18n>Per E-Mail senden</span>
     </button>
-    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
-        <pngx-bs-icon width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></pngx-bs-icon><span i18n>Reprocess</span>
-      </button>
-
-      @if (manualWorkflows().length > 0) {
-        <button ngbDropdownItem (click)="runWorkflow()" [disabled]="!userCanEdit || !userIsOwner">
-          <pngx-bs-icon width="1em" height="1em" name="play-circle" class="me-2"></pngx-bs-icon><span i18n>Run workflow</span>
-        </button>
-      }
-
-      <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
-        <pngx-bs-icon width="1em" height="1em" name="printer" class="me-2"></pngx-bs-icon><span i18n>Print</span>
-      </button>
-
-      <button ngbDropdownItem (click)="moreLike()">
-        <pngx-bs-icon width="1em" height="1em" name="diagram-3" class="me-2"></pngx-bs-icon><span i18n>More like this</span>
-      </button>
-
-      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <pngx-bs-icon name="pencil" class="me-2"></pngx-bs-icon><ng-container i18n>PDF Editor</ng-container>
-      </button>
-
-      @if (userIsOwner && (requiresPassword || password)) {
-        <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
-          <pngx-bs-icon name="unlock" class="me-2"></pngx-bs-icon><ng-container i18n>Remove Password</ng-container>
-        </button>
-      }
-    </div>
-  </div>
-
-  <div class="ms-md-auto" ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
-      <pngx-bs-icon name="send"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
+  }
+  @if (userIsOwner && (requiresPassword || password)) {
+    <button type="button" ngbDropdownItem (click)="removePassword()" [disabled]="!password">
+      <pngx-bs-icon name="unlock" class="me-2" width="14" height="14"></pngx-bs-icon>
+      <span i18n>Passwort entfernen</span>
     </button>
-    <div ngbDropdownMenu aria-labelledby="sendDropdown" class="shadow">
-      <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
-        <pngx-bs-icon name="link" class="me-2"></pngx-bs-icon><span i18n>Share Links</span>
-      </button>
-      @if (emailEnabled) {
-        <button ngbDropdownItem (click)="openEmailDocument()">
-          <pngx-bs-icon name="envelope" class="me-2"></pngx-bs-icon><span i18n>Email</span>
-        </button>
-      }
-    </div>
-  </div>
-
-</pngx-page-header>
-
-<div class="row">
-  <div class="col-md-6 col-xl-5 mb-4">
-
-    <form [formGroup]='documentForm' (ngSubmit)="save()">
-
-      <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
-        <div class="btn-group">
-          <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
-            <pngx-bs-icon width="1.2em" height="1.2em" name="x"></pngx-bs-icon>
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-            <pngx-bs-icon width="1.2em" height="1.2em" name="arrow-left"></pngx-bs-icon>
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-            <pngx-bs-icon width="1.2em" height="1.2em" name="arrow-right"></pngx-bs-icon>
-          </button>
-        </div>
-
-        <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-          <div class="btn-group ms-3">
-            <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
-              [disabled]="!userCanEdit || suggestionsLoading()"
-              [loading]="suggestionsLoading()"
-              [suggestions]="suggestions()"
-              [aiEnabled]="aiEnabled"
-              [source]="suggestionSource"
-              [defaultSource]="defaultSuggestionSource"
-              [fetchedSources]="fetchedSuggestionSources()"
-              [appliedTags]="documentForm.value.tags"
-              [appliedCorrespondent]="documentForm.value.correspondent"
-              [appliedDocumentType]="documentForm.value.document_type"
-              [appliedStoragePath]="documentForm.value.storage_path"
-              [appliedTitle]="documentForm.value.title"
-              [appliedCreated]="documentForm.value.created"
-              (getSuggestions)="getSuggestions($event)"
-              (sourceChange)="suggestionSourceOverride.set($event)"
-              (addTag)="createTag($event)"
-              (addDocumentType)="createDocumentType($event)"
-              (addCorrespondent)="createCorrespondent($event)">
-            </pngx-suggestions-dropdown>
-          </div>
-
-          <div class="ms-auto">
-            <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
-          </div>
-        </ng-container>
-      </div>
-
-      <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)">
-        <li [ngbNavItem]="DocumentDetailNavIDs.Details">
-          <a ngbNavLink i18n>Details</a>
-          <ng-template ngbNavContent>
-            <div>
-              <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" [suggestion]="suggestions()?.title" (keyup)="titleKeyUp($event)" [error]="error()?.title"></pngx-input-text>
-              @if (!isFieldHidden(DocumentDetailFieldID.ArchiveSerialNumber)) {
-                <pngx-input-number i18n-title title="Archive serial number" [error]="error()?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
-              }
-              <pngx-input-date i18n-title title="Date created" formControlName="created" [suggestions]="suggestions()?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              [error]="error()?.created"></pngx-input-date>
-              @if (!isFieldHidden(DocumentDetailFieldID.Correspondent)) {
-                <pngx-input-select [items]="correspondents()" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Correspondent)"
-                (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions()?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
-              }
-              @if (!isFieldHidden(DocumentDetailFieldID.DocumentType)) {
-                <pngx-input-select [items]="documentTypes()" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.DocumentType)"
-                (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions()?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
-              }
-              @if (!isFieldHidden(DocumentDetailFieldID.StoragePath)) {
-                <pngx-input-select [items]="storagePaths()" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
-                (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions()?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
-              }
-              @if (!isFieldHidden(DocumentDetailFieldID.Tags)) {
-                <pngx-input-tags #tagsInput formControlName="tags" [suggestions]="suggestions()?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-              }
-              @for (fieldInstance of document()?.custom_fields; track fieldInstance.field; let i = $index) {
-                <div [formGroup]="customFieldFormFields.controls[i]">
-                  @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
-                    @case (CustomFieldDataType.String) {
-                      <pngx-input-text formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-text>
-                    }
-                    @case (CustomFieldDataType.Date) {
-                      <pngx-input-date formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-date>
-                    }
-                    @case (CustomFieldDataType.Integer) {
-                      <pngx-input-number formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [showAdd]="false"
-                      [error]="getCustomFieldError(i)"></pngx-input-number>
-                    }
-                    @case (CustomFieldDataType.Float) {
-                      <pngx-input-number formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [showAdd]="false"
-                      [step]=".1"
-                      [error]="getCustomFieldError(i)"></pngx-input-number>
-                    }
-                    @case (CustomFieldDataType.Monetary) {
-                      <pngx-input-monetary formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-monetary>
-                    }
-                    @case (CustomFieldDataType.Boolean) {
-                      <pngx-input-check formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"></pngx-input-check>
-                    }
-                    @case (CustomFieldDataType.Url) {
-                      <pngx-input-url formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-url>
-                    }
-                    @case (CustomFieldDataType.DocumentLink) {
-                      <pngx-input-document-link formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [parentDocumentID]="documentId()"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-document-link>
-                    }
-                    @case (CustomFieldDataType.Select) {
-                      <pngx-input-select formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [items]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
-                      bindLabel="label"
-                      [allowNull]="true"
-                      [horizontal]="true"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [error]="getCustomFieldError(i)"></pngx-input-select>
-                    }
-                    @case (CustomFieldDataType.LongText) {
-                      <pngx-input-textarea formControlName="value"
-                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userCanEdit"
-                      (removed)="removeField(fieldInstance)"
-                      [horizontal]="true"
-                      [error]="getCustomFieldError(i)"></pngx-input-textarea>
-                    }
-                  }
-                </div>
-              }
-            </div>
-
-            <div class="d-flex border-top pt-3">
-              <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-                <pngx-custom-fields-dropdown
-                  *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-                  [documentId]="documentId()"
-                  [disabled]="!userCanEdit"
-                  [existingFields]="document()?.custom_fields"
-                  (created)="refreshCustomFields()"
-                  (added)="addField($event)">
-                </pngx-custom-fields-dropdown>
-              </ng-container>
-              <div class="ms-auto">
-                <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
-              </div>
-            </div>
-          </ng-template>
-        </li>
-
-        <li [ngbNavItem]="DocumentDetailNavIDs.Content">
-          <a ngbNavLink i18n>Content</a>
-          <ng-template ngbNavContent>
-            <div>
-              <textarea class="form-control" id="content" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
-            </div>
-          </ng-template>
-        </li>
-
-        <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
-          <a ngbNavLink i18n>Metadata</a>
-          <ng-template ngbNavContent>
-
-            @if (document()) {
-              <table class="table table-borderless">
-                <tbody>
-                  <tr>
-                    <td i18n>Date modified</td>
-                    <td>{{document().modified | customDate}}</td>
-                  </tr>
-                  <tr>
-                    <td i18n>Date added</td>
-                    <td>{{document().added | customDate}}</td>
-                  </tr>
-                  <tr>
-                    <td i18n>Media filename</td>
-                    <td>{{metadata()?.media_filename}}</td>
-                  </tr>
-                  <tr>
-                    <td i18n>Original filename</td>
-                    <td>{{metadata()?.original_filename}}</td>
-                  </tr>
-                  <tr class="align-middle">
-                    <td i18n>Original SHA256 checksum</td>
-                    <td><span class="badge bg-light text-dark font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
-                  </tr>
-                  <tr>
-                    <td i18n>Original file size</td>
-                    <td>{{metadata()?.original_size | fileSize}}</td>
-                  </tr>
-                  <tr>
-                    <td i18n>Original mime type</td>
-                    <td>{{metadata()?.original_mime_type}}</td>
-                  </tr>
-                  @if (metadata()?.has_archive_version) {
-                    <tr class="align-middle">
-                      <td i18n>Archive SHA256 checksum</td>
-                      <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.archive_checksum}}</span></td>
-                    </tr>
-                  }
-                  @if (metadata()?.has_archive_version) {
-                    <tr>
-                      <td i18n>Archive file size</td>
-                      <td>{{metadata()?.archive_size | fileSize}}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-
-            @if (metadata()?.barcodes?.length > 0) {
-              <h6 i18n>Barcodes</h6>
-              <pngx-document-barcodes [barcodes]="metadata().barcodes"></pngx-document-barcodes>
-            }
-            @if (metadata()?.original_metadata?.length > 0) {
-              <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata()?.original_metadata"></pngx-metadata-collapse>
-            }
-            @if (metadata()?.archive_metadata?.length > 0) {
-              <pngx-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata()?.archive_metadata"></pngx-metadata-collapse>
-            }
-
-          </ng-template>
-        </li>
-
-        <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
-          <a ngbNavLink i18n>Preview</a>
-          @if (!pdfPreview.offsetParent) {
-            <ng-template ngbNavContent>
-              <div class="position-relative">
-                <ng-container *ngTemplateOutlet="previewContent"></ng-container>
-              </div>
-            </ng-template>
-          }
-        </li>
-
-        @if (notesEnabled) {
-          <li [ngbNavItem]="DocumentDetailNavIDs.Notes">
-            <a class="text-nowrap" ngbNavLink i18n>Notes @if (document()?.notes.length) {
-              <span class="badge text-bg-secondary ms-1">{{document().notes.length}}</span>
-            }</a>
-            <ng-template ngbNavContent>
-              <pngx-document-notes [documentId]="documentId()" [notes]="document()?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
-            </ng-template>
-          </li>
-        }
-
-        @if (historyEnabled) {
-          <li [ngbNavItem]="DocumentDetailNavIDs.History">
-            <a ngbNavLink i18n>History</a>
-            <ng-template ngbNavContent>
-              <div class="mb-3">
-                <pngx-document-history [documentId]="documentId()"></pngx-document-history>
-              </div>
-            </ng-template>
-          </li>
-        }
-
-        @if (showPermissions) {
-          <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
-            <a ngbNavLink i18n>Permissions</a>
-            <ng-template ngbNavContent>
-              <div class="mb-3">
-                <pngx-permissions-form title="" [users]="users()" formControlName="permissions_form"></pngx-permissions-form>
-              </div>
-            </ng-template>
-          </li>
-        }
-
-        @if (document()?.duplicate_documents?.length) {
-          <li [ngbNavItem]="DocumentDetailNavIDs.Duplicates">
-            <a class="text-nowrap" ngbNavLink i18n>
-              Duplicates
-              <span class="badge text-bg-secondary ms-1">{{ document().duplicate_documents.length }}</span>
-            </a>
-            <ng-template ngbNavContent>
-              <div class="d-flex flex-column gap-2">
-                <div class="fst-italic" i18n>Duplicate documents detected:</div>
-                <div class="list-group">
-                  @for (duplicate of document()?.duplicate_documents; track duplicate.id) {
-                    <a
-                      class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                      [routerLink]="['/documents', duplicate.id, 'details']"
-                      [class.disabled]="duplicate.deleted_at"
-                    >
-                      <span class="d-flex align-items-center gap-2">
-                        <span>{{ duplicate.title || ('#' + duplicate.id) }}</span>
-                        @if (duplicate.deleted_at) {
-                          <span class="badge text-bg-secondary" i18n>In trash</span>
-                        }
-                      </span>
-                      <span class="text-secondary">#{{ duplicate.id }}</span>
-                    </a>
-                  }
-                </div>
-              </div>
-            </ng-template>
-          </li>
-        }
-      </ul>
-
-      <div [ngbNavOutlet]="nav" class="mt-3"></div>
-
-    </form>
-  </div>
-
-  <div class="col-md-6 col-xl-7 mb-3 d-none d-md-block position-relative" #pdfPreview>
-    <ng-container *ngTemplateOutlet="previewContent"></ng-container>
-  </div>
-
-</div>
-
-<ng-template #saveButtons>
-  @let saveDisabled = !userCanEdit || networkActive() || (isDirty$ | async) !== true;
-  <div class="btn-group">
-    <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <button type="submit" class="order-3 btn btn-sm" [class.btn-primary]="!saveDisabled" [class.btn-outline-primary]="saveDisabled" title="Save" i18n-title [disabled]="saveDisabled">
-        <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="floppy"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Save</span>
-      </button>
-      @if (hasNext()) {
-        <button type="button" class="order-1 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="saveEditNext()" i18n [disabled]="saveDisabled">Save &amp; next</button>
-      } @else {
-        <button type="button" class="order-2 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="save(true)" i18n [disabled]="saveDisabled">Save &amp; close</button>
-      }
-      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" title="Discard" i18n-title [disabled]="saveDisabled">
-        <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="arrow-counterclockwise"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Discard</span>
-      </button>
-      <div class="btn-group order-4 d-md-none" ngbDropdown placement="bottom-end top-end" role="group">
-        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" ngbDropdownToggle aria-label="More save options" i18n-aria-label [disabled]="saveDisabled"></button>
-        <div class="dropdown-menu shadow" ngbDropdownMenu>
-          @if (hasNext()) {
-            <button type="button" ngbDropdownItem (click)="saveEditNext()" i18n>Save &amp; next</button>
-          }
-          <button type="button" ngbDropdownItem (click)="save(true)" i18n>Save &amp; close</button>
-        </div>
-      </div>
-    </ng-container>
-  </div>
-</ng-template>
-
-<ng-template #previewContent>
-  <div class="thumb-preview position-absolute pe-none text-center" [class.fade]="previewLoaded()">
-    @if (showThumbnailOverlay) {
-      <img [src]="thumbUrl()" class="mx-auto" [attr.width]="previewZoomScale() === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale() === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
-    }
-    <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
-      <div>
-        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-        <ng-container i18n>Loading...</ng-container>
-      </div>
-    </div>
-  </div>
-  @if (document()) {
-    @switch (archiveContentRenderType) {
-      @case (ContentRenderType.PDF) {
-        @if (!useNativePdfViewer) {
-          <div class="preview-sticky pdf-viewer-container" tabindex="-1">
-            <pngx-pdf-viewer
-              [src]="pdfSource()"
-              [sourceRevision]="previewRevision()"
-              [password]="pdfPassword()"
-              [renderMode]="PdfRenderMode.All"
-              [page]="previewCurrentPage()" (pageChange)="previewCurrentPage.set($event)"
-              [zoomScale]="previewZoomScale()"
-              [zoom]="previewZoomSetting()"
-              (loadError)="onError($event)"
-              (afterLoadComplete)="pdfPreviewLoaded($event)">
-            </pngx-pdf-viewer>
-            <div class="preview-controls position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
-              @if (previewNumPages()) {
-                <div class="input-group input-group-sm w-auto flex-nowrap">
-                  <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModelOptions]="{standalone: true}" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" aria-label="Page" i18n-aria-label />
-                  <div class="input-group-text" i18n>of {{previewNumPages()}}</div>
-                </div>
-              }
-              <div class="input-group input-group-sm w-auto flex-nowrap">
-                <button class="btn btn-outline-secondary" type="button" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
-                  <pngx-bs-icon width="1em" height="1em" name="dash"></pngx-bs-icon>
-                </button>
-                <select class="form-select" (change)="setZoom($event.target.value)" [ngModelOptions]="{standalone: true}" [ngModel]="currentZoom" aria-label="Zoom" i18n-aria-label>
-                  @for (setting of zoomSettings; track setting) {
-                    <option [value]="setting">
-                      {{ getZoomSettingTitle(setting) }}
-                    </option>
-                  }
-                </select>
-                <button class="btn btn-outline-secondary" type="button" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
-                  <pngx-bs-icon width="1em" height="1em" name="plus"></pngx-bs-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        } @else {
-          <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
-        }
-      }
-      @case (ContentRenderType.Text) {
-        <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText()}}</div>
-      }
-      @case (ContentRenderType.Image) {
-        <div class="preview-sticky">
-          <img [src]="previewUrl()" width="100%" height="100%" alt="{{title()}}" />
-        </div>
-      }
-      @case (ContentRenderType.TIFF) {
-        @if (!tiffError()) {
-          <div class="preview-sticky">
-            <img [src]="tiffURL()" width="100%" height="100%" alt="{{title()}}" />
-          </div>
-        } @else {
-          <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{tiffError()}}</div>
-        }
-      }
-      @case (ContentRenderType.Other) {
-        <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
-      }
-    }
-    @if (requiresPassword) {
-      <div class="password-prompt">
-        <form>
-          <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-        </form>
-      </div>
-    }
+  }
+  <div class="dropdown-divider"></div>
+  <button type="button" ngbDropdownItem (click)="inspectorOpen.set(true); inspectorSection.set('content')">
+    <pngx-bs-icon name="file-text" class="me-2" width="14" height="14"></pngx-bs-icon>
+    <span i18n>OCR-Text anzeigen</span>
+  </button>
+  <button type="button" ngbDropdownItem (click)="inspectorOpen.set(true); inspectorSection.set('metadata')">
+    <pngx-bs-icon name="info-circle" class="me-2" width="14" height="14"></pngx-bs-icon>
+    <span i18n>Datei-Metadaten</span>
+  </button>
+  @if (showPermissions) {
+    <button type="button" ngbDropdownItem (click)="inspectorOpen.set(true); inspectorSection.set('permissions')">
+      <pngx-bs-icon name="person-lock" class="me-2" width="14" height="14"></pngx-bs-icon>
+      <span i18n>Berechtigungen</span>
+    </button>
   }
 </ng-template>
+
+<div class="rd-detail-layout" [class.is-inspector-closed]="!inspectorOpen()">
+  <section class="rd-viewer-stage" #viewerStage #pdfPreview>
+    @if (
+      document() &&
+      archiveContentRenderType === ContentRenderType.PDF &&
+      !useNativePdfViewer &&
+      getPageNumbers().length > 0
+    ) {
+      <aside class="rd-thumb-strip" aria-label="Seitenübersicht" i18n-aria-label>
+        @for (page of getPageNumbers(); track page) {
+          <button
+            type="button"
+            class="rd-page-thumb"
+            [class.is-active]="previewCurrentPage() === page"
+            (click)="selectPreviewPage(page)"
+            [attr.aria-label]="'Seite ' + page"
+          >
+            <span class="rd-page-thumb-frame">
+              @if (page === 1 && thumbUrl()) {
+                <img class="rd-doc-thumb-img" [src]="thumbUrl()" [alt]="'Seite ' + page" />
+              } @else {
+                <span class="rd-page-thumb-sheet" aria-hidden="true">
+                  <span class="rd-thumb-line is-title"></span>
+                  <span class="rd-thumb-line"></span>
+                  <span class="rd-thumb-line"></span>
+                  <span class="rd-thumb-line is-mid"></span>
+                  <span class="rd-thumb-line"></span>
+                  <span class="rd-thumb-line is-short"></span>
+                </span>
+              }
+            </span>
+            <span class="rd-page-thumb-num">{{ page }}</span>
+          </button>
+        }
+      </aside>
+    }
+
+    <div class="rd-viewer-canvas">
+      <div class="rd-viewer-loading" [class.is-hidden]="previewLoaded()">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <span i18n>Dokument wird geladen …</span>
+      </div>
+
+      @if (document()) {
+        @switch (archiveContentRenderType) {
+          @case (ContentRenderType.PDF) {
+            @if (!useNativePdfViewer) {
+              <div class="rd-pdf-scroll" tabindex="-1">
+                <pngx-pdf-viewer
+                  [src]="pdfSource()"
+                  [sourceRevision]="previewRevision()"
+                  [password]="pdfPassword()"
+                  [renderMode]="PdfRenderMode.All"
+                  [page]="previewCurrentPage()"
+                  (pageChange)="previewCurrentPage.set($event)"
+                  [zoomScale]="previewZoomScale()"
+                  [zoom]="previewZoomSetting()"
+                  (loadError)="onError($event)"
+                  (afterLoadComplete)="pdfPreviewLoaded($event)"
+                ></pngx-pdf-viewer>
+              </div>
+            } @else {
+              <object [data]="previewUrl() | safeUrl" class="rd-object-preview" width="100%"></object>
+            }
+          }
+          @case (ContentRenderType.Text) {
+            <div class="rd-text-preview">{{ previewText() }}</div>
+          }
+          @case (ContentRenderType.Image) {
+            <div class="rd-image-preview">
+              <img [src]="previewUrl()" [alt]="title()" />
+            </div>
+          }
+          @case (ContentRenderType.TIFF) {
+            @if (!tiffError()) {
+              <div class="rd-image-preview">
+                <img [src]="tiffURL()" [alt]="title()" />
+              </div>
+            } @else {
+              <div class="rd-text-preview">{{ tiffError() }}</div>
+            }
+          }
+          @case (ContentRenderType.Other) {
+            <object [data]="previewUrl() | safeUrl" class="rd-object-preview" width="100%"></object>
+          }
+        }
+
+        @if (requiresPassword) {
+          <div class="rd-password-overlay">
+            <form class="rd-password-card">
+              <label class="form-label fw-semibold" i18n>Passwortgeschütztes PDF</label>
+              <input
+                autocomplete="off"
+                autofocus="true"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Passwort eingeben …"
+                type="password"
+                (keyup)="onPasswordKeyUp($event)"
+              />
+            </form>
+          </div>
+        }
+      }
+
+      @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
+        <div class="rd-viewer-pill" role="toolbar" aria-label="Ansichtssteuerung" i18n-aria-label>
+          <button
+            type="button"
+            class="rd-viewer-pill-btn"
+            (click)="decreaseZoom()"
+            aria-label="Verkleinern"
+            i18n-aria-label
+            title="Verkleinern"
+            i18n-title
+          >
+            <pngx-bs-icon name="dash" width="15" height="15"></pngx-bs-icon>
+          </button>
+          <button
+            type="button"
+            class="rd-viewer-zoom-label"
+            (click)="resetZoomToHundred()"
+            title="Auf 100 % zurücksetzen"
+            i18n-title
+          >
+            {{ getZoomDisplayPercent() }}
+          </button>
+          <button
+            type="button"
+            class="rd-viewer-pill-btn"
+            (click)="increaseZoom()"
+            aria-label="Vergrößern"
+            i18n-aria-label
+            title="Vergrößern"
+            i18n-title
+          >
+            <pngx-bs-icon name="plus" width="15" height="15"></pngx-bs-icon>
+          </button>
+
+          @if (previewNumPages()) {
+            <span class="rd-viewer-pill-sep" aria-hidden="true"></span>
+            <span class="rd-viewer-page-indicator" i18n>
+              Seite {{ previewCurrentPage() }} von {{ previewNumPages() }}
+            </span>
+          }
+
+          <button
+            type="button"
+            class="rd-viewer-pill-btn ms-1"
+            (click)="toggleFullscreen()"
+            aria-label="Vollbild umschalten"
+            i18n-aria-label
+            title="Vollbild"
+            i18n-title
+          >
+            <pngx-bs-icon [name]="isFullscreen() ? 'fullscreen-exit' : 'fullscreen'" width="13" height="13"></pngx-bs-icon>
+          </button>
+        </div>
+      }
+
+      @if (mergedBanner(); as banner) {
+        <div class="rd-merge-toast" role="status">
+          <span class="rd-merge-toast-icon" aria-hidden="true">
+            <pngx-bs-icon name="check" width="14" height="14"></pngx-bs-icon>
+          </span>
+          <div class="rd-merge-toast-copy">
+            <div class="rd-merge-toast-title" i18n>Neues Dokument erstellt</div>
+            <div class="rd-merge-toast-sub">
+              @if (banner.deleteOriginals) {
+                <span i18n>Aus {{ banner.count }} Dokumenten zusammengeführt · Originale im Papierkorb</span>
+              } @else {
+                <span i18n>Aus {{ banner.count }} Dokumenten zusammengeführt · Originale behalten</span>
+              }
+            </div>
+          </div>
+          <button
+            type="button"
+            class="rd-merge-toast-close"
+            (click)="dismissMergedBanner()"
+            aria-label="Hinweis schließen"
+            i18n-aria-label
+          >
+            <pngx-bs-icon name="x-lg" width="12" height="12"></pngx-bs-icon>
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (inspectorOpen()) {
+    <aside class="rd-inspector-panel" aria-label="Dokument-Inspektor" i18n-aria-label>
+      <form [formGroup]="documentForm" (ngSubmit)="save()" class="rd-inspector-form">
+        @let isDirty = (isDirty$ | async) === true;
+        @if (isDirty && userCanEdit) {
+          <div class="rd-save-bar">
+            <button
+              type="button"
+              class="rd-save-discard"
+              (click)="discard()"
+              [disabled]="networkActive()"
+              i18n
+            >Verwerfen</button>
+            <button
+              type="submit"
+              class="rd-save-primary"
+              [disabled]="networkActive()"
+            >
+              @if (networkActive()) {
+                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              }
+              <span i18n>Speichern</span>
+            </button>
+          </div>
+        }
+
+        @if (inspectorSection() !== 'details') {
+          <div class="rd-inspector-subnav">
+            <button
+              type="button"
+              class="rd-subnav-back"
+              (click)="inspectorSection.set('details')"
+            >
+              <pngx-bs-icon name="chevron-left" width="12" height="12"></pngx-bs-icon>
+              <span i18n>Zurück zu Details</span>
+            </button>
+          </div>
+        }
+
+        @if (inspectorSection() === 'details') {
+          <div class="rd-inspector-section">
+            <div class="rd-inspector-heading" i18n>Titel</div>
+            <input
+              type="text"
+              class="rd-title-input"
+              formControlName="title"
+              (keyup)="titleKeyUp($event)"
+              [attr.aria-label]="'Dokumenttitel'"
+              i18n-placeholder
+              placeholder="Ohne Titel"
+            />
+            <div class="rd-doc-file-meta">
+              <span>{{ getFileFormatLabel() }}</span>
+              @if (previewNumPages() || document()?.page_count) {
+                <span>·</span>
+                <span i18n>{previewNumPages() || document()?.page_count, plural, =1 {1 Seite} other {{{ previewNumPages() || document()?.page_count }} Seiten}}</span>
+              }
+              @if (metadata()?.original_size) {
+                <span>·</span>
+                <span>{{ metadata()?.original_size | fileSize }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="rd-inspector-section">
+            <div class="rd-inspector-heading" i18n>Informationen</div>
+
+            <div class="rd-info-rows">
+              @if (!isFieldHidden(DocumentDetailFieldID.Correspondent) && permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+                <div class="rd-info-row">
+                  <label class="rd-info-label" for="rd-correspondent" i18n>Korrespondent</label>
+                  <div class="rd-info-control">
+                    <select id="rd-correspondent" class="rd-inline-select" formControlName="correspondent">
+                      <option [ngValue]="null">—</option>
+                      @for (c of correspondents(); track c.id) {
+                        <option [ngValue]="c.id">{{ c.name }}</option>
+                      }
+                    </select>
+                    <pngx-bs-icon class="rd-select-chevron" name="chevron-expand" width="11" height="11"></pngx-bs-icon>
+                  </div>
+                </div>
+              }
+
+              @if (!isFieldHidden(DocumentDetailFieldID.DocumentType) && permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+                <div class="rd-info-row">
+                  <label class="rd-info-label" for="rd-doctype" i18n>Dokumenttyp</label>
+                  <div class="rd-info-control">
+                    <select id="rd-doctype" class="rd-inline-select" formControlName="document_type">
+                      <option [ngValue]="null">—</option>
+                      @for (dt of documentTypes(); track dt.id) {
+                        <option [ngValue]="dt.id">{{ dt.name }}</option>
+                      }
+                    </select>
+                    <pngx-bs-icon class="rd-select-chevron" name="chevron-expand" width="11" height="11"></pngx-bs-icon>
+                  </div>
+                </div>
+              }
+
+              <div class="rd-info-row">
+                <label class="rd-info-label" for="rd-created" i18n>Ausgestellt</label>
+                <div class="rd-info-control">
+                  <input
+                    id="rd-created"
+                    type="date"
+                    class="rd-inline-input"
+                    formControlName="created"
+                  />
+                </div>
+              </div>
+
+              @if (!isFieldHidden(DocumentDetailFieldID.StoragePath) && permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+                <div class="rd-info-row">
+                  <label class="rd-info-label" for="rd-storage-path" i18n>Speicherpfad</label>
+                  <div class="rd-info-control">
+                    <select id="rd-storage-path" class="rd-inline-select" formControlName="storage_path">
+                      <option [ngValue]="null" i18n>Standard</option>
+                      @for (sp of storagePaths(); track sp.id) {
+                        <option [ngValue]="sp.id">{{ sp.name }}</option>
+                      }
+                    </select>
+                    <pngx-bs-icon class="rd-select-chevron" name="chevron-expand" width="11" height="11"></pngx-bs-icon>
+                  </div>
+                </div>
+              }
+
+              @if (!isFieldHidden(DocumentDetailFieldID.ArchiveSerialNumber)) {
+                <div class="rd-info-row">
+                  <label class="rd-info-label" for="rd-asn" i18n>Archivnummer</label>
+                  <div class="rd-info-control">
+                    <input
+                      id="rd-asn"
+                      type="number"
+                      class="rd-inline-input rd-inline-asn"
+                      formControlName="archive_serial_number"
+                      placeholder="—"
+                    />
+                  </div>
+                </div>
+              }
+
+              @if (document()?.added) {
+                <div class="rd-info-row">
+                  <span class="rd-info-label" i18n>Hinzugefügt</span>
+                  <span class="rd-info-static">{{ document()?.added | customDate:'medium' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (!isFieldHidden(DocumentDetailFieldID.Tags) && permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
+            <div class="rd-inspector-section">
+              <div class="rd-inspector-heading" i18n>Tags</div>
+              <div class="rd-tags-wrap">
+                @for (tag of selectedTagObjects; track tag.id) {
+                  <span class="rd-tag-pill">
+                    <span
+                      class="rd-tag-dot"
+                      [style.background-color]="tag.color || '#0671e3'"
+                      aria-hidden="true"
+                    ></span>
+                    <span class="rd-tag-name">{{ tag.name }}</span>
+                    @if (userCanEdit) {
+                      <button
+                        type="button"
+                        class="rd-tag-remove"
+                        (click)="removeTagFromDocument(tag.id)"
+                        [attr.aria-label]="'Tag ' + tag.name + ' entfernen'"
+                      >
+                        <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                      </button>
+                    }
+                  </span>
+                }
+
+                @if (userCanEdit) {
+                  <div ngbDropdown placement="bottom-start" class="d-inline-block">
+                    <button type="button" class="rd-add-tag-btn" ngbDropdownToggle>
+                      <pngx-bs-icon name="plus" width="13" height="13"></pngx-bs-icon>
+                      <span i18n>Tag</span>
+                    </button>
+                    <div ngbDropdownMenu class="rd-tag-picker-menu">
+                      @for (tag of availableTagsToAdd; track tag.id) {
+                        <button type="button" ngbDropdownItem (click)="addTagToDocument(tag.id)">
+                          <span
+                            class="rd-tag-dot me-2"
+                            [style.background-color]="tag.color || '#0671e3'"
+                          ></span>
+                          <span>{{ tag.name }}</span>
+                        </button>
+                      }
+                      @if (availableTagsToAdd.length === 0) {
+                        <div class="dropdown-item-text small text-muted" i18n>Alle Tags zugewiesen</div>
+                      }
+                      @if (!createDisabled(DataType.Tag)) {
+                        <div class="dropdown-divider"></div>
+                        <button type="button" ngbDropdownItem (click)="createTag()">
+                          <pngx-bs-icon name="plus" class="me-1" width="13" height="13"></pngx-bs-icon>
+                          <span i18n>Neues Tag erstellen …</span>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
+            <div class="rd-inspector-section">
+              <div class="rd-inspector-section-head">
+                <div class="rd-inspector-heading m-0" i18n>Eigene Felder</div>
+                @if (userCanEdit) {
+                  <div class="rd-custom-field-add">
+                    <pngx-custom-fields-dropdown
+                      [documentId]="documentId()"
+                      [disabled]="!userCanEdit"
+                      [existingFields]="document()?.custom_fields"
+                      (created)="refreshCustomFields()"
+                      (added)="addField($event)"
+                    ></pngx-custom-fields-dropdown>
+                  </div>
+                }
+              </div>
+
+              @if (document()?.custom_fields?.length) {
+                <div class="rd-custom-fields-list">
+                  @for (fieldInstance of document()?.custom_fields; track fieldInstance.field; let i = $index) {
+                    @if (customFieldFormFields.controls[i]) {
+                      <div class="rd-cf-row" [formGroup]="customFieldFormFields.controls[i]">
+                        <span class="rd-info-label">{{ getCustomFieldFromInstance(fieldInstance)?.name }}</span>
+                        <div class="rd-cf-value">
+                          @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
+                            @case (CustomFieldDataType.Boolean) {
+                              <div class="form-check form-switch m-0">
+                                <input type="checkbox" class="form-check-input" formControlName="value" />
+                              </div>
+                            }
+                            @case (CustomFieldDataType.Date) {
+                              <input type="date" class="rd-inline-input" formControlName="value" />
+                            }
+                            @case (CustomFieldDataType.Integer) {
+                              <input type="number" class="rd-inline-input" formControlName="value" />
+                            }
+                            @case (CustomFieldDataType.Float) {
+                              <input type="number" step="0.01" class="rd-inline-input" formControlName="value" />
+                            }
+                            @case (CustomFieldDataType.Select) {
+                              <select class="rd-inline-select" formControlName="value">
+                                <option [ngValue]="null">—</option>
+                                @for (opt of getCustomFieldFromInstance(fieldInstance)?.extra_data?.select_options; track opt.id) {
+                                  <option [ngValue]="opt.id">{{ opt.label }}</option>
+                                }
+                              </select>
+                            }
+                            @default {
+                              <input type="text" class="rd-inline-input" formControlName="value" />
+                            }
+                          }
+                          @if (userCanEdit) {
+                            <button
+                              type="button"
+                              class="rd-cf-remove"
+                              (click)="removeField(fieldInstance)"
+                              title="Feld entfernen"
+                              i18n-title
+                            >
+                              <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              } @else {
+                <div class="rd-muted-empty" i18n>Keine eigenen Felder zugewiesen</div>
+              }
+            </div>
+          }
+
+          @if (notesEnabled) {
+            <div class="rd-inspector-section">
+              <div class="rd-inspector-heading" i18n>Notizen</div>
+
+              @if (document()?.notes?.length) {
+                <div class="rd-notes-list">
+                  @for (note of document()?.notes; track note.id) {
+                    <div class="rd-note-card">
+                      <div class="rd-note-text">{{ note.note }}</div>
+                      <div class="rd-note-footer">
+                        <span>
+                          @if (getNoteAuthorName(note)) {
+                            {{ getNoteAuthorName(note) }} ·
+                          }
+                          {{ note.created | customDate:'short' }}
+                        </span>
+                        @if (userCanEdit) {
+                          <button
+                            type="button"
+                            class="rd-note-delete"
+                            (click)="deleteQuickNote(note.id)"
+                            aria-label="Notiz löschen"
+                            i18n-aria-label
+                          >
+                            <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (userCanEdit) {
+                <div class="rd-note-composer">
+                  <input
+                    type="text"
+                    class="rd-note-input"
+                    [ngModel]="newNoteText()"
+                    (ngModelChange)="newNoteText.set($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    (keydown.enter)="$event.preventDefault(); submitQuickNote()"
+                    placeholder="Notiz hinzufügen …"
+                    i18n-placeholder
+                    aria-label="Notiz hinzufügen"
+                    i18n-aria-label
+                  />
+                  <button
+                    type="button"
+                    class="rd-note-send"
+                    (click)="submitQuickNote()"
+                    [disabled]="!newNoteText().trim() || savingNote()"
+                    aria-label="Notiz senden"
+                    i18n-aria-label
+                  >
+                    <pngx-bs-icon name="arrow-up" width="13" height="13"></pngx-bs-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          @if (historyEnabled || document()?.added) {
+            <div class="rd-inspector-section">
+              <div class="rd-inspector-heading" i18n>Verlauf</div>
+              <ul class="rd-history-timeline">
+                @if (historyEntries().length > 0) {
+                  @for (entry of historyEntries(); track entry.id; let idx = $index) {
+                    <li class="rd-history-item" [class.is-latest]="idx === 0">
+                      <span class="rd-history-dot" aria-hidden="true"></span>
+                      <div class="rd-history-body">
+                        <div class="rd-history-title">{{ getHistoryTitle(entry) }}</div>
+                        @if (getHistorySummary(entry)) {
+                          <div class="rd-history-sub">{{ getHistorySummary(entry) }}</div>
+                        }
+                        <div class="rd-history-time">{{ entry.timestamp | customDate:'short' }}</div>
+                      </div>
+                    </li>
+                  }
+                } @else if (document()?.added) {
+                  <li class="rd-history-item is-latest">
+                    <span class="rd-history-dot" aria-hidden="true"></span>
+                    <div class="rd-history-body">
+                      <div class="rd-history-title" i18n>Hochgeladen</div>
+                      <div class="rd-history-sub" i18n>In Paperless archiviert</div>
+                      <div class="rd-history-time">{{ document()?.added | customDate:'short' }}</div>
+                    </div>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <div class="rd-inspector-footer-links">
+            <button type="button" class="rd-footer-tab" (click)="inspectorSection.set('content')" i18n>OCR-Text</button>
+            <button type="button" class="rd-footer-tab" (click)="inspectorSection.set('metadata')" i18n>Metadaten</button>
+            @if (showPermissions) {
+              <button type="button" class="rd-footer-tab" (click)="inspectorSection.set('permissions')" i18n>Rechte</button>
+            }
+          </div>
+        } @else if (inspectorSection() === 'content') {
+          <div class="rd-inspector-section">
+            <div class="rd-inspector-heading" i18n>Erkannter Text (OCR)</div>
+            <textarea
+              class="form-control rd-ocr-textarea"
+              id="content"
+              rows="22"
+              formControlName="content"
+              [class.rtl]="isRTL"
+            ></textarea>
+          </div>
+        } @else if (inspectorSection() === 'metadata') {
+          <div class="rd-inspector-section">
+            <div class="rd-inspector-heading" i18n>Datei-Metadaten</div>
+            @if (document()) {
+              <div class="rd-meta-list">
+                <div class="rd-meta-row">
+                  <span i18n>Geändert</span>
+                  <span>{{ document().modified | customDate }}</span>
+                </div>
+                <div class="rd-meta-row">
+                  <span i18n>Hinzugefügt</span>
+                  <span>{{ document().added | customDate }}</span>
+                </div>
+                <div class="rd-meta-row">
+                  <span i18n>Originaldatei</span>
+                  <span class="text-break">{{ metadata()?.original_filename }}</span>
+                </div>
+                <div class="rd-meta-row">
+                  <span i18n>Dateigröße</span>
+                  <span>{{ metadata()?.original_size | fileSize }}</span>
+                </div>
+                <div class="rd-meta-row">
+                  <span i18n>MIME-Typ</span>
+                  <span>{{ metadata()?.original_mime_type }}</span>
+                </div>
+                @if (metadata()?.has_archive_version) {
+                  <div class="rd-meta-row">
+                    <span i18n>Archivgröße</span>
+                    <span>{{ metadata()?.archive_size | fileSize }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else if (inspectorSection() === 'permissions' && showPermissions) {
+          <div class="rd-inspector-section">
+            <div class="rd-inspector-heading" i18n>Berechtigungen</div>
+            <pngx-permissions-form title="" [users]="users()" formControlName="permissions_form"></pngx-permissions-form>
+          </div>
+        }
+      </form>
+    </aside>
+  }
+</div>

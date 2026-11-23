@@ -2,10 +2,12 @@ import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import {
   Component,
+  ElementRef,
   inject,
   OnDestroy,
   OnInit,
   signal,
+  TemplateRef,
   ViewChild,
 } from '@angular/core'
 import {
@@ -41,6 +43,7 @@ import {
   tap,
 } from 'rxjs/operators'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
+import { AuditLogAction, AuditLogEntry } from 'src/app/data/auditlog-entry'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
@@ -86,6 +89,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
   BulkEditSourceMode,
@@ -140,6 +144,7 @@ import {
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
+import { RedesignTopbarService } from '../redesign/redesign-topbar.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { DocumentBarcodesComponent } from './document-barcodes/document-barcodes.component'
 import { DocumentHistoryComponent } from './document-history/document-history.component'
@@ -241,6 +246,8 @@ export class DocumentDetailComponent
   private savedViewService = inject(SavedViewService)
   private readonly workflowService = inject(WorkflowService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
+  private readonly topbar = inject(RedesignTopbarService)
+  private readonly notesService = inject(DocumentNotesService)
   private readonly useNativePdfViewerSetting = this.settings.getSignal<boolean>(
     SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
   )
@@ -258,6 +265,26 @@ export class DocumentDetailComponent
     this.settings.getSignal<SuggestionSource>(
       SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE
     )
+
+  readonly inspectorOpen = signal(true)
+  readonly inspectorSection = signal<'details' | 'content' | 'metadata' | 'permissions'>('details')
+  readonly allTags = signal<Tag[]>([])
+  readonly newNoteText = signal('')
+  readonly savingNote = signal(false)
+  readonly historyEntries = signal<AuditLogEntry[]>([])
+  readonly mergedBanner = signal<{ count: number; deleteOriginals: boolean } | null>(null)
+  readonly isFullscreen = signal(false)
+
+  detailMoreActionsTemplate?: TemplateRef<any>
+
+  @ViewChild('detailMoreActions')
+  set detailMoreActions(tpl: TemplateRef<any> | undefined) {
+    this.detailMoreActionsTemplate = tpl
+    this.syncTopbarConfig()
+  }
+
+  @ViewChild('viewerStage')
+  viewerStageRef?: ElementRef<HTMLElement>
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
@@ -680,10 +707,11 @@ export class DocumentDetailComponent
               takeUntil(this.unsubscribeNotifier)
             )
             .subscribe((titleValue) => {
-              if (titleValue !== this.titleInput.value) return
+              if (this.titleInput && titleValue !== this.titleInput.value) return
               this.title.set(titleValue)
               this.documentForm.patchValue({ title: titleValue })
               this.documentForm.get('title').markAsDirty()
+              this.syncTopbarConfig()
             })
           const keepContentEdits =
             useDoc.__selectedVersionId === this.selectedVersionId() &&
@@ -859,6 +887,25 @@ export class DocumentDetailComponent
         .subscribe((result) => this.manualWorkflows.set(result.results))
     }
 
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
+      this.tagService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => this.allTags.set(result.results ?? []))
+    }
+
+    const navState = history?.state as {
+      mergedFrom?: { count: number; deleteOriginals: boolean }
+    }
+    if (navState?.mergedFrom) {
+      this.mergedBanner.set(navState.mergedFrom)
+    }
+
     this.getCustomFields()
 
     this.websocketStatusService
@@ -945,9 +992,12 @@ export class DocumentDetailComponent
           else this.save(true)
         }
       })
+
+    this.syncTopbarConfig()
   }
 
   ngOnDestroy(): void {
+    this.topbar.reset()
     this.cleanupPrintDocument()
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
@@ -976,6 +1026,7 @@ export class DocumentDetailComponent
     this.requiresPassword = false
     this.updateFormForCustomFields()
     this.loadMetadataForSelectedVersion()
+    this.loadHistoryTimeline(doc.id)
     if (
       this.autoSuggest &&
       this.permissionsService.currentUserHasObjectPermissions(
@@ -1003,6 +1054,7 @@ export class DocumentDetailComponent
     ) {
       this.activeNavID.set(DocumentDetailNavIDs.Details)
     }
+    this.syncTopbarConfig()
   }
 
   // Update file preview and download target to a specific version (by document id)
@@ -2222,5 +2274,235 @@ export class DocumentDetailComponent
           )
         },
       })
+  }
+
+  private syncTopbarConfig(): void {
+    const parentLabel =
+      this.documentListViewService.activeSavedViewTitle ||
+      $localize`Alle Dokumente`
+    this.topbar.setDetailConfig({
+      breadcrumbParent: parentLabel,
+      breadcrumbTitle: this.title() || this.document()?.title || '',
+      hasPrevious: this.hasPrevious(),
+      hasNext: this.hasNext(),
+      inspectorOpen: this.inspectorOpen(),
+      canDelete:
+        this.userIsOwner &&
+        this.permissionsService.currentUserCan(
+          PermissionAction.Delete,
+          PermissionType.Document
+        ),
+      canShare:
+        this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.ShareLink
+        ) || this.emailEnabled,
+      onBackToList: () => this.close(),
+      onPrevious: () => this.previousDoc(),
+      onNext: () => this.nextDoc(),
+      onDownload: () => this.download(),
+      onShare: () => {
+        if (
+          this.permissionsService.currentUserCan(
+            PermissionAction.Add,
+            PermissionType.ShareLink
+          )
+        ) {
+          this.openShareLinks()
+        } else if (this.emailEnabled) {
+          this.openEmailDocument()
+        }
+      },
+      onDelete: () => this.delete(),
+      onToggleInspector: () => this.toggleInspector(),
+      moreActionsTemplate: this.detailMoreActionsTemplate,
+    })
+  }
+
+  toggleInspector(): void {
+    this.inspectorOpen.set(!this.inspectorOpen())
+    this.syncTopbarConfig()
+  }
+
+  dismissMergedBanner(): void {
+    this.mergedBanner.set(null)
+  }
+
+  getPageNumbers(): number[] {
+    const count = this.previewNumPages() || this.document()?.page_count || 0
+    if (count <= 0) return []
+    return Array.from({ length: Math.min(count, 50) }, (_, i) => i + 1)
+  }
+
+  selectPreviewPage(page: number): void {
+    this.previewCurrentPage.set(page)
+  }
+
+  getZoomDisplayPercent(): string {
+    if (this.previewZoomScale() === PdfZoomScale.PageFit) {
+      return $localize`Passend`
+    }
+    const numeric = parseFloat(this.previewZoomSetting())
+    if (!Number.isFinite(numeric)) return '100 %'
+    return `${Math.round(numeric * 100)} %`
+  }
+
+  resetZoomToHundred(): void {
+    this.previewZoomScale.set(PdfZoomScale.PageWidth)
+    this.previewZoomSetting.set(PdfZoomLevel.One)
+  }
+
+  toggleFullscreen(): void {
+    const el = this.viewerStageRef?.nativeElement
+    if (!el) return
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.().catch(() => {})
+      this.isFullscreen.set(false)
+    } else if (el.requestFullscreen) {
+      el.requestFullscreen()
+        .then(() => this.isFullscreen.set(true))
+        .catch(() => {})
+    }
+  }
+
+  getFileFormatLabel(): string {
+    const mime =
+      this.metadata()?.original_mime_type || this.document()?.mime_type || ''
+    if (mime.includes('pdf')) return 'PDF'
+    if (mime.includes('png')) return 'PNG'
+    if (mime.includes('jpeg') || mime.includes('jpg')) return 'JPG'
+    if (mime.includes('tiff')) return 'TIFF'
+    if (mime.includes('text')) return 'TXT'
+    return 'Dokument'
+  }
+
+  get selectedTagObjects(): Tag[] {
+    const ids: number[] = this.documentForm.get('tags')?.value || []
+    const tagById = new Map(this.allTags().map((t) => [t.id, t]))
+    return ids
+      .map((id) => tagById.get(id))
+      .filter((t): t is Tag => !!t)
+  }
+
+  get availableTagsToAdd(): Tag[] {
+    const current = new Set<number>(this.documentForm.get('tags')?.value || [])
+    return this.allTags().filter((t) => !current.has(t.id))
+  }
+
+  addTagToDocument(tagId: number): void {
+    if (!this.userCanEdit) return
+    const current: number[] = [...(this.documentForm.get('tags')?.value || [])]
+    if (!current.includes(tagId)) {
+      current.push(tagId)
+      this.documentForm.get('tags')?.setValue(current)
+      this.documentForm.get('tags')?.markAsDirty()
+    }
+  }
+
+  removeTagFromDocument(tagId: number): void {
+    if (!this.userCanEdit) return
+    const current: number[] = (this.documentForm.get('tags')?.value || []).filter(
+      (id: number) => id !== tagId
+    )
+    this.documentForm.get('tags')?.setValue(current)
+    this.documentForm.get('tags')?.markAsDirty()
+  }
+
+  submitQuickNote(): void {
+    const text = this.newNoteText().trim()
+    if (!text || !this.documentId() || this.savingNote()) return
+    this.savingNote.set(true)
+    this.notesService
+      .addNote(this.documentId(), text)
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (notes) => {
+          this.newNoteText.set('')
+          this.savingNote.set(false)
+          this.notesUpdated(notes)
+        },
+        error: (err) => {
+          this.savingNote.set(false)
+          this.toastService.showError($localize`Fehler beim Speichern der Notiz`, err)
+        },
+      })
+  }
+
+  deleteQuickNote(noteId: number): void {
+    if (!this.documentId() || !this.userCanEdit) return
+    this.notesService
+      .deleteNote(this.documentId(), noteId)
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (notes) => this.notesUpdated(notes),
+        error: (err) =>
+          this.toastService.showError($localize`Fehler beim Löschen der Notiz`, err),
+      })
+  }
+
+  getNoteAuthorName(note: DocumentNote): string {
+    if (!note.user) return ''
+    if (typeof note.user === 'object') {
+      return note.user.first_name || note.user.username || ''
+    }
+    const found = this.users()?.find((u) => u.id === note.user)
+    return found?.first_name || found?.username || ''
+  }
+
+  private loadHistoryTimeline(documentId: number): void {
+    if (!documentId || !this.historyEnabled) {
+      this.historyEntries.set([])
+      return
+    }
+    this.documentsService
+      .getHistory(documentId)
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier),
+        catchError(() => of([] as AuditLogEntry[]))
+      )
+      .subscribe((entries) => {
+        this.historyEntries.set((entries ?? []).slice(0, 6))
+      })
+  }
+
+  getHistoryTitle(entry: AuditLogEntry): string {
+    switch (entry.action) {
+      case AuditLogAction.Create:
+        return $localize`Hochgeladen`
+      case AuditLogAction.Update:
+        return $localize`Aktualisiert`
+      case AuditLogAction.Delete:
+        return $localize`Gelöscht`
+      default:
+        return $localize`Änderung`
+    }
+  }
+
+  getHistorySummary(entry: AuditLogEntry): string {
+    const keys = Object.keys(entry.changes || {})
+    if (entry.action === AuditLogAction.Create) {
+      return entry.actor?.username
+        ? $localize`Von ${entry.actor.username}`
+        : $localize`Automatisch erfasst`
+    }
+    if (keys.length === 0) {
+      return entry.actor?.username || ''
+    }
+    const labelMap: Record<string, string> = {
+      title: $localize`Titel`,
+      correspondent: $localize`Korrespondent`,
+      document_type: $localize`Dokumenttyp`,
+      storage_path: $localize`Speicherpfad`,
+      tags: $localize`Tags`,
+      created: $localize`Ausgestellt`,
+      archive_serial_number: $localize`Archivnummer`,
+      custom_fields: $localize`Eigene Felder`,
+    }
+    return keys
+      .slice(0, 3)
+      .map((k) => labelMap[k] || k)
+      .join(', ')
   }
 }
