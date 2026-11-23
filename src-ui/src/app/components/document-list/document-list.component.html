@@ -138,47 +138,59 @@
       }
 
       @if (allCorrespondents().length > 0) {
-        <div class="rd-filter-pills-row" role="group" aria-label="Korrespondenten" i18n-aria-label>
-          <button
-            type="button"
-            class="rd-filter-pill"
-            [class.is-active]="activeCorrespondentFilterIds.size === 0"
-            [attr.aria-pressed]="activeCorrespondentFilterIds.size === 0"
-            (click)="clearQuickCorrespondents()"
-            i18n
-          >Alle Korrespondenten</button>
+        <div
+          class="rd-filter-pills-row rd-filter-pills-row--correspondents"
+          [class.is-expanded]="correspondentsRowExpanded()"
+          role="group"
+          aria-label="Korrespondenten"
+          i18n-aria-label
+        >
+          <div
+            class="rd-correspondents-viewport"
+            [style.max-height.px]="correspondentsRowExpanded() ? correspondentsExpandedHeight() : 29"
+          >
+            <div class="rd-correspondents-track" #correspondentsTrack>
+              <button
+                type="button"
+                class="rd-filter-pill"
+                [class.is-active]="activeCorrespondentFilterIds.size === 0"
+                [attr.aria-pressed]="activeCorrespondentFilterIds.size === 0"
+                (click)="clearQuickCorrespondents()"
+                i18n
+              >Alle Korrespondenten</button>
 
-          @for (corr of visibleQuickCorrespondents; track corr.id) {
+              @for (corr of allCorrespondents(); track corr.id) {
+                <button
+                  type="button"
+                  class="rd-filter-pill rd-filter-pill-correspondent"
+                  [class.is-active]="isQuickCorrespondentActive(corr.id)"
+                  [attr.aria-pressed]="isQuickCorrespondentActive(corr.id)"
+                  (click)="toggleQuickCorrespondent(corr.id)"
+                >
+                  <span
+                    class="rd-pill-dot"
+                    [style.background-color]="getCorrespondentColor(corr.id)"
+                    aria-hidden="true"
+                  ></span>
+                  <span>{{ corr.name }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (correspondentsHasOverflow() || correspondentsRowExpanded()) {
             <button
               type="button"
-              class="rd-filter-pill rd-filter-pill-correspondent"
-              [class.is-active]="isQuickCorrespondentActive(corr.id)"
-              [attr.aria-pressed]="isQuickCorrespondentActive(corr.id)"
-              (click)="toggleQuickCorrespondent(corr.id)"
+              class="rd-correspondents-expand-btn"
+              [class.is-expanded]="correspondentsRowExpanded()"
+              [class.has-hidden-active]="hasHiddenActiveCorrespondent"
+              [attr.aria-expanded]="correspondentsRowExpanded()"
+              [attr.aria-label]="correspondentsRowExpanded() ? 'Weitere Korrespondenten einklappen' : 'Weitere Korrespondenten ausklappen'"
+              [title]="correspondentsRowExpanded() ? 'Weitere Korrespondenten einklappen' : 'Weitere Korrespondenten ausklappen'"
+              (click)="toggleCorrespondentsRowExpanded()"
             >
-              <span
-                class="rd-pill-dot"
-                [style.background-color]="getCorrespondentColor(corr.id)"
-                aria-hidden="true"
-              ></span>
-              <span>{{ corr.name }}</span>
+              <pngx-bs-icon class="rd-correspondents-expand-icon" name="chevron-down" width="13" height="13"></pngx-bs-icon>
             </button>
-          }
-
-          @if (hiddenQuickCorrespondentsCount > 0) {
-            <button
-              type="button"
-              class="rd-filter-pill rd-filter-pill-more"
-              (click)="showAllQuickCorrespondents.set(true)"
-              i18n
-            >+{{ hiddenQuickCorrespondentsCount }} weitere</button>
-          } @else if (showAllQuickCorrespondents() && allCorrespondents().length > maxCollapsedQuickCorrespondents) {
-            <button
-              type="button"
-              class="rd-filter-pill rd-filter-pill-more"
-              (click)="showAllQuickCorrespondents.set(false)"
-              i18n
-            >Weniger</button>
           }
         </div>
       }

@@ -145,6 +145,81 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 7px;
+
+  &--correspondents {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+}
+
+.rd-correspondents-viewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  transition: max-height 260ms var(--rd-sidebar-ease);
+}
+
+.rd-correspondents-track {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.rd-correspondents-expand-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 29px;
+  height: 29px;
+  border-radius: var(--rd-radius-pill);
+  border: 1px solid var(--rd-border-subtle);
+  background: var(--rd-bg-pill);
+  color: var(--rd-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
+
+  &:hover {
+    background: var(--rd-bg-pill-hover);
+    color: var(--rd-text-primary);
+  }
+
+  &.has-hidden-active {
+    background: var(--rd-accent-soft);
+    color: var(--rd-accent);
+    border-color: rgba(var(--rd-accent-rgb), 0.22);
+
+    &:hover {
+      background: var(--rd-accent-soft-hover);
+    }
+  }
+}
+
+.rd-correspondents-expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(0deg);
+  transition: transform 220ms var(--rd-sidebar-ease);
+
+  .rd-correspondents-expand-btn.is-expanded & {
+    transform: rotate(180deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-correspondents-viewport,
+  .rd-correspondents-expand-icon {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .rd-filter-pill {
@@ -160,6 +235,7 @@
   font-size: 12.5px;
   font-weight: 500;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
 
@@ -171,17 +247,6 @@
     background: var(--rd-bg-pill-active);
     color: var(--rd-text-pill-active);
     font-weight: 600;
-  }
-}
-
-.rd-filter-pill-more {
-  background: transparent;
-  border: 1px dashed var(--rd-border-medium);
-  color: var(--rd-text-secondary);
-
-  &:hover {
-    background: var(--rd-bg-pill);
-    color: var(--rd-text-primary);
   }
 }
 

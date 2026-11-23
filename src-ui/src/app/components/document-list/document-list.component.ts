@@ -1,12 +1,15 @@
 import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
+  effect,
+  ElementRef,
   inject,
   OnDestroy,
   OnInit,
   QueryList,
   signal,
   ViewChild,
+  viewChild,
   ViewChildren,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -344,8 +347,70 @@ export class DocumentListComponent
     }
   }
 
-  readonly showAllQuickCorrespondents = signal(false)
-  readonly maxCollapsedQuickCorrespondents = 8
+  private readonly correspondentsTrack =
+    viewChild<ElementRef<HTMLElement>>('correspondentsTrack')
+
+  readonly correspondentsRowExpanded = signal(false)
+  readonly correspondentsHasOverflow = signal(false)
+  readonly correspondentsExpandedHeight = signal(29)
+
+  private readonly correspondentsLayoutEffect = effect((onCleanup) => {
+    const trackEl = this.correspondentsTrack()?.nativeElement
+    this.allCorrespondents()
+    if (!trackEl) {
+      this.correspondentsHasOverflow.set(false)
+      this.correspondentsExpandedHeight.set(29)
+      return
+    }
+
+    const measure = () => {
+      const fullHeight = Math.max(29, Math.ceil(trackEl.scrollHeight))
+      this.correspondentsExpandedHeight.set(fullHeight)
+      const hasOverflow = fullHeight > 34
+      this.correspondentsHasOverflow.set(hasOverflow)
+      if (!hasOverflow && this.correspondentsRowExpanded()) {
+        this.correspondentsRowExpanded.set(false)
+      }
+    }
+
+    measure()
+    const rafId =
+      typeof requestAnimationFrame === 'function'
+        ? requestAnimationFrame(measure)
+        : null
+
+    let observer: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => measure())
+      observer.observe(trackEl)
+    }
+
+    onCleanup(() => {
+      if (rafId !== null && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(rafId)
+      }
+      observer?.disconnect()
+    })
+  })
+
+  toggleCorrespondentsRowExpanded(): void {
+    this.correspondentsRowExpanded.update((expanded) => !expanded)
+  }
+
+  get hasHiddenActiveCorrespondent(): boolean {
+    if (
+      this.correspondentsRowExpanded() ||
+      this.activeCorrespondentFilterIds.size === 0
+    ) {
+      return false
+    }
+    const trackEl = this.correspondentsTrack()?.nativeElement
+    if (!trackEl) return false
+    const activeButtons = trackEl.querySelectorAll<HTMLElement>(
+      '.rd-filter-pill-correspondent.is-active'
+    )
+    return Array.from(activeButtons).some((btn) => btn.offsetTop >= 30)
+  }
 
   get activeDocumentTypeFilterIds(): Set<number> {
     const ids = new Set<number>()
@@ -381,32 +446,6 @@ export class DocumentListComponent
       }
     }
     return ids
-  }
-
-  get visibleQuickCorrespondents(): Correspondent[] {
-    const all = this.allCorrespondents()
-    if (
-      this.showAllQuickCorrespondents() ||
-      all.length <= this.maxCollapsedQuickCorrespondents
-    ) {
-      return all
-    }
-    const activeIds = this.activeCorrespondentFilterIds
-    const visible = all.slice(0, this.maxCollapsedQuickCorrespondents)
-    const visibleIds = new Set(visible.map((c) => c.id))
-    for (const corr of all) {
-      if (activeIds.has(corr.id) && !visibleIds.has(corr.id)) {
-        visible.push(corr)
-      }
-    }
-    return visible
-  }
-
-  get hiddenQuickCorrespondentsCount(): number {
-    return Math.max(
-      0,
-      this.allCorrespondents().length - this.visibleQuickCorrespondents.length
-    )
   }
 
   isQuickDocumentTypeActive(documentTypeId: number): boolean {
