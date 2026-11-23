@@ -35,6 +35,8 @@
   // Spacing & Layout
   --rd-sidebar-width: 232px;
   --rd-sidebar-collapsed-width: 68px;
+  --rd-sidebar-duration: 320ms;
+  --rd-sidebar-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --rd-topbar-height: 56px;
   --rd-inspector-width: 332px;
   --rd-shell-gap: 12px;

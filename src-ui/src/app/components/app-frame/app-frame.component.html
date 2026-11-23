@@ -12,9 +12,12 @@
 
 <div class="rd-shell" [class.rd-shell--sidebar-collapsed]="slimSidebarEnabled">
   <!-- Mobile sidebar backdrop -->
-  @if (!isMenuCollapsed()) {
-    <div class="rd-mobile-backdrop d-md-none" (click)="closeMenu()"></div>
-  }
+  <div
+    class="rd-mobile-backdrop d-md-none"
+    [class.rd-mobile-backdrop--visible]="!isMenuCollapsed()"
+    [attr.aria-hidden]="isMenuCollapsed()"
+    (click)="closeMenu()"
+  ></div>
 
   <!-- Floating Left Sidebar -->
   <div

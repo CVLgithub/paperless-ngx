@@ -5,208 +5,254 @@
       <span class="rd-sidebar__brand-icon" aria-hidden="true">
         <pngx-bs-icon name="file-earmark-text" width="1rem" height="1rem"></pngx-bs-icon>
       </span>
-      @if (!collapsed) {
-        <span class="rd-sidebar__brand-name">{{ appTitle }}</span>
-      }
+      <span class="rd-sidebar__brand-name" [attr.aria-hidden]="collapsed ? 'true' : null">{{ appTitle }}</span>
     </a>
     <button
       type="button"
       class="rd-sidebar__collapse-btn"
       (click)="toggleCollapse.emit()"
+      [attr.aria-expanded]="!collapsed"
       [attr.aria-label]="collapsed ? 'Seitenleiste einblenden' : 'Seitenleiste ausblenden'"
       [title]="collapsed ? 'Seitenleiste einblenden' : 'Seitenleiste ausblenden'"
     >
-      <pngx-bs-icon name="layout-sidebar" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+      <pngx-bs-icon class="rd-sidebar__collapse-icon" name="layout-sidebar" width="0.95rem" height="0.95rem"></pngx-bs-icon>
     </button>
   </div>
 
   <!-- Scrollable Navigation Area -->
-  <div class="rd-sidebar__scroll">
+  <div class="rd-sidebar__scroll" #scrollContainer>
     <!-- Primary Navigation -->
     <ul class="rd-nav-list" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
       <li>
         <button
           type="button"
-          class="rd-nav-item"
+          class="rd-nav-item rd-nav-item--primary"
           [class.rd-nav-item--active]="isInboxActive"
           (click)="openInbox()"
-          [ngbTooltip]="collapsed ? 'Posteingang' : null"
+          [ngbTooltip]="collapsed ? (inboxCount() > 0 ? 'Posteingang (' + inboxCount() + ')' : 'Posteingang') : null"
           placement="end"
           container="body"
         >
-          <pngx-bs-icon class="rd-nav-item__icon" name="inbox" width="0.95rem" height="0.95rem"></pngx-bs-icon>
-          @if (!collapsed) {
-            <span class="rd-nav-item__label">Posteingang</span>
+          <span class="rd-nav-item__icon rd-nav-item__icon--primary" aria-hidden="true">
+            <pngx-bs-icon name="inbox" width="0.95rem" height="0.95rem"></pngx-bs-icon>
             @if (inboxCount() > 0) {
-              <span class="rd-nav-item__count">{{ inboxCount() }}</span>
+              <span class="rd-nav-item__collapsed-dot"></span>
             }
+          </span>
+          <span class="rd-nav-item__label">Posteingang</span>
+          @if (inboxCount() > 0) {
+            <span class="rd-nav-item__count">{{ inboxCount() }}</span>
           }
         </button>
       </li>
       <li>
         <button
           type="button"
-          class="rd-nav-item"
+          class="rd-nav-item rd-nav-item--primary"
           [class.rd-nav-item--active]="isAllDocumentsActive"
           (click)="openAllDocuments()"
           [ngbTooltip]="collapsed ? 'Alle Dokumente' : null"
           placement="end"
           container="body"
         >
-          <pngx-bs-icon class="rd-nav-item__icon" name="files" width="0.95rem" height="0.95rem"></pngx-bs-icon>
-          @if (!collapsed) {
-            <span class="rd-nav-item__label">Alle Dokumente</span>
-          }
+          <span class="rd-nav-item__icon rd-nav-item__icon--primary" aria-hidden="true">
+            <pngx-bs-icon name="files" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+          </span>
+          <span class="rd-nav-item__label">Alle Dokumente</span>
         </button>
       </li>
     </ul>
 
-    <!-- Favoriten (Gespeicherte Ansichten) -->
-    @if (!collapsed && savedViewService.sidebarViews?.length > 0) {
-      <div class="rd-sidebar__section" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-        <div class="rd-sidebar__section-label">Favoriten</div>
-        <ul class="rd-nav-list">
-          @for (view of savedViewService.sidebarViews; track view.id) {
-            <li>
-              <a
-                class="rd-nav-item"
-                [routerLink]="['/view', view.id]"
-                routerLinkActive="rd-nav-item--active"
-                (click)="itemSelected.emit()"
-              >
-                <pngx-bs-icon class="rd-nav-item__icon" [name]="view.icon || 'bookmark'" width="0.9rem" height="0.9rem"></pngx-bs-icon>
-                <span class="rd-nav-item__label">{{ view.name }}</span>
-                @if (savedViewService.getDocumentCount(view) !== null && savedViewService.getDocumentCount(view) !== undefined) {
-                  <span class="rd-nav-item__count">{{ savedViewService.getDocumentCount(view) }}</span>
-                }
-              </a>
-            </li>
-          }
-        </ul>
-      </div>
-    }
-
-    <!-- Tags -->
-    @if (!collapsed) {
-      <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
-        <button
-          type="button"
-          class="rd-sidebar__collapse-header"
-          (click)="tagsExpanded.set(!tagsExpanded())"
-          [attr.aria-expanded]="tagsExpanded()"
-        >
-          <span>Tags</span>
-          <pngx-bs-icon [name]="tagsExpanded() ? 'chevron-down' : 'chevron-right'" width="0.72rem" height="0.72rem"></pngx-bs-icon>
-        </button>
-        @if (tagsExpanded()) {
-          <ul class="rd-nav-list rd-nav-list--compact">
-            @for (tag of visibleTags(); track tag.id) {
-              <li>
-                <button
-                  type="button"
-                  class="rd-nav-item rd-nav-item--taxonomy"
-                  [class.rd-nav-item--active]="isTagActive(tag.id)"
-                  (click)="filterByTag(tag)"
-                >
-                  <span class="rd-color-dot" [style.background-color]="tag.color || '#6b7280'" aria-hidden="true"></span>
-                  <span class="rd-nav-item__label">{{ tag.name }}</span>
-                  @if (tag.document_count !== undefined && tag.document_count !== null) {
-                    <span class="rd-nav-item__count">{{ tag.document_count }}</span>
-                  }
-                </button>
-              </li>
-            }
-            @if (visibleTags().length === 0) {
-              <li class="rd-sidebar__empty">Keine Tags</li>
-            }
-          </ul>
+    <!-- Secondary Navigation Sections (animated clip + fade on sidebar collapse) -->
+    <div
+      class="rd-sidebar__sections-clip"
+      [attr.aria-hidden]="collapsed ? 'true' : null"
+      [attr.inert]="collapsed ? '' : null"
+    >
+      <div class="rd-sidebar__sections">
+        <!-- Favoriten (Gespeicherte Ansichten) -->
+        @if (savedViewService.sidebarViews?.length > 0) {
+          <div class="rd-sidebar__section" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+            <div class="rd-sidebar__section-label">Favoriten</div>
+            <ul class="rd-nav-list">
+              @for (view of savedViewService.sidebarViews; track view.id) {
+                <li>
+                  <a
+                    class="rd-nav-item rd-nav-item--taxonomy"
+                    [routerLink]="['/view', view.id]"
+                    routerLinkActive="rd-nav-item--active"
+                    (click)="itemSelected.emit()"
+                  >
+                    <pngx-bs-icon class="rd-nav-item__icon" [name]="view.icon || 'bookmark'" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+                    <span class="rd-nav-item__label">{{ view.name }}</span>
+                    @if (savedViewService.getDocumentCount(view) !== null && savedViewService.getDocumentCount(view) !== undefined) {
+                      <span class="rd-nav-item__count">{{ savedViewService.getDocumentCount(view) }}</span>
+                    }
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
         }
-      </div>
 
-      <!-- Korrespondenten -->
-      <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
-        <button
-          type="button"
-          class="rd-sidebar__collapse-header"
-          (click)="correspondentsExpanded.set(!correspondentsExpanded())"
-          [attr.aria-expanded]="correspondentsExpanded()"
-        >
-          <span>Korrespondenten</span>
-          <pngx-bs-icon [name]="correspondentsExpanded() ? 'chevron-down' : 'chevron-right'" width="0.72rem" height="0.72rem"></pngx-bs-icon>
-        </button>
-        @if (correspondentsExpanded()) {
-          <ul class="rd-nav-list rd-nav-list--compact">
-            @for (correspondent of correspondents(); track correspondent.id) {
-              <li>
-                <button
-                  type="button"
-                  class="rd-nav-item rd-nav-item--taxonomy"
-                  [class.rd-nav-item--active]="isCorrespondentActive(correspondent.id)"
-                  (click)="filterByCorrespondent(correspondent)"
-                >
-                  <span class="rd-color-dot" [style.background-color]="getCorrespondentColor(correspondent.id)" aria-hidden="true"></span>
-                  <span class="rd-nav-item__label">{{ correspondent.name }}</span>
-                  @if (correspondent.document_count !== undefined && correspondent.document_count !== null) {
-                    <span class="rd-nav-item__count">{{ correspondent.document_count }}</span>
-                  }
-                </button>
-              </li>
-            }
-            @if (correspondents().length === 0) {
-              <li class="rd-sidebar__empty">Keine Korrespondenten</li>
-            }
-          </ul>
-        }
-      </div>
+        <!-- Tags -->
+        <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
+          <button
+            type="button"
+            class="rd-sidebar__collapse-header"
+            (click)="tagsExpanded.set(!tagsExpanded())"
+            [attr.aria-expanded]="tagsExpanded()"
+          >
+            <span>Tags</span>
+            <pngx-bs-icon
+              class="rd-sidebar__chevron"
+              [class.rd-sidebar__chevron--open]="tagsExpanded()"
+              name="chevron-right"
+              width="0.72rem"
+              height="0.72rem"
+            ></pngx-bs-icon>
+          </button>
+          <div
+            class="rd-sidebar__group-body"
+            [class.rd-sidebar__group-body--open]="tagsExpanded()"
+            [attr.inert]="!tagsExpanded() ? '' : null"
+          >
+            <ul class="rd-nav-list rd-nav-list--compact">
+              @for (tag of visibleTags(); track tag.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="rd-nav-item rd-nav-item--taxonomy"
+                    [class.rd-nav-item--active]="isTagActive(tag.id)"
+                    (click)="filterByTag(tag)"
+                  >
+                    <span class="rd-color-dot" [style.background-color]="tag.color || '#6b7280'" aria-hidden="true"></span>
+                    <span class="rd-nav-item__label">{{ tag.name }}</span>
+                    @if (tag.document_count !== undefined && tag.document_count !== null) {
+                      <span class="rd-nav-item__count">{{ tag.document_count }}</span>
+                    }
+                  </button>
+                </li>
+              }
+              @if (visibleTags().length === 0) {
+                <li class="rd-sidebar__empty">Keine Tags</li>
+              }
+            </ul>
+          </div>
+        </div>
 
-      <!-- Dokumenttypen -->
-      <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-        <button
-          type="button"
-          class="rd-sidebar__collapse-header"
-          (click)="documentTypesExpanded.set(!documentTypesExpanded())"
-          [attr.aria-expanded]="documentTypesExpanded()"
-        >
-          <span>Dokumenttypen</span>
-          <pngx-bs-icon [name]="documentTypesExpanded() ? 'chevron-down' : 'chevron-right'" width="0.72rem" height="0.72rem"></pngx-bs-icon>
-        </button>
-        @if (documentTypesExpanded()) {
-          <ul class="rd-nav-list rd-nav-list--compact">
-            @for (docType of documentTypes(); track docType.id) {
-              <li>
-                <button
-                  type="button"
-                  class="rd-nav-item rd-nav-item--taxonomy"
-                  [class.rd-nav-item--active]="isDocumentTypeActive(docType.id)"
-                  (click)="filterByDocumentType(docType)"
-                >
-                  <pngx-bs-icon class="rd-nav-item__icon" name="file-earmark" width="0.82rem" height="0.82rem"></pngx-bs-icon>
-                  <span class="rd-nav-item__label">{{ docType.name }}</span>
-                  @if (docType.document_count !== undefined && docType.document_count !== null) {
-                    <span class="rd-nav-item__count">{{ docType.document_count }}</span>
-                  }
-                </button>
-              </li>
-            }
-            @if (documentTypes().length === 0) {
-              <li class="rd-sidebar__empty">Keine Dokumenttypen</li>
-            }
-          </ul>
-        }
+        <!-- Korrespondenten -->
+        <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
+          <button
+            type="button"
+            class="rd-sidebar__collapse-header"
+            (click)="correspondentsExpanded.set(!correspondentsExpanded())"
+            [attr.aria-expanded]="correspondentsExpanded()"
+          >
+            <span>Korrespondenten</span>
+            <pngx-bs-icon
+              class="rd-sidebar__chevron"
+              [class.rd-sidebar__chevron--open]="correspondentsExpanded()"
+              name="chevron-right"
+              width="0.72rem"
+              height="0.72rem"
+            ></pngx-bs-icon>
+          </button>
+          <div
+            class="rd-sidebar__group-body"
+            [class.rd-sidebar__group-body--open]="correspondentsExpanded()"
+            [attr.inert]="!correspondentsExpanded() ? '' : null"
+          >
+            <ul class="rd-nav-list rd-nav-list--compact">
+              @for (correspondent of correspondents(); track correspondent.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="rd-nav-item rd-nav-item--taxonomy"
+                    [class.rd-nav-item--active]="isCorrespondentActive(correspondent.id)"
+                    (click)="filterByCorrespondent(correspondent)"
+                  >
+                    <span class="rd-color-dot" [style.background-color]="getCorrespondentColor(correspondent.id)" aria-hidden="true"></span>
+                    <span class="rd-nav-item__label">{{ correspondent.name }}</span>
+                    @if (correspondent.document_count !== undefined && correspondent.document_count !== null) {
+                      <span class="rd-nav-item__count">{{ correspondent.document_count }}</span>
+                    }
+                  </button>
+                </li>
+              }
+              @if (correspondents().length === 0) {
+                <li class="rd-sidebar__empty">Keine Korrespondenten</li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        <!-- Dokumenttypen -->
+        <div class="rd-sidebar__section rd-sidebar__section--collapsible" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
+          <button
+            type="button"
+            class="rd-sidebar__collapse-header"
+            (click)="documentTypesExpanded.set(!documentTypesExpanded())"
+            [attr.aria-expanded]="documentTypesExpanded()"
+          >
+            <span>Dokumenttypen</span>
+            <pngx-bs-icon
+              class="rd-sidebar__chevron"
+              [class.rd-sidebar__chevron--open]="documentTypesExpanded()"
+              name="chevron-right"
+              width="0.72rem"
+              height="0.72rem"
+            ></pngx-bs-icon>
+          </button>
+          <div
+            class="rd-sidebar__group-body"
+            [class.rd-sidebar__group-body--open]="documentTypesExpanded()"
+            [attr.inert]="!documentTypesExpanded() ? '' : null"
+          >
+            <ul class="rd-nav-list rd-nav-list--compact">
+              @for (docType of documentTypes(); track docType.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="rd-nav-item rd-nav-item--taxonomy"
+                    [class.rd-nav-item--active]="isDocumentTypeActive(docType.id)"
+                    (click)="filterByDocumentType(docType)"
+                  >
+                    <pngx-bs-icon class="rd-nav-item__icon" name="file-earmark" width="0.82rem" height="0.82rem"></pngx-bs-icon>
+                    <span class="rd-nav-item__label">{{ docType.name }}</span>
+                    @if (docType.document_count !== undefined && docType.document_count !== null) {
+                      <span class="rd-nav-item__count">{{ docType.document_count }}</span>
+                    }
+                  </button>
+                </li>
+              }
+              @if (documentTypes().length === 0) {
+                <li class="rd-sidebar__empty">Keine Dokumenttypen</li>
+              }
+            </ul>
+          </div>
+        </div>
       </div>
-    }
+    </div>
   </div>
 
   <!-- Bottom User & Settings Footer -->
   <div class="rd-sidebar__footer" ngbDropdown placement="top-start" container="body">
-    <div class="rd-sidebar__user" ngbDropdownToggle role="button" tabindex="0" aria-label="Benutzer- und Verwaltungsmenü">
+    <div
+      class="rd-sidebar__user"
+      ngbDropdownToggle
+      role="button"
+      tabindex="0"
+      aria-label="Benutzer- und Verwaltungsmenü"
+      [ngbTooltip]="collapsed ? userDisplayName : null"
+      placement="end"
+      container="body"
+    >
       <span class="rd-sidebar__avatar" aria-hidden="true">{{ userInitials }}</span>
-      @if (!collapsed) {
-        <span class="rd-sidebar__username">{{ userDisplayName }}</span>
-        <span class="rd-sidebar__settings-icon" aria-hidden="true">
-          <pngx-bs-icon name="sliders" width="0.92rem" height="0.92rem"></pngx-bs-icon>
-        </span>
-      }
+      <span class="rd-sidebar__username" [attr.aria-hidden]="collapsed ? 'true' : null">{{ userDisplayName }}</span>
+      <span class="rd-sidebar__settings-icon" aria-hidden="true">
+        <pngx-bs-icon name="sliders" width="0.92rem" height="0.92rem"></pngx-bs-icon>
+      </span>
     </div>
 
     <div ngbDropdownMenu class="rd-sidebar-menu">

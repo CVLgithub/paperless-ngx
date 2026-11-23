@@ -1,7 +1,7 @@
-import { NgClass } from '@angular/common'
 import {
   Component,
   DestroyRef,
+  ElementRef,
   EventEmitter,
   Input,
   OnInit,
@@ -9,6 +9,7 @@ import {
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { Router, RouterModule } from '@angular/router'
@@ -59,7 +60,6 @@ const CORRESPONDENT_PALETTE = [
   templateUrl: './redesign-sidebar.component.html',
   styleUrls: ['./redesign-sidebar.component.scss'],
   imports: [
-    NgClass,
     RouterModule,
     NgbDropdownModule,
     NgbTooltipModule,
@@ -80,7 +80,25 @@ export class RedesignSidebarComponent implements OnInit {
   private readonly documentTypeService = inject(DocumentTypeService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
 
-  @Input() collapsed = false
+  private readonly scrollContainer =
+    viewChild<ElementRef<HTMLElement>>('scrollContainer')
+  private _collapsed = false
+
+  @Input()
+  get collapsed(): boolean {
+    return this._collapsed
+  }
+  set collapsed(value: boolean) {
+    const wasCollapsed = this._collapsed
+    this._collapsed = value
+    if (value && !wasCollapsed) {
+      this.scrollContainer()?.nativeElement.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }
+
   @Input() appTitle = 'Paperless'
   @Input() canManageAttributes = false
   @Input() canManageShareLinks = false
