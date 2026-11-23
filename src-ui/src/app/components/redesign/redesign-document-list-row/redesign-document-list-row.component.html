@@ -1,0 +1,66 @@
+<div
+  class="rd-list-row"
+  [class.rd-list-row--selected]="selected"
+  [class.rd-list-row--select-mode]="selectionMode"
+  (click)="onRowClick($event)"
+  role="button"
+  tabindex="0"
+  (keydown.enter)="onRowClick($any($event))"
+>
+  <button
+    type="button"
+    class="rd-list-row__check"
+    [class.rd-list-row__check--checked]="selected"
+    (click)="onCheckClick($event)"
+    [attr.aria-label]="selected ? 'Auswahl aufheben' : 'Dokument auswählen'"
+    [attr.aria-pressed]="selected"
+  >
+    @if (selected) {
+      <pngx-bs-icon name="check" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+    }
+  </button>
+
+  <div class="rd-list-row__thumb-wrap">
+    <img
+      class="rd-list-row__thumb rd-doc-thumb-img"
+      [src]="thumbUrl"
+      [alt]="document.title | documentTitle"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+
+  <div class="rd-list-row__main">
+    <div class="rd-list-row__title" [title]="document.title | documentTitle">
+      {{ document.title | documentTitle }}
+    </div>
+    @if (correspondentName) {
+      <div class="rd-list-row__correspondent">{{ correspondentName }}</div>
+    }
+  </div>
+
+  <div class="rd-list-row__tags">
+    @for (tag of resolvedTags; track tag.id) {
+      <span class="rd-list-row__tag-pill">
+        <span class="rd-list-row__tag-dot" [style.background-color]="tag.color || '#6b7280'"></span>
+        <span>{{ tag.name }}</span>
+      </span>
+    }
+  </div>
+
+  <div class="rd-list-row__type">
+    @if (documentTypeName) {
+      <span class="rd-list-row__type-badge">{{ documentTypeName }}</span>
+    }
+  </div>
+
+  <div class="rd-list-row__pages">
+    @if (document.page_count) {
+      <span>{{ document.page_count }} S.</span>
+    }
+  </div>
+
+  <div class="rd-list-row__date">
+    {{ document.created | customDate:'mediumDate' }}
+  </div>
+</div>

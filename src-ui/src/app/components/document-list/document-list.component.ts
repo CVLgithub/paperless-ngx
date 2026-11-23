@@ -22,17 +22,35 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
-import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import {
+  catchError,
+  filter,
+  first,
+  map,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+} from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
+import { Correspondent } from 'src/app/data/correspondent'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+import {
+  FILTER_CORRESPONDENT,
+  FILTER_DOCUMENT_TYPE,
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_IS_IN_INBOX,
+} from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
+import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
@@ -51,8 +69,12 @@ import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
   PermissionsService,
+  PermissionType,
 } from 'src/app/services/permissions.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
@@ -65,12 +87,30 @@ import { CustomFieldDisplayComponent } from '../common/custom-field-display/cust
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
 import { TagComponent } from '../common/tag/tag.component'
+import { RedesignDocumentCardComponent } from '../redesign/redesign-document-card/redesign-document-card.component'
+import {
+  DocumentTimeGroup,
+  groupDocumentsByRecency,
+} from '../redesign/redesign-document-groups'
+import { RedesignDocumentListRowComponent } from '../redesign/redesign-document-list-row/redesign-document-list-row.component'
+import { RedesignTopbarService } from '../redesign/redesign-topbar.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
 import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
 import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
+
+const CORRESPONDENT_DOT_COLORS = [
+  '#c92a2a',
+  '#7c5a3c',
+  '#1b7f4b',
+  '#1c4e80',
+  '#5c6670',
+  '#7048e8',
+  '#d9480f',
+  '#0b7285',
+]
 
 @Component({
   selector: 'pngx-document-list',
@@ -84,6 +124,8 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     FilterEditorComponent,
     DocumentCardSmallComponent,
     DocumentCardLargeComponent,
+    RedesignDocumentCardComponent,
+    RedesignDocumentListRowComponent,
     PreviewPopupComponent,
     TagComponent,
     CustomDatePipe,
@@ -121,11 +163,25 @@ export class DocumentListComponent
   settingsService = inject(SettingsService)
   private hotKeyService = inject(HotKeyService)
   permissionService = inject(PermissionsService)
+  private readonly topbar = inject(RedesignTopbarService)
+  private readonly tagService = inject(TagService)
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly documentTypeService = inject(DocumentTypeService)
   private readonly notesEnabledSetting =
     this.settingsService.getSignal<boolean>(SETTINGS_KEYS.NOTES_ENABLED)
 
   DisplayField = DisplayField
   DisplayMode = DisplayMode
+
+  readonly selectionMode = signal(false)
+  readonly showAdvancedFilters = signal(false)
+  readonly allTags = signal<Tag[]>([])
+  readonly allCorrespondents = signal<Correspondent[]>([])
+  readonly allDocumentTypes = signal<DocumentType[]>([])
+
+  tagMap: Map<number, Tag> = new Map()
+  correspondentMap: Map<number, Correspondent> = new Map()
+  documentTypeMap: Map<number, DocumentType> = new Map()
 
   @ViewChild('filterEditor')
   private filterEditor: FilterEditorComponent
@@ -203,7 +259,7 @@ export class DocumentListComponent
   }
 
   get isFiltered() {
-    return !!this.filterEditor?.rulesModified
+    return !!this.filterEditor?.rulesModified || this.list.filterRules.length > 0
   }
 
   getTitle() {
@@ -211,9 +267,223 @@ export class DocumentListComponent
     if (title && this.savedViewIsModified) {
       title += '*'
     } else if (!title) {
-      title = $localize`Documents`
+      const rules = this.list.filterRules || []
+      if (rules.length === 1) {
+        const rule = rules[0]
+        if (rule.rule_type === FILTER_IS_IN_INBOX && rule.value === 'true') {
+          return $localize`Inbox`
+        }
+        if (rule.rule_type === FILTER_HAS_TAGS_ALL && rule.value) {
+          const tag = this.tagMap.get(Number(rule.value))
+          if (tag) return tag.name
+        }
+        if (rule.rule_type === FILTER_CORRESPONDENT && rule.value) {
+          const corr = this.correspondentMap.get(Number(rule.value))
+          if (corr) return corr.name
+        }
+        if (rule.rule_type === FILTER_DOCUMENT_TYPE && rule.value) {
+          const dt = this.documentTypeMap.get(Number(rule.value))
+          if (dt) return dt.name
+        }
+      }
+      title = $localize`All Documents`
     }
     return title
+  }
+
+  get redesignDisplayMode(): 'grid' | 'list' {
+    return this.list.displayMode === DisplayMode.TABLE ? 'list' : 'grid'
+  }
+
+  get documentGroups(): DocumentTimeGroup[] {
+    return groupDocumentsByRecency(this.list.documents || [])
+  }
+
+  get activeSortSegment(): 'date' | 'name' | 'type' {
+    const field = this.list.sortField
+    if (field === 'title') return 'name'
+    if (field === 'document_type__name') return 'type'
+    return 'date'
+  }
+
+  setSortSegment(segment: 'date' | 'name' | 'type'): void {
+    const fieldMap: Record<'date' | 'name' | 'type', string> = {
+      date: 'created',
+      name: 'title',
+      type: 'document_type__name',
+    }
+    const defaultReverse: Record<'date' | 'name' | 'type', boolean> = {
+      date: true,
+      name: false,
+      type: false,
+    }
+    const targetField = fieldMap[segment]
+    if (this.list.sortField === targetField) {
+      this.list.setSort(targetField, !this.list.sortReverse)
+    } else {
+      this.list.setSort(targetField, defaultReverse[segment])
+    }
+  }
+
+  get activeDocumentTypeFilterId(): number | null {
+    const rule = (this.list.filterRules || []).find(
+      (r) => r.rule_type === FILTER_DOCUMENT_TYPE && r.value
+    )
+    return rule ? Number(rule.value) : null
+  }
+
+  get activeCorrespondentFilterId(): number | null {
+    const rule = (this.list.filterRules || []).find(
+      (r) => r.rule_type === FILTER_CORRESPONDENT && r.value
+    )
+    return rule ? Number(rule.value) : null
+  }
+
+  get hasQuickPillFilter(): boolean {
+    return (
+      this.activeDocumentTypeFilterId !== null ||
+      this.activeCorrespondentFilterId !== null
+    )
+  }
+
+  clearQuickPillFilters(): void {
+    const remaining = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_DOCUMENT_TYPE &&
+        r.rule_type !== FILTER_CORRESPONDENT
+    )
+    this.list.setFilterRules(remaining)
+  }
+
+  toggleQuickDocumentType(documentTypeId: number): void {
+    const isActive = this.activeDocumentTypeFilterId === documentTypeId
+    const withoutType = (this.list.filterRules || []).filter(
+      (r) => r.rule_type !== FILTER_DOCUMENT_TYPE
+    )
+    if (isActive) {
+      this.list.setFilterRules(withoutType)
+    } else {
+      this.list.setFilterRules([
+        ...withoutType,
+        {
+          rule_type: FILTER_DOCUMENT_TYPE,
+          value: documentTypeId.toString(),
+        },
+      ])
+    }
+  }
+
+  toggleQuickCorrespondent(correspondentId: number): void {
+    const isActive = this.activeCorrespondentFilterId === correspondentId
+    const withoutCorr = (this.list.filterRules || []).filter(
+      (r) => r.rule_type !== FILTER_CORRESPONDENT
+    )
+    if (isActive) {
+      this.list.setFilterRules(withoutCorr)
+    } else {
+      this.list.setFilterRules([
+        ...withoutCorr,
+        {
+          rule_type: FILTER_CORRESPONDENT,
+          value: correspondentId.toString(),
+        },
+      ])
+    }
+  }
+
+  getCorrespondentColor(id: number): string {
+    return CORRESPONDENT_DOT_COLORS[Math.abs(id) % CORRESPONDENT_DOT_COLORS.length]
+  }
+
+  requestUpload(): void {
+    this.topbar.requestUpload()
+  }
+
+  toggleSelectionMode(): void {
+    const next = !this.selectionMode()
+    this.selectionMode.set(next)
+    if (!next && this.list.hasSelection) {
+      this.list.selectNone()
+    }
+    this.syncTopbarConfig()
+  }
+
+  setRedesignDisplayMode(mode: 'grid' | 'list'): void {
+    this.list.displayMode =
+      mode === 'list' ? DisplayMode.TABLE : DisplayMode.SMALL_CARDS
+    this.syncTopbarConfig()
+  }
+
+  private syncTopbarConfig(): void {
+    this.topbar.setListConfig({
+      displayMode: this.redesignDisplayMode,
+      selectionMode: this.selectionMode() || this.list.hasSelection,
+      canUpload: this.permissionService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.Document
+      ),
+      onSetDisplayMode: (mode) => this.setRedesignDisplayMode(mode),
+      onToggleSelectionMode: () => this.toggleSelectionMode(),
+    })
+  }
+
+  private loadTaxonomyLookups(): void {
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
+      this.tagService
+        .listAll()
+        .pipe(
+          first(),
+          catchError(() => of({ results: [] as Tag[] }))
+        )
+        .subscribe((res) => {
+          const items = res.results ?? []
+          this.allTags.set(items)
+          this.tagMap = new Map(items.map((t) => [t.id, t]))
+        })
+    }
+
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      this.correspondentService
+        .listAll()
+        .pipe(
+          first(),
+          catchError(() => of({ results: [] as Correspondent[] }))
+        )
+        .subscribe((res) => {
+          const items = res.results ?? []
+          this.allCorrespondents.set(items)
+          this.correspondentMap = new Map(items.map((c) => [c.id, c]))
+        })
+    }
+
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      this.documentTypeService
+        .listAll()
+        .pipe(
+          first(),
+          catchError(() => of({ results: [] as DocumentType[] }))
+        )
+        .subscribe((res) => {
+          const items = res.results ?? []
+          this.allDocumentTypes.set(items)
+          this.documentTypeMap = new Map(items.map((dt) => [dt.id, dt]))
+        })
+    }
   }
 
   getSortFields() {
@@ -263,11 +533,15 @@ export class DocumentListComponent
   }
 
   ngOnInit(): void {
+    this.loadTaxonomyLookups()
+    this.syncTopbarConfig()
+
     this.websocketStatusService
       .onDocumentConsumptionFinished()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.list.reload()
+        this.loadTaxonomyLookups()
       })
 
     this.websocketStatusService
@@ -275,6 +549,7 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.list.reload()
+        this.loadTaxonomyLookups()
       })
 
     this.route.paramMap
@@ -306,6 +581,7 @@ export class DocumentListComponent
         })
         this.updateDisplayCustomFields()
         this.unmodifiedFilterRules.set(view.filter_rules)
+        this.syncTopbarConfig()
       })
 
     this.route.queryParamMap
@@ -324,6 +600,7 @@ export class DocumentListComponent
           this.list.loadFromQueryParams(queryParams)
           this.unmodifiedFilterRules.set([])
         }
+        this.syncTopbarConfig()
       })
 
     this.hotKeyService
@@ -335,6 +612,11 @@ export class DocumentListComponent
       .subscribe(() => {
         if (this.list.hasSelection) {
           this.list.selectNone()
+          this.selectionMode.set(false)
+          this.syncTopbarConfig()
+        } else if (this.selectionMode()) {
+          this.selectionMode.set(false)
+          this.syncTopbarConfig()
         } else if (this.isFiltered) {
           this.resetFilters()
         }
@@ -345,6 +627,7 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.list.selectAll()
+        this.syncTopbarConfig()
       })
 
     this.hotKeyService
@@ -352,6 +635,7 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.list.selectPage()
+        this.syncTopbarConfig()
       })
 
     this.hotKeyService
@@ -396,6 +680,7 @@ export class DocumentListComponent
   }
 
   ngOnDestroy() {
+    this.topbar.reset()
     this.list.cancelPending()
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
@@ -551,6 +836,7 @@ export class DocumentListComponent
   toggleSelected(document: Document, event: MouseEvent): void {
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)
+    this.syncTopbarConfig()
   }
 
   clickTag(tagID: number) {
@@ -584,6 +870,7 @@ export class DocumentListComponent
   }
 
   resetFilters() {
-    this.filterEditor.resetSelected()
+    this.filterEditor?.resetSelected()
+    this.list.setFilterRules([], true)
   }
 }

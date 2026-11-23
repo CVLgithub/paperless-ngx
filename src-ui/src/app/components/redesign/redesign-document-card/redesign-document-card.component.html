@@ -1,0 +1,58 @@
+<article
+  class="rd-doc-card"
+  [class.rd-doc-card--selected]="selected"
+  [class.rd-doc-card--select-mode]="selectionMode"
+  (click)="onCardClick($event)"
+  role="button"
+  tabindex="0"
+  (keydown.enter)="onCardClick($any($event))"
+>
+  <div class="rd-doc-card__sheet">
+    <img
+      class="rd-doc-card__thumb rd-doc-thumb-img"
+      [src]="thumbUrl"
+      [alt]="document.title | documentTitle"
+      loading="lazy"
+      decoding="async"
+    />
+
+    <!-- Selection circle (top right) -->
+    <button
+      type="button"
+      class="rd-doc-card__check"
+      [class.rd-doc-card__check--checked]="selected"
+      (click)="onCheckClick($event)"
+      [attr.aria-label]="selected ? 'Auswahl aufheben' : 'Dokument auswählen'"
+      [attr.aria-pressed]="selected"
+    >
+      @if (selected) {
+        <pngx-bs-icon name="check" width="0.95rem" height="0.95rem"></pngx-bs-icon>
+      }
+    </button>
+
+    <!-- Page count pill (bottom right, only for multi-page documents) -->
+    @if (document.page_count && document.page_count > 1) {
+      <span class="rd-doc-card__pages">{{ document.page_count }} S.</span>
+    }
+  </div>
+
+  <div class="rd-doc-card__info">
+    <h3 class="rd-doc-card__title" [title]="document.title | documentTitle">
+      {{ document.title | documentTitle }}
+    </h3>
+    <div class="rd-doc-card__meta">
+      <span class="rd-doc-card__date">{{ document.created | customDate:'mediumDate' }}</span>
+      @if (resolvedTags.length > 0) {
+        <span class="rd-doc-card__dots" aria-label="Tags">
+          @for (tag of resolvedTags; track tag.id) {
+            <span
+              class="rd-doc-card__dot"
+              [style.background-color]="tag.color || '#6b7280'"
+              [title]="tag.name"
+            ></span>
+          }
+        </span>
+      }
+    </div>
+  </div>
+</article>
