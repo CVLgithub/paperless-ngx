@@ -189,10 +189,10 @@
   }
 }
 
+.rd-doc-card__type,
 .rd-doc-card__pages {
   position: absolute;
   bottom: 8px;
-  right: 8px;
   padding: 2px 7px;
   border-radius: var(--rd-radius-pill);
   background: var(--rd-page-badge-bg);
@@ -201,6 +201,19 @@
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: -0.01em;
+  pointer-events: none;
+}
+
+.rd-doc-card__type {
+  left: 8px;
+  max-width: calc(100% - 62px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rd-doc-card__pages {
+  right: 8px;
 }
 
 .rd-doc-card__info {

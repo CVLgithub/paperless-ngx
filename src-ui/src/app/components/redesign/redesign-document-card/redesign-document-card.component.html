@@ -46,8 +46,13 @@
       }
     </button>
 
-    <!-- Page count pill (bottom right, only for multi-page documents) -->
-    @if (document.page_count && document.page_count > 1) {
+    <!-- Document type pill (bottom left) -->
+    @if (documentTypeName) {
+      <span class="rd-doc-card__type" [title]="documentTypeName">{{ documentTypeName }}</span>
+    }
+
+    <!-- Page count pill (bottom right) -->
+    @if (document.page_count && document.page_count > 0) {
       <span class="rd-doc-card__pages">{{ document.page_count }} S.</span>
     }
   </div>

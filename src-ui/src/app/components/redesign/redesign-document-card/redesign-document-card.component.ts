@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import { Tag } from 'src/app/data/tag'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -19,6 +20,7 @@ export class RedesignDocumentCardComponent {
   @Input() selected = false
   @Input() selectionMode = false
   @Input() tagMap: Map<number, Tag> = new Map()
+  @Input() documentTypeMap: Map<number, DocumentType> = new Map()
 
   @Output() cardClick = new EventEmitter<MouseEvent>()
   @Output() toggleSelect = new EventEmitter<MouseEvent>()
@@ -29,6 +31,11 @@ export class RedesignDocumentCardComponent {
 
   get previewUrl(): string {
     return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  get documentTypeName(): string {
+    if (!this.document.document_type) return ''
+    return this.documentTypeMap.get(this.document.document_type)?.name ?? ''
   }
 
   get resolvedTags(): Tag[] {

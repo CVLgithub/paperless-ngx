@@ -283,6 +283,7 @@
                   [selected]="list.isSelected(doc)"
                   [selectionMode]="selectionMode() || list.hasSelection"
                   [tagMap]="tagMap"
+                  [documentTypeMap]="documentTypeMap"
                   (cardClick)="openDocumentDetail(doc)"
                   (toggleSelect)="toggleSelected(doc, $event)"
                 ></pngx-redesign-document-card>
