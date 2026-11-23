@@ -1,0 +1,446 @@
+// ============================================================================
+// Paperless-ngx Redesign Design System & Theme Tokens
+// Derived from Paperless-ngx Redesign PDF (Pages 1–7 Light, Pages 8–14 Dark)
+// Fonts: system-ui with self-hosted Inter Variable fallback (no CDN, no Apple assets)
+// ============================================================================
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('assets/fonts/InterVariable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('assets/fonts/InterVariable-Italic.woff2') format('woff2');
+}
+
+:root {
+  // Typography
+  --rd-font-sans: system-ui, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --rd-font-mono: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+
+  --rd-text-page-title: 1.75rem;      // 28px
+  --rd-text-section-title: 0.9375rem; // 15px
+  --rd-text-body: 0.84375rem;         // 13.5px
+  --rd-text-card-title: 0.8125rem;    // 13px
+  --rd-text-meta: 0.75rem;            // 12px
+  --rd-text-micro: 0.6875rem;         // 11px
+
+  // Spacing & Layout
+  --rd-sidebar-width: 232px;
+  --rd-sidebar-collapsed-width: 68px;
+  --rd-topbar-height: 56px;
+  --rd-inspector-width: 332px;
+  --rd-shell-gap: 12px;
+
+  // Radii
+  --rd-radius-xs: 6px;
+  --rd-radius-sm: 10px;
+  --rd-radius-md: 14px;
+  --rd-radius-lg: 18px;
+  --rd-radius-xl: 22px;
+  --rd-radius-pill: 9999px;
+
+  // Blur / Frosted Glass
+  --rd-blur-sm: blur(12px) saturate(160%);
+  --rd-blur-md: blur(20px) saturate(180%);
+  --rd-blur-lg: blur(28px) saturate(190%);
+
+  // Light Mode Palette
+  --rd-bg-canvas: #fefefe;
+  --rd-bg-sidebar: rgba(242, 242, 245, 0.92);
+  --rd-bg-sidebar-solid: #f2f2f5;
+  --rd-bg-viewer-canvas: #edeef1;
+  --rd-bg-inspector: rgba(244, 244, 247, 0.92);
+  --rd-bg-inspector-solid: #f4f4f7;
+  --rd-bg-surface: #ffffff;
+  --rd-bg-surface-hover: #f6f6f9;
+  --rd-bg-surface-subtle: #ebebf0;
+  --rd-bg-pill: #ededf1;
+  --rd-bg-pill-hover: #e2e2e8;
+  --rd-bg-pill-active: #1c1c1e;
+  --rd-text-pill-active: #ffffff;
+  --rd-bg-segmented: #e9e9ee;
+  --rd-bg-segmented-active: #ffffff;
+  --rd-bg-glass: rgba(255, 255, 255, 0.78);
+  --rd-bg-glass-strong: rgba(252, 252, 254, 0.9);
+  --rd-bg-glass-bar: rgba(250, 250, 253, 0.88);
+  --rd-bg-backdrop: rgba(20, 22, 28, 0.24);
+  --rd-bg-drop-overlay: rgba(6, 113, 227, 0.1);
+
+  // Borders
+  --rd-border-subtle: rgba(17, 17, 20, 0.08);
+  --rd-border-medium: rgba(17, 17, 20, 0.14);
+  --rd-border-strong: rgba(17, 17, 20, 0.22);
+  --rd-border-glass: rgba(255, 255, 255, 0.78);
+
+  // Text
+  --rd-text-primary: #1c1c1e;
+  --rd-text-secondary: #68686e;
+  --rd-text-tertiary: #8e8e95;
+
+  // Accent & Semantic
+  --rd-accent: #0671e3;
+  --rd-accent-rgb: 6, 113, 227;
+  --rd-accent-hover: #0560c4;
+  --rd-accent-soft: rgba(6, 113, 227, 0.14);
+  --rd-accent-soft-hover: rgba(6, 113, 227, 0.2);
+  --rd-accent-ring: rgba(6, 113, 227, 0.3);
+  --rd-danger: #d93025;
+  --rd-danger-soft: rgba(217, 48, 37, 0.1);
+  --rd-danger-soft-hover: rgba(217, 48, 37, 0.17);
+  --rd-danger-border: rgba(217, 48, 37, 0.22);
+  --rd-success: #16a34a;
+  --rd-page-badge-bg: rgba(28, 28, 32, 0.8);
+  --rd-page-badge-text: #ffffff;
+
+  // Shadows (Light)
+  --rd-shadow-panel: 0 2px 10px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.055);
+  --rd-shadow-pill: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --rd-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --rd-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08), 0 12px 26px rgba(0, 0, 0, 0.07);
+  --rd-shadow-floating: 0 10px 34px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --rd-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
+  --rd-shadow-paper: 0 8px 30px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  // Override Paperless & Bootstrap Theme Variables globally so non-redesigned pages stay cohesive
+  --pngx-primary: 211, 95%;
+  --pngx-primary-lightness: 45%;
+  --bs-primary: var(--rd-accent);
+  --bs-primary-rgb: 6, 113, 227;
+  --bs-link-color: var(--rd-accent);
+  --bs-link-hover-color: var(--rd-accent-hover);
+  --bs-body-font-family: var(--rd-font-sans);
+  --bs-body-bg: var(--rd-bg-canvas);
+  --bs-body-bg-rgb: 254, 254, 254;
+  --bs-body-color: var(--rd-text-primary);
+  --bs-secondary-color: var(--rd-text-secondary);
+  --bs-border-color: var(--rd-border-medium);
+  --bs-border-radius: 10px;
+  --bs-border-radius-sm: 8px;
+  --bs-border-radius-lg: 14px;
+  --pngx-bg-alt: var(--rd-bg-surface);
+  --pngx-bg-darker: var(--rd-bg-sidebar-solid);
+  --pngx-bg-alt2: var(--rd-bg-surface-subtle);
+  --pngx-toast-bg: var(--rd-bg-glass-strong);
+}
+
+@mixin redesign-dark-tokens {
+  --rd-bg-canvas: #151517;
+  --rd-bg-sidebar: rgba(34, 34, 38, 0.92);
+  --rd-bg-sidebar-solid: #222226;
+  --rd-bg-viewer-canvas: #0d0d0f;
+  --rd-bg-inspector: rgba(34, 34, 38, 0.94);
+  --rd-bg-inspector-solid: #222226;
+  --rd-bg-surface: #26262b;
+  --rd-bg-surface-hover: #2f2f35;
+  --rd-bg-surface-subtle: #313137;
+  --rd-bg-pill: #2a2a2f;
+  --rd-bg-pill-hover: #35353c;
+  --rd-bg-pill-active: #f5f5f7;
+  --rd-text-pill-active: #151517;
+  --rd-bg-segmented: #28282d;
+  --rd-bg-segmented-active: #3a3a41;
+  --rd-bg-glass: rgba(38, 38, 43, 0.78);
+  --rd-bg-glass-strong: rgba(38, 38, 43, 0.92);
+  --rd-bg-glass-bar: rgba(34, 34, 39, 0.9);
+  --rd-bg-backdrop: rgba(0, 0, 0, 0.56);
+  --rd-bg-drop-overlay: rgba(16, 118, 235, 0.16);
+
+  --rd-border-subtle: rgba(255, 255, 255, 0.08);
+  --rd-border-medium: rgba(255, 255, 255, 0.14);
+  --rd-border-strong: rgba(255, 255, 255, 0.22);
+  --rd-border-glass: rgba(255, 255, 255, 0.11);
+
+  --rd-text-primary: #f5f5f7;
+  --rd-text-secondary: #a1a1a8;
+  --rd-text-tertiary: #75757d;
+
+  --rd-accent: #1076eb;
+  --rd-accent-rgb: 16, 118, 235;
+  --rd-accent-hover: #2d8af5;
+  --rd-accent-soft: rgba(16, 118, 235, 0.24);
+  --rd-accent-soft-hover: rgba(16, 118, 235, 0.34);
+  --rd-accent-ring: rgba(16, 118, 235, 0.42);
+  --rd-danger: #ff5a5f;
+  --rd-danger-soft: rgba(255, 90, 95, 0.14);
+  --rd-danger-soft-hover: rgba(255, 90, 95, 0.24);
+  --rd-danger-border: rgba(255, 90, 95, 0.28);
+  --rd-success: #22c55e;
+  --rd-page-badge-bg: rgba(16, 16, 20, 0.85);
+  --rd-page-badge-text: #f5f5f7;
+
+  --rd-shadow-panel: 0 2px 12px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.42);
+  --rd-shadow-pill: 0 1px 4px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.25);
+  --rd-shadow-card: 0 1px 4px rgba(0, 0, 0, 0.35), 0 4px 14px rgba(0, 0, 0, 0.28);
+  --rd-shadow-card-hover: 0 6px 18px rgba(0, 0, 0, 0.46), 0 14px 32px rgba(0, 0, 0, 0.38);
+  --rd-shadow-floating: 0 12px 42px rgba(0, 0, 0, 0.58), 0 2px 10px rgba(0, 0, 0, 0.4);
+  --rd-shadow-modal: 0 24px 72px rgba(0, 0, 0, 0.65), 0 6px 20px rgba(0, 0, 0, 0.45);
+  --rd-shadow-paper: 0 12px 38px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+
+  --pngx-primary: 212, 87%;
+  --pngx-primary-lightness: 49%;
+  --bs-primary: var(--rd-accent);
+  --bs-primary-rgb: 16, 118, 235;
+  --bs-link-color: #4aa3ff;
+  --bs-link-hover-color: #74b8ff;
+  --bs-body-bg: var(--rd-bg-canvas);
+  --bs-body-bg-rgb: 21, 21, 23;
+  --bs-body-color: var(--rd-text-primary);
+  --bs-secondary-color: var(--rd-text-secondary);
+  --bs-border-color: var(--rd-border-medium);
+  --pngx-bg-alt: var(--rd-bg-surface);
+  --pngx-bg-darker: #111113;
+  --pngx-bg-alt2: var(--rd-bg-surface-subtle);
+  --pngx-toast-bg: var(--rd-bg-glass-strong);
+}
+
+[data-bs-theme='dark'] {
+  @include redesign-dark-tokens;
+
+  body:not(.primary-light):not(.primary-dark) {
+    --pngx-primary: 212, 87%;
+    --pngx-primary-lightness: 49%;
+    --bs-primary: var(--rd-accent);
+  }
+}
+
+[data-bs-theme='auto'] {
+  @media (prefers-color-scheme: dark) {
+    @include redesign-dark-tokens;
+
+    body:not(.primary-light):not(.primary-dark) {
+      --pngx-primary: 212, 87%;
+      --pngx-primary-lightness: 49%;
+      --bs-primary: var(--rd-accent);
+    }
+  }
+}
+
+// ============================================================================
+// Base & Global Polish (keeps all non-redesigned pages harmonious)
+// ============================================================================
+
+html,
+body {
+  font-family: var(--rd-font-sans);
+  background-color: var(--rd-bg-canvas);
+  color: var(--rd-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Reusable Glass & Pill Surfaces
+.rd-glass-pill {
+  background: var(--rd-bg-glass);
+  backdrop-filter: var(--rd-blur-md);
+  -webkit-backdrop-filter: var(--rd-blur-md);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-pill), inset 0 1px 0 var(--rd-border-glass);
+  border-radius: var(--rd-radius-pill);
+  color: var(--rd-text-primary);
+}
+
+.rd-glass-panel {
+  background: var(--rd-bg-glass-strong);
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-floating), inset 0 1px 0 var(--rd-border-glass);
+}
+
+.rd-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--rd-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--rd-radius-pill);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 7px 15px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.28);
+
+  &:hover:not(:disabled) {
+    background: var(--rd-accent-hover);
+    color: #ffffff;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.rd-btn-soft-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--rd-accent-soft);
+  color: var(--rd-accent);
+  border: 1px solid transparent;
+  border-radius: var(--rd-radius-pill);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--rd-accent-soft-hover);
+  }
+}
+
+.rd-btn-neutral {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--rd-bg-pill);
+  color: var(--rd-text-primary);
+  border: 1px solid var(--rd-border-subtle);
+  border-radius: var(--rd-radius-pill);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--rd-bg-pill-hover);
+  }
+}
+
+// Harmonized Bootstrap overrides for Settings, Workflows, Mail, Tasks, Trash, Modals
+.btn-primary {
+  --bs-btn-bg: var(--rd-accent);
+  --bs-btn-border-color: var(--rd-accent);
+  --bs-btn-hover-bg: var(--rd-accent-hover);
+  --bs-btn-hover-border-color: var(--rd-accent-hover);
+  --bs-btn-active-bg: var(--rd-accent-hover);
+  --bs-btn-active-border-color: var(--rd-accent-hover);
+  --bs-btn-color: #ffffff;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-active-color: #ffffff;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--rd-accent);
+  --bs-btn-border-color: var(--rd-accent);
+  --bs-btn-hover-bg: var(--rd-accent);
+  --bs-btn-hover-border-color: var(--rd-accent);
+  --bs-btn-hover-color: #ffffff;
+}
+
+.modal-backdrop.show {
+  background-color: var(--rd-bg-backdrop);
+  opacity: 1 !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--rd-bg-glass-strong) !important;
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle) !important;
+  border-radius: var(--rd-radius-xl) !important;
+  box-shadow: var(--rd-shadow-modal), inset 0 1px 0 var(--rd-border-glass) !important;
+  color: var(--rd-text-primary);
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  background-color: transparent !important;
+  border-color: var(--rd-border-subtle) !important;
+}
+
+.dropdown-menu {
+  background: var(--rd-bg-glass-strong);
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle);
+  border-radius: var(--rd-radius-md);
+  box-shadow: var(--rd-shadow-floating);
+  padding: 6px;
+
+  .dropdown-item {
+    border-radius: var(--rd-radius-xs);
+    font-size: 0.8125rem;
+    padding: 6px 10px;
+    color: var(--rd-text-primary);
+
+    &:hover,
+    &:focus {
+      background-color: var(--rd-bg-pill);
+      color: var(--rd-text-primary);
+    }
+
+    &.active,
+    &:active {
+      background-color: var(--rd-accent-soft);
+      color: var(--rd-accent);
+    }
+  }
+}
+
+.card {
+  background-color: var(--rd-bg-surface);
+  border-color: var(--rd-border-subtle);
+  border-radius: var(--rd-radius-md);
+  box-shadow: var(--rd-shadow-card);
+}
+
+.form-control,
+.form-select {
+  background-color: var(--rd-bg-surface-subtle);
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-primary);
+  border-radius: var(--rd-radius-sm);
+
+  &:focus {
+    background-color: var(--rd-bg-surface);
+    border-color: var(--rd-accent);
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    color: var(--rd-text-primary);
+  }
+}
+
+.form-check-input:checked {
+  background-color: var(--rd-accent);
+  border-color: var(--rd-accent);
+}
+
+// Custom modal class for Redesign Merge & Progress Dialogs
+.rd-glass-modal .modal-dialog {
+  max-width: 480px;
+}
+
+.rd-progress-modal .modal-dialog {
+  max-width: 440px;
+}
+
+// Ensure crisp dark mode document thumbnails without inverting crisp white document sheets
+[data-bs-theme='dark'],
+[data-bs-theme='auto'] {
+  .rd-doc-thumb-img {
+    filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+}

@@ -149,6 +149,39 @@
                 }
               ]
             },
+            "redesign": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "outputPath": {
+                "base": "../src/documents/static/frontend/",
+                "browser": ""
+              },
+              "localize": [
+                "de-DE",
+                "en-US",
+                "en-GB"
+              ],
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "extractLicenses": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kb",
+                  "maximumError": "40kb"
+                }
+              ]
+            },
             "e2e": {
               "fileReplacements": [
                 {
