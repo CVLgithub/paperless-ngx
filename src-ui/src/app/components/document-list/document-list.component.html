@@ -197,7 +197,11 @@
     </div>
   }
 
-  <div class="rd-advanced-filter-panel" [class.d-none]="!showAdvancedFilters()">
+  <div
+    class="rd-advanced-filter-panel"
+    [class.d-none]="!showAdvancedFilters()"
+    [class.is-open]="showAdvancedFilters()"
+  >
     <pngx-filter-editor
       [disabled]="isBulkEditing"
       [filterRules]="list.filterRules"

@@ -448,3 +448,367 @@ body {
     mix-blend-mode: normal !important;
   }
 }
+
+// ============================================================================
+// Redesign Advanced Filter Panel (FilterEditor + Filterable/Dates/Permissions Dropdowns)
+// ============================================================================
+.rd-advanced-filter-panel {
+  // Pill triggers for filterable, dates, permissions, and custom-fields dropdowns
+  .rd-filter-dropdown-item {
+    > .btn-group {
+      width: auto !important;
+    }
+
+    > .btn-group > button.btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 13px;
+      border-radius: var(--rd-radius-pill) !important;
+      font-size: 12.5px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: none !important;
+      transition:
+        background-color 140ms ease,
+        color 140ms ease,
+        border-color 140ms ease,
+        box-shadow 140ms ease;
+
+      pngx-bs-icon {
+        display: inline-flex;
+        opacity: 0.78;
+      }
+
+      &::after {
+        margin-left: 2px;
+        opacity: 0.52;
+      }
+
+      &.btn-outline-primary {
+        --bs-btn-color: var(--rd-text-primary);
+        --bs-btn-bg: var(--rd-bg-pill);
+        --bs-btn-border-color: var(--rd-border-subtle);
+        --bs-btn-hover-color: var(--rd-text-primary);
+        --bs-btn-hover-bg: var(--rd-bg-pill-hover);
+        --bs-btn-hover-border-color: var(--rd-border-medium);
+        --bs-btn-active-color: var(--rd-text-primary);
+        --bs-btn-active-bg: var(--rd-bg-surface);
+        --bs-btn-active-border-color: var(--rd-accent);
+        background-color: var(--rd-bg-pill) !important;
+        border: 1px solid var(--rd-border-subtle) !important;
+        color: var(--rd-text-primary) !important;
+
+        pngx-bs-icon {
+          color: var(--rd-text-secondary);
+        }
+
+        &:hover:not(:disabled) {
+          background-color: var(--rd-bg-pill-hover) !important;
+          border-color: var(--rd-border-medium) !important;
+          color: var(--rd-text-primary) !important;
+        }
+
+        &:focus:not(.show):not([aria-expanded='true']),
+        &:active:not(.show):not([aria-expanded='true']) {
+          background-color: var(--rd-bg-pill) !important;
+          border-color: var(--rd-border-medium) !important;
+          color: var(--rd-text-primary) !important;
+        }
+
+        &:focus-visible {
+          box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+        }
+
+        &.show,
+        &.active,
+        &[aria-expanded='true'] {
+          background-color: var(--rd-bg-surface) !important;
+          border-color: var(--rd-accent) !important;
+          color: var(--rd-text-primary) !important;
+          box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+
+          pngx-bs-icon {
+            color: var(--bs-link-color);
+            opacity: 1;
+          }
+        }
+      }
+
+      &.btn-primary {
+        --bs-btn-color: var(--bs-link-color);
+        --bs-btn-bg: var(--rd-accent-soft);
+        --bs-btn-border-color: rgba(var(--rd-accent-rgb), 0.28);
+        --bs-btn-hover-color: var(--bs-link-color);
+        --bs-btn-hover-bg: var(--rd-accent-soft-hover);
+        --bs-btn-hover-border-color: rgba(var(--rd-accent-rgb), 0.38);
+        --bs-btn-active-color: var(--bs-link-color);
+        --bs-btn-active-bg: var(--rd-accent-soft-hover);
+        --bs-btn-active-border-color: var(--rd-accent);
+        background-color: var(--rd-accent-soft) !important;
+        border: 1px solid rgba(var(--rd-accent-rgb), 0.28) !important;
+        color: var(--bs-link-color) !important;
+        font-weight: 600;
+
+        pngx-bs-icon {
+          opacity: 1;
+          color: var(--bs-link-color);
+        }
+
+        &:hover:not(:disabled),
+        &:focus:not(:disabled) {
+          background-color: var(--rd-accent-soft-hover) !important;
+          border-color: rgba(var(--rd-accent-rgb), 0.38) !important;
+          color: var(--bs-link-color) !important;
+        }
+
+        &:focus-visible {
+          box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+        }
+
+        &.show,
+        &.active,
+        &:active,
+        &[aria-expanded='true'] {
+          background-color: var(--rd-accent-soft-hover) !important;
+          border-color: var(--rd-accent) !important;
+          color: var(--bs-link-color) !important;
+          box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.45;
+      }
+    }
+
+    // Ensure open dropdown parent .show never forces white text or solid primary fill
+    .show > button.btn-outline-primary {
+      background-color: var(--rd-bg-surface) !important;
+      border-color: var(--rd-accent) !important;
+      color: var(--rd-text-primary) !important;
+    }
+
+    .show > button.btn-primary {
+      background-color: var(--rd-accent-soft-hover) !important;
+      border-color: var(--rd-accent) !important;
+      color: var(--bs-link-color) !important;
+    }
+  }
+
+  // Clearable count badge on active filter pills
+  pngx-clearable-badge .badge {
+    background: var(--rd-accent) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--rd-bg-surface) !important;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    min-width: 19px;
+    min-height: 19px;
+    padding: 0 4px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(var(--rd-accent-rgb), 0.35);
+    transition: background-color 140ms ease, transform 120ms ease;
+
+    &:hover {
+      background: var(--rd-danger) !important;
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+  }
+
+  // Frosted dropdown menus inside filter editor
+  .dropdown-menu {
+    background: var(--rd-bg-glass-strong);
+    backdrop-filter: var(--rd-blur-lg);
+    -webkit-backdrop-filter: var(--rd-blur-lg);
+    border: 1px solid var(--rd-border-subtle);
+    border-radius: var(--rd-radius-md);
+    box-shadow: var(--rd-shadow-floating);
+    padding: 8px !important;
+    margin-top: 6px !important;
+    color: var(--rd-text-primary);
+
+    .list-group {
+      background: transparent;
+    }
+
+    .list-group-item {
+      background: transparent !important;
+      border-color: var(--rd-border-subtle) !important;
+      color: var(--rd-text-primary);
+    }
+
+    // All / Any & Include / Exclude segmented toggle
+    .list-group-item > .btn-group.btn-group-xs {
+      background: var(--rd-bg-segmented);
+      border: 1px solid var(--rd-border-subtle);
+      border-radius: var(--rd-radius-pill);
+      padding: 2px;
+      gap: 2px;
+
+      > label.btn {
+        border: 0 !important;
+        border-radius: var(--rd-radius-pill) !important;
+        background: transparent !important;
+        color: var(--rd-text-secondary) !important;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 10px;
+        box-shadow: none !important;
+        transition: background-color 140ms ease, color 140ms ease;
+
+        &:hover {
+          color: var(--rd-text-primary) !important;
+        }
+      }
+
+      > input.btn-check:checked + label.btn {
+        background: var(--rd-bg-segmented-active) !important;
+        color: var(--rd-text-primary) !important;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+      }
+    }
+
+    // Search filter box inside filterable-dropdown
+    .input-group-sm > .form-control {
+      border-radius: var(--rd-radius-sm);
+      background: var(--rd-bg-surface-subtle);
+      border: 1px solid var(--rd-border-subtle);
+      color: var(--rd-text-primary);
+      font-size: 12.5px;
+      padding: 5px 10px;
+
+      &::placeholder {
+        color: var(--rd-text-tertiary);
+      }
+
+      &:focus {
+        background: var(--rd-bg-surface);
+        border-color: var(--rd-accent);
+        box-shadow: 0 0 0 3px var(--rd-accent-ring);
+      }
+    }
+
+    // Toggleable items & permission items
+    .list-group-item-action {
+      border: 0 !important;
+      border-radius: var(--rd-radius-xs);
+      font-size: 12.5px;
+      color: var(--rd-text-primary);
+      transition: background-color 120ms ease;
+
+      &:hover,
+      &:focus {
+        background: var(--rd-bg-pill) !important;
+        color: var(--rd-text-primary);
+      }
+    }
+
+    pngx-toggleable-dropdown-button {
+      .list-group-item {
+        padding: 5px 8px !important;
+      }
+
+      .selected-icon pngx-bs-icon {
+        color: var(--rd-accent);
+      }
+
+      .badge {
+        background: var(--rd-bg-surface-subtle) !important;
+        color: var(--rd-text-secondary) !important;
+        border-radius: var(--rd-radius-pill);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    .list-group-item-note {
+      padding: 6px 8px 2px !important;
+      border-top: 1px solid var(--rd-border-subtle) !important;
+      color: var(--rd-text-tertiary);
+    }
+
+    // Dates dropdown polish
+    &.date-dropdown {
+      min-width: 310px;
+
+      h6.dropdown-header {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--rd-text-tertiary);
+        border-bottom: 1px solid var(--rd-border-subtle) !important;
+        padding: 6px 8px 5px;
+        margin: 2px 0 4px;
+      }
+
+      .input-group-text {
+        background: var(--rd-bg-surface-subtle);
+        border-color: var(--rd-border-subtle);
+        color: var(--rd-text-secondary) !important;
+        font-size: 12px;
+      }
+
+      .input-group > .btn-outline-secondary {
+        background: var(--rd-bg-surface-subtle);
+        border-color: var(--rd-border-subtle);
+        color: var(--rd-text-secondary);
+
+        &:hover {
+          background: var(--rd-bg-pill-hover);
+          color: var(--rd-text-primary);
+        }
+      }
+    }
+
+    // Permissions dropdown polish
+    &.permission-filter-dropdown {
+      min-width: 240px;
+
+      .selected-icon pngx-bs-icon {
+        color: var(--rd-accent);
+      }
+    }
+
+    // ng-select inside Dates & Permissions dropdowns
+    .ng-select .ng-select-container {
+      background: var(--rd-bg-surface-subtle);
+      border-color: var(--rd-border-subtle);
+      border-radius: var(--rd-radius-sm);
+      color: var(--rd-text-primary);
+      min-height: 31px;
+      font-size: 12.5px;
+    }
+
+    .ng-select .ng-dropdown-panel {
+      background: var(--rd-bg-surface);
+      border-color: var(--rd-border-subtle);
+      border-radius: var(--rd-radius-sm);
+      box-shadow: var(--rd-shadow-floating);
+
+      .ng-option {
+        background: transparent;
+        color: var(--rd-text-primary);
+        font-size: 12.5px;
+
+        &.ng-option-marked,
+        &:hover {
+          background: var(--rd-bg-pill);
+        }
+
+        &.ng-option-selected {
+          background: var(--rd-accent-soft);
+          color: var(--rd-accent);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}

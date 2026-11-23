@@ -1,112 +1,181 @@
-<div class="row flex-wrap row-gap-3" tourAnchor="tour.documents-filter-editor">
-  <div class="col">
-    <div class="form-inline d-flex align-items-center fade" [class.show]="show()">
-      <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
-        <div ngbDropdown>
-          <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
-          <div class="dropdown-menu shadow" ngbDropdownMenu>
-            @for (t of textFilterTargets; track t) {
-              <button ngbDropdownItem [class.active]="textFilterTarget === t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
-            }
-          </div>
+<div class="rd-filter-editor" tourAnchor="tour.documents-filter-editor">
+  <!-- Row 1: Unified Text Filter Bar + Reset Button -->
+  <div class="rd-filter-editor__top fade" [class.show]="show()">
+    <div class="rd-filter-search" [class.is-disabled]="textFilterInputDisabled">
+      <div class="rd-filter-search__target" ngbDropdown>
+        <button type="button" class="btn btn-sm rd-filter-target-btn" ngbDropdownToggle>
+          <span>{{ textFilterTargetName }}</span>
+        </button>
+        <div class="dropdown-menu shadow" ngbDropdownMenu>
+          @for (t of textFilterTargets; track t) {
+            <button
+              type="button"
+              ngbDropdownItem
+              [class.active]="textFilterTarget === t.id"
+              (click)="changeTextFilterTarget(t.id)"
+            >{{ t.name }}</button>
+          }
         </div>
-        @if (textFilterTarget === 'asn' || textFilterTarget === 'duplicates') {
-          <select class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
-            @for (m of textFilterModifiers; track m) {
-              <option ngbDropdownItem [value]="m.id">{{m.label}}</option>
-            }
-          </select>
-        }
-        @if (_textFilter) {
-          <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetTextField()" aria-label="Clear search" i18n-aria-label>
-            <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon>
-          </button>
-        }
-        <input #textFilterInput class="form-control form-control-sm" type="text"
-        [disabled]="textFilterInputDisabled"
-        [(ngModel)]="textFilter"
-        (keydown)="textFilterKeydown($event)"
-        [ngbTypeahead]="searchAutoComplete"
-        (selectItem)="itemSelected($event)"
-        [readonly]="textFilterTarget === 'fulltext-morelike'">
       </div>
-    </div>
-  </div>
-  <div class="col-auto">
-    <div class="d-flex flex-wrap gap-3">
-      <div class="d-flex flex-wrap gap-2">
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tagSelectionModel.items.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show()" title="Tags" icon="tag-fill" i18n-title
-          filterPlaceholder="Filter tags" i18n-filterPlaceholder
-          [(selectionModel)]="tagSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onTagsDropdownOpen()"
-          [documentCounts]="tagDocumentCounts"
-          [allowSelectNone]="true"
-          [disabled]="disabled"
-          shortcutKey="t"></pngx-filterable-dropdown>
-        }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondentSelectionModel.items.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show()" title="Correspondent" icon="person-fill" i18n-title
-          filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
-          [(selectionModel)]="correspondentSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onCorrespondentDropdownOpen()"
-          [documentCounts]="correspondentDocumentCounts"
-          [allowSelectNone]="true"
-          [disabled]="disabled"
-          shortcutKey="y"></pngx-filterable-dropdown>
-        }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypeSelectionModel.items.length > 0) {
-            <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show()" title="Document type" icon="file-earmark-fill" i18n-title
-            filterPlaceholder="Filter document types" i18n-filterPlaceholder
-            [(selectionModel)]="documentTypeSelectionModel"
-            (selectionModelChange)="updateRules()"
-            (opened)="onDocumentTypeDropdownOpen()"
-            [documentCounts]="documentTypeDocumentCounts"
-            [allowSelectNone]="true"
-            [disabled]="disabled"
-            shortcutKey="u"></pngx-filterable-dropdown>
-        }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePathSelectionModel.items.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show()" title="Storage path" icon="folder-fill" i18n-title
-          filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
-          [(selectionModel)]="storagePathSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onStoragePathDropdownOpen()"
-          [documentCounts]="storagePathDocumentCounts"
-          [allowSelectNone]="true"
-          [disabled]="disabled"
-          shortcutKey="i"></pngx-filterable-dropdown>
-        }
 
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields().length > 0) {
-          <pngx-custom-fields-query-dropdown class="flex-fill fade" [class.show]="show()" title="Custom fields" icon="ui-radios" i18n-title
-          [(selectionModel)]="customFieldQueriesModel"
-          (selectionModelChange)="updateRules()"
-          ></pngx-custom-fields-query-dropdown>
-        }
-        <pngx-dates-dropdown class="flex-fill fade" [class.show]="show()"
-          title="Dates" i18n-title
-          placement="bottom-end"
-          (datesSet)="updateRules()"
-          [(createdDateTo)]="dateCreatedTo"
-          [(createdDateFrom)]="dateCreatedFrom"
-          [(createdRelativeDate)]="dateCreatedRelativeDate"
-          [(addedDateTo)]="dateAddedTo"
-          [(addedDateFrom)]="dateAddedFrom"
-          [(addedRelativeDate)]="dateAddedRelativeDate">
-        </pngx-dates-dropdown>
-        <pngx-permissions-filter-dropdown class="flex-fill fade" [class.show]="show()"
-          title="Permissions" i18n-title
-          (ownerFilterSet)="updateRules()"
-        [(selectionModel)]="permissionsSelectionModel"></pngx-permissions-filter-dropdown>
-      </div>
-      <div class="d-flex flex-wrap d-none d-sm-inline-block">
-        <button class="btn btn-outline-secondary btn-sm" [disabled]="!rulesModified" (click)="resetSelected()">
-          <pngx-bs-icon class="ms-n1" name="x"></pngx-bs-icon><ng-container i18n>Reset filters</ng-container>
+      @if (textFilterTarget === 'asn' || textFilterTarget === 'duplicates') {
+        <select
+          class="form-select rd-filter-modifier-select"
+          [(ngModel)]="textFilterModifier"
+          (change)="textFilterModifierChange()"
+        >
+          @for (m of textFilterModifiers; track m) {
+            <option ngbDropdownItem [value]="m.id">{{ m.label }}</option>
+          }
+        </select>
+      }
+
+      <div class="rd-filter-search__field">
+        <pngx-bs-icon class="rd-filter-search__icon" name="search" width="13" height="13"></pngx-bs-icon>
+        <input
+          #textFilterInput
+          class="rd-filter-search__input"
+          type="text"
+          placeholder="Suchbegriff eingeben …"
+          i18n-placeholder
+          [disabled]="textFilterInputDisabled"
+          [(ngModel)]="textFilter"
+          (keydown)="textFilterKeydown($event)"
+          [ngbTypeahead]="searchAutoComplete"
+          (selectItem)="itemSelected($event)"
+          [readonly]="textFilterTarget === 'fulltext-morelike'"
+        />
+        @if (_textFilter) {
+          <button
+            type="button"
+            class="rd-filter-search__clear"
+            (click)="resetTextField()"
+            aria-label="Clear search"
+            i18n-aria-label
+          >
+            <pngx-bs-icon width="13" height="13" name="x"></pngx-bs-icon>
           </button>
-        </div>
+        }
       </div>
     </div>
+
+    <button
+      type="button"
+      class="rd-filter-reset-btn"
+      [disabled]="!rulesModified"
+      (click)="resetSelected()"
+    >
+      <pngx-bs-icon width="14" height="14" name="x"></pngx-bs-icon>
+      <span i18n>Reset filters</span>
+    </button>
   </div>
+
+  <!-- Row 2: Filter Dropdown Pills -->
+  <div class="rd-filter-editor__pills">
+    @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tagSelectionModel.items.length > 0) {
+      <pngx-filterable-dropdown
+        class="rd-filter-dropdown-item fade"
+        [class.show]="show()"
+        title="Tags"
+        icon="tag-fill"
+        i18n-title
+        filterPlaceholder="Filter tags"
+        i18n-filterPlaceholder
+        [(selectionModel)]="tagSelectionModel"
+        (selectionModelChange)="updateRules()"
+        (opened)="onTagsDropdownOpen()"
+        [documentCounts]="tagDocumentCounts"
+        [allowSelectNone]="true"
+        [disabled]="disabled"
+        shortcutKey="t"
+      ></pngx-filterable-dropdown>
+    }
+    @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondentSelectionModel.items.length > 0) {
+      <pngx-filterable-dropdown
+        class="rd-filter-dropdown-item fade"
+        [class.show]="show()"
+        title="Correspondent"
+        icon="person-fill"
+        i18n-title
+        filterPlaceholder="Filter correspondents"
+        i18n-filterPlaceholder
+        [(selectionModel)]="correspondentSelectionModel"
+        (selectionModelChange)="updateRules()"
+        (opened)="onCorrespondentDropdownOpen()"
+        [documentCounts]="correspondentDocumentCounts"
+        [allowSelectNone]="true"
+        [disabled]="disabled"
+        shortcutKey="y"
+      ></pngx-filterable-dropdown>
+    }
+    @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypeSelectionModel.items.length > 0) {
+      <pngx-filterable-dropdown
+        class="rd-filter-dropdown-item fade"
+        [class.show]="show()"
+        title="Document type"
+        icon="file-earmark-fill"
+        i18n-title
+        filterPlaceholder="Filter document types"
+        i18n-filterPlaceholder
+        [(selectionModel)]="documentTypeSelectionModel"
+        (selectionModelChange)="updateRules()"
+        (opened)="onDocumentTypeDropdownOpen()"
+        [documentCounts]="documentTypeDocumentCounts"
+        [allowSelectNone]="true"
+        [disabled]="disabled"
+        shortcutKey="u"
+      ></pngx-filterable-dropdown>
+    }
+    @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePathSelectionModel.items.length > 0) {
+      <pngx-filterable-dropdown
+        class="rd-filter-dropdown-item fade"
+        [class.show]="show()"
+        title="Storage path"
+        icon="folder-fill"
+        i18n-title
+        filterPlaceholder="Filter storage paths"
+        i18n-filterPlaceholder
+        [(selectionModel)]="storagePathSelectionModel"
+        (selectionModelChange)="updateRules()"
+        (opened)="onStoragePathDropdownOpen()"
+        [documentCounts]="storagePathDocumentCounts"
+        [allowSelectNone]="true"
+        [disabled]="disabled"
+        shortcutKey="i"
+      ></pngx-filterable-dropdown>
+    }
+    @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields().length > 0) {
+      <pngx-custom-fields-query-dropdown
+        class="rd-filter-dropdown-item fade"
+        [class.show]="show()"
+        title="Custom fields"
+        icon="ui-radios"
+        i18n-title
+        [(selectionModel)]="customFieldQueriesModel"
+        (selectionModelChange)="updateRules()"
+      ></pngx-custom-fields-query-dropdown>
+    }
+    <pngx-dates-dropdown
+      class="rd-filter-dropdown-item fade"
+      [class.show]="show()"
+      title="Dates"
+      i18n-title
+      placement="bottom-end"
+      (datesSet)="updateRules()"
+      [(createdDateTo)]="dateCreatedTo"
+      [(createdDateFrom)]="dateCreatedFrom"
+      [(createdRelativeDate)]="dateCreatedRelativeDate"
+      [(addedDateTo)]="dateAddedTo"
+      [(addedDateFrom)]="dateAddedFrom"
+      [(addedRelativeDate)]="dateAddedRelativeDate"
+    ></pngx-dates-dropdown>
+    <pngx-permissions-filter-dropdown
+      class="rd-filter-dropdown-item fade"
+      [class.show]="show()"
+      title="Permissions"
+      i18n-title
+      (ownerFilterSet)="updateRules()"
+      [(selectionModel)]="permissionsSelectionModel"
+    ></pngx-permissions-filter-dropdown>
+  </div>
+</div>
