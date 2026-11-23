@@ -27,6 +27,10 @@ export class RedesignDocumentCardComponent {
     return this.documentService.getThumbUrl(this.document.id)
   }
 
+  get previewUrl(): string {
+    return this.documentService.getPreviewUrl(this.document.id)
+  }
+
   get resolvedTags(): Tag[] {
     if (!this.document?.tags?.length) return []
     const result: Tag[] = []

@@ -31,6 +31,10 @@ export class RedesignDocumentListRowComponent {
     return this.documentService.getThumbUrl(this.document.id)
   }
 
+  get previewUrl(): string {
+    return this.documentService.getPreviewUrl(this.document.id)
+  }
+
   get correspondentName(): string {
     if (!this.document.correspondent) return ''
     return this.correspondentMap.get(this.document.correspondent)?.name ?? ''

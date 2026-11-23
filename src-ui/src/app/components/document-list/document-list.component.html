@@ -178,20 +178,21 @@
             </div>
           </div>
 
-          @if (correspondentsHasOverflow() || correspondentsRowExpanded()) {
-            <button
-              type="button"
-              class="rd-correspondents-expand-btn"
-              [class.is-expanded]="correspondentsRowExpanded()"
-              [class.has-hidden-active]="hasHiddenActiveCorrespondent"
-              [attr.aria-expanded]="correspondentsRowExpanded()"
-              [attr.aria-label]="correspondentsRowExpanded() ? 'Weitere Korrespondenten einklappen' : 'Weitere Korrespondenten ausklappen'"
-              [title]="correspondentsRowExpanded() ? 'Weitere Korrespondenten einklappen' : 'Weitere Korrespondenten ausklappen'"
-              (click)="toggleCorrespondentsRowExpanded()"
-            >
-              <pngx-bs-icon class="rd-correspondents-expand-icon" name="chevron-down" width="13" height="13"></pngx-bs-icon>
-            </button>
-          }
+          <button
+            type="button"
+            class="rd-correspondents-expand-btn"
+            [class.is-hidden]="!correspondentsHasOverflow() && !correspondentsRowExpanded()"
+            [class.is-expanded]="correspondentsRowExpanded()"
+            [class.has-hidden-active]="hasHiddenActiveCorrespondent"
+            [disabled]="!correspondentsHasOverflow() && !correspondentsRowExpanded()"
+            [attr.aria-hidden]="!correspondentsHasOverflow() && !correspondentsRowExpanded()"
+            [attr.aria-expanded]="correspondentsRowExpanded()"
+            [attr.aria-label]="correspondentsRowExpanded() ? 'Weitere Korrespondenten einklappen' : 'Weitere Korrespondenten ausklappen'"
+            [title]="correspondentsRowExpanded() ? 'Weitere Korrespondenten einklappen' : 'Weitere Korrespondenten ausklappen'"
+            (click)="toggleCorrespondentsRowExpanded()"
+          >
+            <pngx-bs-icon class="rd-correspondents-expand-icon" name="chevron-down" width="13" height="13"></pngx-bs-icon>
+          </button>
         </div>
       }
     </div>
@@ -221,23 +222,23 @@
     } @else {
       @if (list.documents.length === 0 && !list.isReloading) {
         <div class="rd-empty-state">
-          @if (!isFiltered && permissionService.currentUserCan(PermissionAction.Add, PermissionType.Document)) {
-            <button type="button" class="rd-upload-card" (click)="requestUpload()">
-              <span class="rd-upload-card-box">
-                <pngx-bs-icon name="plus-lg" width="24" height="24"></pngx-bs-icon>
-              </span>
-              <span class="rd-upload-card-label" i18n>Neu …</span>
-            </button>
-          }
           <div class="rd-empty-copy">
             <h2 class="rd-empty-title" i18n>Keine Dokumente gefunden</h2>
-            <p class="rd-empty-desc" i18n>
-              Lade neue Dateien hoch oder passe die aktiven Filter an.
-            </p>
             @if (isFiltered) {
+              <p class="rd-empty-desc" i18n>
+                Passe die aktiven Filter an oder setze sie zurück.
+              </p>
               <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" (click)="resetFilters()" i18n>
                 Filter zurücksetzen
               </button>
+            } @else if (permissionService.currentUserCan(PermissionAction.Add, PermissionType.Document)) {
+              <p class="rd-empty-desc" i18n>
+                Ziehe Dateien einfach hierher oder nutze „Hochladen“ oben rechts.
+              </p>
+            } @else {
+              <p class="rd-empty-desc" i18n>
+                Es sind aktuell keine Dokumente vorhanden.
+              </p>
             }
           </div>
         </div>
@@ -267,7 +268,7 @@
           </section>
         }
       } @else {
-        @for (group of documentGroups; track group.key; let gi = $index) {
+        @for (group of documentGroups; track group.key) {
           <section class="rd-doc-group">
             @if (group.label) {
               <div class="rd-group-header">
@@ -276,21 +277,6 @@
               </div>
             }
             <div class="rd-doc-grid">
-              @if (group.showUploadCard) {
-                <button
-                  type="button"
-                  class="rd-upload-card"
-                  (click)="requestUpload()"
-                  aria-label="Neues Dokument hochladen"
-                  i18n-aria-label
-                >
-                  <span class="rd-upload-card-box">
-                    <pngx-bs-icon name="plus-lg" width="24" height="24"></pngx-bs-icon>
-                  </span>
-                  <span class="rd-upload-card-label" i18n>Neu …</span>
-                </button>
-              }
-
               @for (doc of group.documents; track doc.id) {
                 <pngx-redesign-document-card
                   [document]="doc"

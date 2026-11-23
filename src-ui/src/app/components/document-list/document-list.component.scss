@@ -183,9 +183,23 @@
   justify-content: center;
   cursor: pointer;
   transition:
+    opacity 150ms ease,
+    visibility 0s linear 0s,
     background-color 140ms ease,
     color 140ms ease,
     border-color 140ms ease;
+
+  &.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 150ms ease,
+      visibility 0s linear 150ms,
+      background-color 140ms ease,
+      color 140ms ease,
+      border-color 140ms ease;
+  }
 
   &:hover {
     background: var(--rd-bg-pill-hover);
@@ -217,6 +231,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rd-correspondents-viewport,
+  .rd-correspondents-expand-btn,
   .rd-correspondents-expand-icon {
     transition-duration: 0.01ms !important;
   }
@@ -294,6 +309,7 @@
 
 .rd-doc-group {
   margin-bottom: 28px;
+  contain: layout style;
 
   &:last-child {
     margin-bottom: 0;
@@ -323,9 +339,21 @@
 
 .rd-doc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 18px;
   align-items: start;
+}
+
+@media (min-width: 576px) {
+  .rd-doc-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .rd-doc-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 1280px) {
@@ -340,45 +368,6 @@
   }
 }
 
-.rd-upload-card {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  text-align: center;
-
-  &:hover .rd-upload-card-box {
-    border-color: var(--rd-accent);
-    background: var(--rd-accent-soft);
-    transform: translateY(-2px);
-  }
-}
-
-.rd-upload-card-box {
-  width: 100%;
-  aspect-ratio: 1 / 1.38;
-  border-radius: var(--rd-radius-md);
-  border: 1.5px dashed var(--rd-border-medium);
-  background: var(--rd-bg-surface-hover);
-  color: var(--rd-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
-}
-
-.rd-upload-card-label {
-  margin-top: 9px;
-  font-size: var(--rd-text-card-title);
-  font-weight: 600;
-  color: var(--rd-accent);
-}
-
 .rd-doc-list-group {
   display: flex;
   flex-direction: column;
@@ -391,14 +380,15 @@
 
 .rd-empty-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 28px;
-  padding: 28px 12px;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 16px;
+}
 
-  .rd-upload-card {
-    width: 172px;
-    flex-shrink: 0;
-  }
+.rd-empty-copy {
+  max-width: 420px;
 }
 
 .rd-empty-title {
@@ -409,9 +399,13 @@
 }
 
 .rd-empty-desc {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: var(--rd-text-body);
   color: var(--rd-text-secondary);
+
+  + .btn {
+    margin-top: 14px;
+  }
 }
 
 .rd-pagination-bar {

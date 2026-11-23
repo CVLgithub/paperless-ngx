@@ -63,4 +63,17 @@
   <div class="rd-list-row__date">
     {{ document.created | customDate:'mediumDate' }}
   </div>
+
+  <a
+    class="rd-list-row__preview"
+    [href]="previewUrl"
+    target="_blank"
+    rel="noopener noreferrer"
+    (click)="$event.stopPropagation()"
+    (keydown.enter)="$event.stopPropagation()"
+    title="Im Browser-PDF-Viewer öffnen"
+    aria-label="Im Browser-PDF-Viewer öffnen"
+  >
+    <pngx-bs-icon name="eye" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+  </a>
 </div>

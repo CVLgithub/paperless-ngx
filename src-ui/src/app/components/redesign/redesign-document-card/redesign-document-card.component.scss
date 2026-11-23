@@ -1,6 +1,7 @@
 :host {
   display: block;
   min-width: 0;
+  contain: layout style;
 }
 
 .rd-doc-card {
@@ -9,9 +10,18 @@
   cursor: pointer;
   outline: none;
   user-select: none;
+  contain: layout style;
 
-  &:focus-visible .rd-doc-card__sheet {
-    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+  &:focus-visible {
+    .rd-doc-card__sheet {
+      box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    }
+
+    .rd-doc-card__preview {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
   }
 
   &:hover {
@@ -22,12 +32,27 @@
 
     .rd-doc-card__check {
       opacity: 1;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .rd-doc-card__preview {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
   }
 
   &--select-mode {
     .rd-doc-card__check {
       opacity: 1;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .rd-doc-card__preview {
+      opacity: 0;
+      pointer-events: none;
     }
   }
 
@@ -64,6 +89,58 @@
   background: #ffffff;
 }
 
+.rd-doc-card__preview {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--rd-border-medium);
+  background: var(--rd-bg-glass-strong);
+  color: var(--rd-text-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+
+  // Enlarged invisible hitbox (~36x36px) strictly within top-left corner
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+  }
+
+  &:hover {
+    background: var(--rd-bg-surface);
+    color: var(--rd-accent);
+    border-color: rgba(var(--rd-accent-rgb), 0.45);
+    transform: scale(1.08);
+  }
+
+  &:focus-visible {
+    opacity: 1;
+    outline: none;
+    background: var(--rd-bg-surface);
+    color: var(--rd-accent);
+    border-color: var(--rd-accent);
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
 .rd-doc-card__check {
   position: absolute;
   top: 8px;
@@ -74,7 +151,6 @@
   border-radius: 50%;
   border: 1.5px solid rgba(28, 28, 30, 0.28);
   background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(6px);
   color: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -99,6 +175,13 @@
     border-color: var(--rd-accent);
   }
 
+  &:focus-visible {
+    opacity: 1;
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    border-color: var(--rd-accent);
+  }
+
   &--checked {
     background: var(--rd-accent);
     border-color: var(--rd-accent);
@@ -118,7 +201,6 @@
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: -0.01em;
-  backdrop-filter: blur(8px);
 }
 
 .rd-doc-card__info {

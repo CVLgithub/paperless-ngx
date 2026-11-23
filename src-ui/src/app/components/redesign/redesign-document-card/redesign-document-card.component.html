@@ -16,6 +16,22 @@
       decoding="async"
     />
 
+    <!-- Native browser PDF preview (top left, hidden during selection mode) -->
+    @if (!selectionMode) {
+      <a
+        class="rd-doc-card__preview"
+        [href]="previewUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        (click)="$event.stopPropagation()"
+        (keydown.enter)="$event.stopPropagation()"
+        title="Im Browser-PDF-Viewer öffnen"
+        aria-label="Im Browser-PDF-Viewer öffnen"
+      >
+        <pngx-bs-icon name="eye" width="0.85rem" height="0.85rem"></pngx-bs-icon>
+      </a>
+    }
+
     <!-- Selection circle (top right) -->
     <button
       type="button"

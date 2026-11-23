@@ -4,10 +4,12 @@ import {
   effect,
   ElementRef,
   inject,
+  NgZone,
   OnDestroy,
   OnInit,
   QueryList,
   signal,
+  untracked,
   ViewChild,
   viewChild,
   ViewChildren,
@@ -169,6 +171,7 @@ export class DocumentListComponent
   private hotKeyService = inject(HotKeyService)
   permissionService = inject(PermissionsService)
   private readonly topbar = inject(RedesignTopbarService)
+  private readonly ngZone = inject(NgZone)
   private readonly tagService = inject(TagService)
   private readonly correspondentService = inject(CorrespondentService)
   private readonly documentTypeService = inject(DocumentTypeService)
@@ -308,17 +311,46 @@ export class DocumentListComponent
     return this.list.displayMode === DisplayMode.TABLE ? 'list' : 'grid'
   }
 
+  private cachedDocGroups: DocumentTimeGroup[] = []
+  private cachedDocGroupsKey: {
+    documents: Document[] | null
+    length: number
+    firstId: number | undefined
+    lastId: number | undefined
+    sortField: string
+  } | null = null
+
   get documentGroups(): DocumentTimeGroup[] {
-    return groupDocumentsByRecency(
-      this.list.documents || [],
-      this.list.sortField,
-      !this.selectionMode() &&
-        !this.list.hasSelection &&
-        this.permissionService.currentUserCan(
-          PermissionAction.Add,
-          PermissionType.Document
-        )
-    )
+    const documents = this.list.documents || []
+    const sortField = this.list.sortField
+    const length = documents.length
+    const firstId = documents[0]?.id
+    const lastId = documents[length - 1]?.id
+
+    if (
+      this.cachedDocGroupsKey &&
+      this.cachedDocGroupsKey.documents === documents &&
+      this.cachedDocGroupsKey.length === length &&
+      this.cachedDocGroupsKey.firstId === firstId &&
+      this.cachedDocGroupsKey.lastId === lastId &&
+      this.cachedDocGroupsKey.sortField === sortField
+    ) {
+      return this.cachedDocGroups
+    }
+
+    this.cachedDocGroups = groupDocumentsByRecency(
+      documents,
+      sortField,
+      false
+    ).filter((group) => group.documents.length > 0)
+    this.cachedDocGroupsKey = {
+      documents,
+      length,
+      firstId,
+      lastId,
+      sortField,
+    }
+    return this.cachedDocGroups
   }
 
   get activeSortSegment(): 'date' | 'name' | 'type' {
@@ -353,6 +385,8 @@ export class DocumentListComponent
   readonly correspondentsRowExpanded = signal(false)
   readonly correspondentsHasOverflow = signal(false)
   readonly correspondentsExpandedHeight = signal(29)
+  private correspondentsResizing = false
+  private lastHiddenActiveCorrespondent = false
 
   private readonly correspondentsLayoutEffect = effect((onCleanup) => {
     const trackEl = this.correspondentsTrack()?.nativeElement
@@ -360,34 +394,107 @@ export class DocumentListComponent
     if (!trackEl) {
       this.correspondentsHasOverflow.set(false)
       this.correspondentsExpandedHeight.set(29)
+      this.lastHiddenActiveCorrespondent = false
       return
     }
 
-    const measure = () => {
-      const fullHeight = Math.max(29, Math.ceil(trackEl.scrollHeight))
-      this.correspondentsExpandedHeight.set(fullHeight)
-      const hasOverflow = fullHeight > 34
-      this.correspondentsHasOverflow.set(hasOverflow)
-      if (!hasOverflow && this.correspondentsRowExpanded()) {
-        this.correspondentsRowExpanded.set(false)
+    const computeHiddenActive = (isExpanded: boolean): boolean => {
+      if (isExpanded || this.activeCorrespondentFilterIds.size === 0) {
+        return false
       }
+      const activeButtons = trackEl.querySelectorAll<HTMLElement>(
+        '.rd-filter-pill-correspondent.is-active'
+      )
+      return Array.from(activeButtons).some((btn) => btn.offsetTop >= 30)
     }
 
-    measure()
-    const rafId =
-      typeof requestAnimationFrame === 'function'
-        ? requestAnimationFrame(measure)
-        : null
+    const applyMeasurement = () => {
+      const fullHeight = Math.max(29, Math.ceil(trackEl.scrollHeight))
+      const hasOverflow = fullHeight > 34
+      const wasExpanded = untracked(() => this.correspondentsRowExpanded())
+      const shouldCollapse = !hasOverflow && wasExpanded
+      const nextExpanded = shouldCollapse ? false : wasExpanded
+      const hiddenActive = computeHiddenActive(nextExpanded)
+      const changed =
+        fullHeight !== untracked(() => this.correspondentsExpandedHeight()) ||
+        hasOverflow !== untracked(() => this.correspondentsHasOverflow()) ||
+        shouldCollapse ||
+        hiddenActive !== this.lastHiddenActiveCorrespondent
 
+      this.correspondentsResizing = false
+
+      if (!changed) {
+        return
+      }
+
+      this.ngZone.run(() => {
+        this.lastHiddenActiveCorrespondent = hiddenActive
+        this.correspondentsExpandedHeight.set(fullHeight)
+        this.correspondentsHasOverflow.set(hasOverflow)
+        if (shouldCollapse) {
+          this.correspondentsRowExpanded.set(false)
+        }
+      })
+    }
+
+    let initRafId: number | null = null
+    let settleTimerId: ReturnType<typeof setTimeout> | null = null
+    let settleRafId: number | null = null
     let observer: ResizeObserver | null = null
+    let initialized = false
+
+    untracked(() => applyMeasurement())
+    if (typeof requestAnimationFrame === 'function') {
+      initRafId = requestAnimationFrame(() => {
+        initRafId = null
+        applyMeasurement()
+      })
+    }
+
     if (typeof ResizeObserver !== 'undefined') {
-      observer = new ResizeObserver(() => measure())
-      observer.observe(trackEl)
+      this.ngZone.runOutsideAngular(() => {
+        observer = new ResizeObserver(() => {
+          if (!initialized) {
+            initialized = true
+            return
+          }
+          this.correspondentsResizing = true
+          if (settleTimerId !== null) {
+            clearTimeout(settleTimerId)
+          }
+          if (
+            settleRafId !== null &&
+            typeof cancelAnimationFrame === 'function'
+          ) {
+            cancelAnimationFrame(settleRafId)
+            settleRafId = null
+          }
+          settleTimerId = setTimeout(() => {
+            settleTimerId = null
+            if (typeof requestAnimationFrame === 'function') {
+              settleRafId = requestAnimationFrame(() => {
+                settleRafId = null
+                applyMeasurement()
+              })
+            } else {
+              applyMeasurement()
+            }
+          }, 140)
+        })
+        observer.observe(trackEl)
+      })
     }
 
     onCleanup(() => {
-      if (rafId !== null && typeof cancelAnimationFrame === 'function') {
-        cancelAnimationFrame(rafId)
+      this.correspondentsResizing = false
+      if (initRafId !== null && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(initRafId)
+      }
+      if (settleTimerId !== null) {
+        clearTimeout(settleTimerId)
+      }
+      if (settleRafId !== null && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(settleRafId)
       }
       observer?.disconnect()
     })
@@ -402,14 +509,24 @@ export class DocumentListComponent
       this.correspondentsRowExpanded() ||
       this.activeCorrespondentFilterIds.size === 0
     ) {
+      this.lastHiddenActiveCorrespondent = false
       return false
     }
+    if (this.correspondentsResizing) {
+      return this.lastHiddenActiveCorrespondent
+    }
     const trackEl = this.correspondentsTrack()?.nativeElement
-    if (!trackEl) return false
+    if (!trackEl) {
+      this.lastHiddenActiveCorrespondent = false
+      return false
+    }
     const activeButtons = trackEl.querySelectorAll<HTMLElement>(
       '.rd-filter-pill-correspondent.is-active'
     )
-    return Array.from(activeButtons).some((btn) => btn.offsetTop >= 30)
+    this.lastHiddenActiveCorrespondent = Array.from(activeButtons).some(
+      (btn) => btn.offsetTop >= 30
+    )
+    return this.lastHiddenActiveCorrespondent
   }
 
   get activeDocumentTypeFilterIds(): Set<number> {
@@ -532,10 +649,6 @@ export class DocumentListComponent
 
   getCorrespondentColor(id: number): string {
     return CORRESPONDENT_DOT_COLORS[Math.abs(id) % CORRESPONDENT_DOT_COLORS.length]
-  }
-
-  requestUpload(): void {
-    this.topbar.requestUpload()
   }
 
   toggleSelectionMode(): void {
