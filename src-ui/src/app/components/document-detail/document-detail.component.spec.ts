@@ -3126,6 +3126,84 @@ describe('DocumentDetailComponent', () => {
     expect(textareas[0].nativeElement.style.height).toBe('148px')
   })
 
+  it('should render DocumentLink custom fields with pngx-input-document-link, fetch suggestions, and store document IDs', () => {
+    currentUserCan = true
+    currentUserHasObjectPermissions = true
+    currentUserOwnsObject = true
+    const linkCustomFields: CustomField[] = [
+      {
+        id: 10,
+        name: 'Verknüpfte Datei',
+        data_type: CustomFieldDataType.DocumentLink,
+        created: new Date(),
+      },
+    ]
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({ all: [10], count: 1, results: linkCustomFields })
+    )
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [42],
+        count: 1,
+        results: [{ id: 42, title: 'Verknüpfter Vertrag' } as Document],
+      })
+    )
+    const listFilteredSpy = jest
+      .spyOn(documentService, 'listFiltered')
+      .mockReturnValue(
+        of({
+          all: [3, 42, 77],
+          count: 3,
+          results: [
+            { id: 3, title: 'Aktuelles Dokument' } as Document,
+            { id: 42, title: 'Verknüpfter Vertrag' } as Document,
+            { id: 77, title: 'Rechnung 2026' } as Document,
+          ],
+        })
+      )
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(
+      of({
+        ...doc,
+        custom_fields: [{ field: 10, value: [42] }] as CustomFieldInstance[],
+      })
+    )
+
+    fixture.detectChanges()
+
+    const docLinkDebug = fixture.debugElement.query(
+      By.css('.rd-cf-row--document-link pngx-input-document-link')
+    )
+    expect(docLinkDebug).not.toBeNull()
+    const docLinkComponent = docLinkDebug.componentInstance
+    expect(docLinkComponent.parentDocumentID).toBe(3)
+    expect(docLinkComponent.selectedDocuments.map((d) => d.id)).toEqual([42])
+
+    // Typing triggers document suggestions excluding parent (3) and already selected (42)
+    let found: Document[] = []
+    docLinkComponent.foundDocuments$.subscribe((docs) => (found = docs))
+    docLinkComponent.documentsInput$.next('Rechnung')
+    expect(listFilteredSpy).toHaveBeenCalled()
+    expect(found.map((d) => d.id)).toEqual([77])
+
+    // Selecting a suggestion updates form control value to number[]
+    docLinkComponent.selectedDocuments = [
+      ...docLinkComponent.selectedDocuments,
+      found[0],
+    ]
+    docLinkComponent.onChange(docLinkComponent.selectedDocumentIDs)
+    fixture.detectChanges()
+    expect(component.customFieldFormFields.at(0).get('value').value).toEqual([
+      42, 77,
+    ])
+  })
+
   it('should render notes composer as textarea and submit on Enter without Shift while allowing Shift+Enter', () => {
     currentUserCan = true
     currentUserHasObjectPermissions = true

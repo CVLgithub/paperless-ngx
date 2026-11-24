@@ -874,3 +874,42 @@ a.rd-detail-pill__btn {
     color: var(--rd-text-primary);
   }
 }
+
+// Body-appended ng-select overlays (e.g. DocumentLink custom field typeahead)
+body > .ng-dropdown-panel {
+  background-color: var(--rd-bg-surface) !important;
+  border: 1px solid var(--rd-border-subtle) !important;
+  border-radius: var(--rd-radius-sm) !important;
+  box-shadow: var(--rd-shadow-floating) !important;
+  overflow: hidden;
+  z-index: 1080 !important;
+
+  .ng-dropdown-panel-items .ng-option {
+    background-color: transparent !important;
+    color: var(--rd-text-primary) !important;
+    font-size: 12.5px;
+    padding: 7px 10px;
+    white-space: normal;
+
+    small.text-muted {
+      color: var(--rd-text-tertiary) !important;
+    }
+
+    &.ng-option-marked,
+    &:hover {
+      background-color: var(--rd-bg-pill) !important;
+      color: var(--rd-text-primary) !important;
+    }
+
+    &.ng-option-selected,
+    &.ng-option-selected.ng-option-marked {
+      background-color: var(--rd-accent-soft) !important;
+      color: var(--rd-accent) !important;
+      font-weight: 600;
+    }
+
+    &.ng-option-disabled {
+      color: var(--rd-text-tertiary) !important;
+    }
+  }
+}

@@ -597,6 +597,34 @@
                             }
                           }
                         </div>
+                      } @else if (cf?.data_type === CustomFieldDataType.DocumentLink) {
+                        <div class="rd-cf-row rd-cf-row--multiline rd-cf-row--document-link" [formGroup]="customFieldFormFields.controls[i]">
+                          <div class="rd-cf-header">
+                            <span class="rd-info-label">{{ cf?.name }}</span>
+                            @if (userCanEdit) {
+                              <button
+                                type="button"
+                                class="rd-cf-remove"
+                                (click)="removeField(fieldInstance)"
+                                title="Feld entfernen"
+                                i18n-title
+                              >
+                                <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                              </button>
+                            }
+                          </div>
+                          <pngx-input-document-link
+                            class="rd-cf-doclink"
+                            formControlName="value"
+                            [minimal]="true"
+                            [parentDocumentID]="documentId()"
+                            appendTo="body"
+                            [error]="getCustomFieldError(i)"
+                          ></pngx-input-document-link>
+                          @if (getCustomFieldError(i)) {
+                            <div class="rd-cf-error">{{ getCustomFieldError(i) }}</div>
+                          }
+                        </div>
                       } @else {
                         <div class="rd-cf-row" [formGroup]="customFieldFormFields.controls[i]">
                           <span class="rd-info-label">{{ cf?.name }}</span>
