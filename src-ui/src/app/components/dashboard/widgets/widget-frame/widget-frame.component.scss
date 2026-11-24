@@ -2,6 +2,48 @@
   display: block;
 }
 
+// Frameless section variant (matches Alle Dokumente .rd-doc-group aesthetic)
+.rd-widget-section {
+  position: relative;
+  color: var(--rd-text-primary);
+
+  &:hover .rd-widget-drag-handle--minimal,
+  &:focus-within .rd-widget-drag-handle--minimal {
+    opacity: 1;
+  }
+
+  &.cdk-drag-preview {
+    padding: 16px 20px;
+    border-radius: var(--rd-radius-lg);
+    background: var(--rd-bg-glass-strong);
+    backdrop-filter: var(--rd-blur-md);
+    -webkit-backdrop-filter: var(--rd-blur-md);
+    border: 1px solid var(--rd-border-medium);
+    box-shadow: var(--rd-shadow-floating);
+    opacity: 0.96;
+  }
+
+  &.cdk-drag-placeholder {
+    border-radius: var(--rd-radius-lg);
+    border: 1.5px dashed var(--rd-accent);
+    background: color-mix(in srgb, var(--rd-accent-soft) 35%, transparent);
+    opacity: 0.45;
+  }
+}
+
+.rd-widget-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rd-widget-section-body {
+  min-width: 0;
+}
+
+// Card variant (for boxed widgets)
 .rd-widget-card {
   position: relative;
   border-radius: var(--rd-radius-lg);
@@ -54,9 +96,15 @@
   color: var(--rd-text-tertiary);
   cursor: grab;
   flex-shrink: 0;
-  transition: color 140ms ease, background-color 140ms ease;
+  transition: opacity 140ms ease, color 140ms ease, background-color 140ms ease;
+
+  &--minimal {
+    opacity: 0.3;
+    margin-left: -4px;
+  }
 
   &:hover {
+    opacity: 1;
     color: var(--rd-text-primary);
     background: var(--rd-bg-pill);
   }
@@ -76,6 +124,12 @@
   background: var(--rd-accent-soft);
   color: var(--rd-accent);
   flex-shrink: 0;
+
+  &--minimal {
+    width: 26px;
+    height: 26px;
+    border-radius: var(--rd-radius-xs);
+  }
 }
 
 .rd-widget-title {
@@ -88,6 +142,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &--minimal {
+    font-weight: 700;
+  }
 }
 
 .rd-widget-badge {
@@ -148,7 +206,8 @@
     animation: none;
   }
 
-  .rd-widget-card {
+  .rd-widget-card,
+  .rd-widget-drag-handle {
     transition: none;
   }
 }

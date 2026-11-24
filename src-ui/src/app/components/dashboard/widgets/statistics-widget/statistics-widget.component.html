@@ -1,65 +1,138 @@
-<pngx-widget-frame title="Statistics" titleIcon="layers" [loading]="loading()" i18n-title>
+<pngx-widget-frame title="Statistics" [loading]="loading()" [cardless]="true" i18n-title>
   <ng-container content>
-    <div class="rd-stat-list">
-      @if (loading()) {
-        <div class="rd-stat-row rd-stat-row--skeleton">
-          <span class="rd-stat-skeleton rd-stat-skeleton--lg"></span>
-          <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-        </div>
-        <div class="rd-stat-row rd-stat-row--skeleton">
-          <span class="rd-stat-skeleton rd-stat-skeleton--md"></span>
-          <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-        </div>
-        <div class="rd-stat-row rd-stat-row--skeleton">
-          <span class="rd-stat-skeleton rd-stat-skeleton--md"></span>
-          <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-        </div>
-        <div class="rd-stat-row rd-stat-row--skeleton">
-          <span class="rd-stat-skeleton rd-stat-skeleton--sm"></span>
-          <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-        </div>
-        <div class="rd-filetypes">
-          <div class="rd-stat-skeleton rd-stat-skeleton--bar"></div>
-          <div class="rd-stat-skeleton rd-stat-skeleton--lg mt-2"></div>
-        </div>
-      } @else {
-        @if (statistics()?.documents_inbox !== null) {
-          <a
-            class="rd-stat-row rd-stat-row--interactive"
-            title="Go to inbox"
-            i18n-title
-            href="javascript:void(0)"
-            (click)="goToInbox()"
-          >
-            <span class="rd-stat-label"><ng-container i18n>Documents in inbox</ng-container>:</span>
-            <span
-              class="rd-stat-pill"
-              [class.rd-stat-pill--accent]="statistics()?.documents_inbox > 0"
-            >{{ statistics()?.documents_inbox }}</span>
-          </a>
-        }
-        <a
-          class="rd-stat-row rd-stat-row--interactive"
-          title="Go to documents"
-          i18n-title
-          routerLink="/documents/"
-        >
-          <span class="rd-stat-label"><ng-container i18n>Total documents</ng-container>:</span>
-          <span class="rd-stat-pill rd-stat-pill--accent">{{ statistics()?.documents_total }}</span>
-        </a>
-        <div class="rd-stat-row">
-          <span class="rd-stat-label"><ng-container i18n>Total characters</ng-container>:</span>
-          <span class="rd-stat-pill">{{ statistics()?.character_count | number }}</span>
-        </div>
-        @if (statistics()?.current_asn) {
-          <div class="rd-stat-row">
-            <span class="rd-stat-label"><ng-container i18n>Current ASN</ng-container>:</span>
-            <span class="rd-stat-pill">{{ statistics()?.current_asn }}</span>
+    <section class="rd-kpi-bar" aria-label="Statistics" i18n-aria-label>
+      <div class="rd-kpi-strip">
+        @if (loading()) {
+          <div class="rd-kpi-pill rd-kpi-pill--skeleton" aria-hidden="true">
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--icon"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--lg"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--val"></span>
           </div>
+          <div class="rd-kpi-pill rd-kpi-pill--skeleton" aria-hidden="true">
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--icon"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--md"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--val"></span>
+          </div>
+          <div class="rd-kpi-pill rd-kpi-pill--skeleton" aria-hidden="true">
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--icon"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--sm"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--val"></span>
+          </div>
+          <div class="rd-kpi-pill rd-kpi-pill--skeleton" aria-hidden="true">
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--icon"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--md"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--val"></span>
+          </div>
+          <div class="rd-kpi-pill rd-kpi-pill--skeleton" aria-hidden="true">
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--icon"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--md"></span>
+            <span class="rd-kpi-skeleton rd-kpi-skeleton--val"></span>
+          </div>
+        } @else {
+          @if (statistics()?.documents_inbox !== null && statistics()?.documents_inbox !== undefined) {
+            <a
+              class="rd-kpi-pill rd-kpi-pill--interactive"
+              [class.rd-kpi-pill--accent]="statistics()?.documents_inbox > 0"
+              title="Go to inbox"
+              i18n-title
+              href="javascript:void(0)"
+              (click)="goToInbox()"
+            >
+              <span class="rd-kpi-icon" aria-hidden="true">
+                <pngx-bs-icon name="inbox" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+              </span>
+              <span class="rd-kpi-label"><ng-container i18n>Documents in inbox</ng-container><span class="visually-hidden">:</span></span>
+              <span class="rd-kpi-value">{{ statistics()?.documents_inbox | number }}</span>
+            </a>
+          }
+
+          @if (statistics()?.documents_total !== null && statistics()?.documents_total !== undefined) {
+            <a
+              class="rd-kpi-pill rd-kpi-pill--interactive"
+              title="Go to documents"
+              i18n-title
+              routerLink="/documents/"
+            >
+              <span class="rd-kpi-icon" aria-hidden="true">
+                <pngx-bs-icon name="files" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+              </span>
+              <span class="rd-kpi-label"><ng-container i18n>Total documents</ng-container><span class="visually-hidden">:</span></span>
+              <span class="rd-kpi-value">{{ statistics()?.documents_total | number }}</span>
+            </a>
+          }
+
+          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
+            @if (statistics()?.tag_count > 0) {
+              <a class="rd-kpi-pill rd-kpi-pill--interactive" routerLink="/tags/">
+                <span class="rd-kpi-icon" aria-hidden="true">
+                  <pngx-bs-icon name="tags" width="0.86rem" height="0.86rem"></pngx-bs-icon>
+                </span>
+                <span class="rd-kpi-label"><ng-container i18n>Tags</ng-container><span class="visually-hidden">:</span></span>
+                <span class="rd-kpi-value">{{ statistics()?.tag_count | number }}</span>
+              </a>
+            }
+          </ng-container>
+
+          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
+            @if (statistics()?.correspondent_count > 0) {
+              <a class="rd-kpi-pill rd-kpi-pill--interactive" routerLink="/correspondents/">
+                <span class="rd-kpi-icon" aria-hidden="true">
+                  <pngx-bs-icon name="person" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+                </span>
+                <span class="rd-kpi-label"><ng-container i18n>Correspondents</ng-container><span class="visually-hidden">:</span></span>
+                <span class="rd-kpi-value">{{ statistics()?.correspondent_count | number }}</span>
+              </a>
+            }
+          </ng-container>
+
+          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
+            @if (statistics()?.document_type_count > 0) {
+              <a class="rd-kpi-pill rd-kpi-pill--interactive" routerLink="/documenttypes/">
+                <span class="rd-kpi-icon" aria-hidden="true">
+                  <pngx-bs-icon name="file-earmark-text" width="0.86rem" height="0.86rem"></pngx-bs-icon>
+                </span>
+                <span class="rd-kpi-label"><ng-container i18n>Document Types</ng-container><span class="visually-hidden">:</span></span>
+                <span class="rd-kpi-value">{{ statistics()?.document_type_count | number }}</span>
+              </a>
+            }
+          </ng-container>
+
+          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
+            @if (statistics()?.storage_path_count > 0) {
+              <a class="rd-kpi-pill rd-kpi-pill--interactive" routerLink="/storagepaths/">
+                <span class="rd-kpi-icon" aria-hidden="true">
+                  <pngx-bs-icon name="folder" width="0.86rem" height="0.86rem"></pngx-bs-icon>
+                </span>
+                <span class="rd-kpi-label"><ng-container i18n>Storage Paths</ng-container><span class="visually-hidden">:</span></span>
+                <span class="rd-kpi-value">{{ statistics()?.storage_path_count | number }}</span>
+              </a>
+            }
+          </ng-container>
+
+          @if (statistics()?.character_count !== null && statistics()?.character_count !== undefined) {
+            <div class="rd-kpi-pill rd-kpi-pill--muted">
+              <span class="rd-kpi-icon" aria-hidden="true">
+                <pngx-bs-icon name="body-text" width="0.84rem" height="0.84rem"></pngx-bs-icon>
+              </span>
+              <span class="rd-kpi-label"><ng-container i18n>Total characters</ng-container><span class="visually-hidden">:</span></span>
+              <span class="rd-kpi-value">{{ statistics()?.character_count | number }}</span>
+            </div>
+          }
+
+          @if (statistics()?.current_asn) {
+            <div class="rd-kpi-pill rd-kpi-pill--muted">
+              <span class="rd-kpi-icon" aria-hidden="true">
+                <pngx-bs-icon name="upc-scan" width="0.84rem" height="0.84rem"></pngx-bs-icon>
+              </span>
+              <span class="rd-kpi-label"><ng-container i18n>Current ASN</ng-container><span class="visually-hidden">:</span></span>
+              <span class="rd-kpi-value">{{ statistics()?.current_asn }}</span>
+            </div>
+          }
         }
-      }
-      @if (statistics()?.document_file_type_counts?.length > 1) {
-        <div class="rd-filetypes">
+      </div>
+
+      @if (!loading() && statistics()?.document_file_type_counts?.length > 1) {
+        <div class="rd-kpi-filetypes">
           <div class="rd-filetypes-bar">
             @for (filetype of statistics()?.document_file_type_counts; track filetype; let i = $index; let last = $last) {
               <div
@@ -82,86 +155,21 @@
           </div>
           <div class="rd-filetypes-legend">
             @for (filetype of statistics()?.document_file_type_counts; track filetype; let i = $index) {
-              <div
+              <button
+                type="button"
                 class="rd-filetype-item"
                 [class.rd-filetype-item--interactive]="!filetype.is_other"
+                [disabled]="filetype.is_other"
                 (click)="filterByFileType(filetype)"
               >
                 <span class="rd-filetype-dot" [style.opacity]="getItemOpacity(i)"></span>
                 <span class="rd-filetype-ext">{{ getFileTypeExtension(filetype) }}</span>
                 <span class="rd-filetype-pct">({{ getFileTypePercent(filetype) | number: '1.0-1' }}%)</span>
-              </div>
+              </button>
             }
           </div>
         </div>
       }
-    </div>
-
-    @if (
-      loading() ||
-      statistics()?.tag_count > 0 ||
-      statistics()?.correspondent_count > 0 ||
-      statistics()?.document_type_count > 0 ||
-      statistics()?.storage_path_count > 0
-    ) {
-      <div class="rd-stat-list rd-stat-list--secondary">
-        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
-          @if (loading()) {
-            <div class="rd-stat-row rd-stat-row--skeleton">
-              <span class="rd-stat-skeleton rd-stat-skeleton--sm"></span>
-              <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-            </div>
-          }
-          @if (statistics()?.tag_count > 0) {
-            <a class="rd-stat-row rd-stat-row--interactive" routerLink="/tags/">
-              <span class="rd-stat-label"><ng-container i18n>Tags</ng-container>:</span>
-              <span class="rd-stat-pill">{{ statistics()?.tag_count | number }}</span>
-            </a>
-          }
-        </ng-container>
-        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
-          @if (loading()) {
-            <div class="rd-stat-row rd-stat-row--skeleton">
-              <span class="rd-stat-skeleton rd-stat-skeleton--md"></span>
-              <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-            </div>
-          }
-          @if (statistics()?.correspondent_count > 0) {
-            <a class="rd-stat-row rd-stat-row--interactive" routerLink="/correspondents/">
-              <span class="rd-stat-label"><ng-container i18n>Correspondents</ng-container>:</span>
-              <span class="rd-stat-pill">{{ statistics()?.correspondent_count | number }}</span>
-            </a>
-          }
-        </ng-container>
-        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-          @if (loading()) {
-            <div class="rd-stat-row rd-stat-row--skeleton">
-              <span class="rd-stat-skeleton rd-stat-skeleton--md"></span>
-              <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-            </div>
-          }
-          @if (statistics()?.document_type_count > 0) {
-            <a class="rd-stat-row rd-stat-row--interactive" routerLink="/documenttypes/">
-              <span class="rd-stat-label"><ng-container i18n>Document Types</ng-container>:</span>
-              <span class="rd-stat-pill">{{ statistics()?.document_type_count | number }}</span>
-            </a>
-          }
-        </ng-container>
-        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-          @if (loading()) {
-            <div class="rd-stat-row rd-stat-row--skeleton">
-              <span class="rd-stat-skeleton rd-stat-skeleton--md"></span>
-              <span class="rd-stat-skeleton rd-stat-skeleton--pill"></span>
-            </div>
-          }
-          @if (statistics()?.storage_path_count > 0) {
-            <a class="rd-stat-row rd-stat-row--interactive" routerLink="/storagepaths/">
-              <span class="rd-stat-label"><ng-container i18n>Storage Paths</ng-container>:</span>
-              <span class="rd-stat-pill">{{ statistics()?.storage_path_count | number }}</span>
-            </a>
-          }
-        </ng-container>
-      </div>
-    }
+    </section>
   </ng-container>
 </pngx-widget-frame>

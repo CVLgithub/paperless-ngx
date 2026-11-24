@@ -4,7 +4,7 @@
   [titleIcon]="savedView.icon || 'funnel'"
   [loading]="false"
   [draggable]="savedView"
-  [flushBody]="displayMode() === DisplayMode.TABLE && !error()"
+  [minimal]="true"
 >
   @if (count() !== null) {
     <span title-badge class="rd-count-pill">{{ count() }}</span>
@@ -27,264 +27,71 @@
       @if (!loading() && documents().length === 0) {
         <div class="rd-widget-empty" i18n>Keine Dokumente in dieser Ansicht</div>
       } @else {
-        <div class="rd-table-wrap">
-          <table class="rd-saved-view-table">
-            <thead>
-              <tr>
-                @for (field of displayFields(); track field; let i = $index) {
-                  @if (displayFields().includes(field)) {
-                    <th
-                      scope="col"
-                      class="rd-table-th text-truncate"
-                      [title]="getColumnTitle(field)"
-                      [ngClass]="{
-                        'd-none d-md-table-cell': i > 1,
-                        'rd-col-date': field === DisplayField.CREATED || field === DisplayField.ADDED,
-                        'rd-col-compact': field === DisplayField.PAGE_COUNT || field === DisplayField.ASN || field === DisplayField.NOTES || field === DisplayField.SHARED
-                      }"
-                    >
-                      {{ getColumnTitle(field) }}
-                    </th>
-                  }
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @if (loading() && !documents().length) {
-                @for (row of placeholderRows; track row) {
-                  <tr class="rd-table-row rd-table-row--skeleton">
-                    @for (field of displayFields(); track field; let j = $index) {
-                      <td class="rd-table-td" [ngClass]="{ 'd-none d-md-table-cell': j > 1 }">
-                        <div class="rd-skeleton-bar" [ngStyle]="{ opacity: 1 - (row * 0.7 / placeholderRows.length) }"></div>
-                      </td>
-                    }
-                  </tr>
-                }
-              }
-              @for (doc of documents(); track doc.id; let i = $index) {
-                <tr class="rd-table-row">
-                  @for (field of displayFields(); track field; let j = $index) {
-                    <td
-                      class="rd-table-td position-relative"
-                      [ngClass]="{
-                        'd-none d-md-table-cell': j > 1,
-                        'rd-table-td--last': j === displayFields().length - 1
-                      }"
-                    >
-                      @switch (field) {
-                        @case (DisplayField.ADDED) {
-                          <a
-                            routerLink="/documents/{{ doc.id }}"
-                            (click)="activateViewForNavigation()"
-                            class="rd-doc-meta-link rd-tabular"
-                            title="Open document"
-                            i18n-title
-                          >{{ doc.added | customDate }}</a>
-                        }
-                        @case (DisplayField.CREATED) {
-                          <a
-                            routerLink="/documents/{{ doc.id }}"
-                            (click)="activateViewForNavigation()"
-                            class="rd-doc-meta-link rd-tabular"
-                            title="Open document"
-                            i18n-title
-                          >{{ doc.created | customDate }}</a>
-                        }
-                        @case (DisplayField.TITLE) {
-                          <a
-                            routerLink="/documents/{{ doc.id }}"
-                            (click)="activateViewForNavigation()"
-                            title="Open document"
-                            i18n-title
-                            class="rd-doc-title-link"
-                          >{{ doc.title | documentTitle }}</a>
-                        }
-                        @case (DisplayField.CORRESPONDENT) {
-                          @if (doc.correspondent) {
-                            <a
-                              class="rd-doc-meta-link"
-                              type="button"
-                              (click)="clickCorrespondent(doc.correspondent, $event)"
-                              title="Filter by correspondent"
-                              i18n-title
-                            >{{ doc.correspondent | correspondentName | async }}</a>
-                          }
-                        }
-                        @case (DisplayField.TAGS) {
-                          <div class="rd-tags-cell">
-                            @for (tagID of doc.tags; track tagID) {
-                              <pngx-tag
-                                [tagID]="tagID"
-                                (click)="clickTag(tagID, $event)"
-                                [clickable]="true"
-                                linkTitle="Filter by tag"
-                                i18n-title
-                              ></pngx-tag>
-                            }
-                          </div>
-                        }
-                        @case (DisplayField.DOCUMENT_TYPE) {
-                          @if (doc.document_type) {
-                            <a
-                              class="rd-doc-type-chip"
-                              type="button"
-                              (click)="clickDocType(doc.document_type, $event)"
-                              title="Filter by document type"
-                              i18n-title
-                            >{{ doc.document_type | documentTypeName | async }}</a>
-                          }
-                        }
-                        @case (DisplayField.STORAGE_PATH) {
-                          @if (doc.storage_path) {
-                            <a
-                              class="rd-doc-meta-link"
-                              type="button"
-                              (click)="clickStoragePath(doc.storage_path, $event)"
-                              title="Filter by storage path"
-                              i18n-title
-                            >{{ doc.storage_path | storagePathName | async }}</a>
-                          }
-                        }
-                        @case (DisplayField.OWNER) {
-                          @if (doc.owner) {
-                            <a
-                              class="rd-doc-meta-link"
-                              type="button"
-                              (click)="clickOwner(doc.owner, $event)"
-                              title="Filter by owner"
-                              i18n-title
-                            >{{ doc.owner | username | async }}</a>
-                          }
-                        }
-                        @case (DisplayField.ASN) {
-                          <span class="rd-tabular rd-doc-muted">{{ doc.archive_serial_number }}</span>
-                        }
-                        @case (DisplayField.PAGE_COUNT) {
-                          <span class="rd-tabular rd-doc-muted">{{ doc.page_count }}</span>
-                        }
-                        @case (DisplayField.SHARED) {
-                          <span class="rd-doc-muted">
-                            @if (doc.is_shared_by_requester) {
-                              <ng-container i18n>Yes</ng-container>
-                            } @else {
-                              <ng-container i18n>No</ng-container>
-                            }
-                          </span>
-                        }
-                        @case (DisplayField.NOTES) {
-                          @if (doc.notes.length) {
-                            <a
-                              routerLink="/documents/{{ doc.id }}/notes"
-                              (click)="activateViewForNavigation()"
-                              class="rd-notes-pill"
-                            >
-                              <pngx-bs-icon width="0.82rem" height="0.82rem" name="chat-left-text"></pngx-bs-icon>
-                              <span>{{ doc.notes.length }}</span>
-                            </a>
-                          }
-                        }
-                      }
-                      @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
-                        <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
-                      }
-                      @if (j === displayFields().length - 1) {
-                        <div class="rd-row-actions">
-                          <a
-                            [href]="getPreviewUrl(doc)"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            (click)="$event.stopPropagation()"
-                            class="btn rd-row-action-btn"
-                            title="Im Browser-PDF-Viewer öffnen"
-                            i18n-title
-                            aria-label="Im Browser-PDF-Viewer öffnen"
-                            i18n-aria-label
-                          >
-                            <pngx-bs-icon width="0.88rem" height="0.88rem" name="eye"></pngx-bs-icon>
-                          </a>
-                          <a
-                            [href]="getDownloadUrl(doc)"
-                            class="btn rd-row-action-btn"
-                            title="Herunterladen"
-                            i18n-title
-                            aria-label="Herunterladen"
-                            i18n-aria-label
-                            (click)="$event.stopPropagation()"
-                          >
-                            <pngx-bs-icon width="0.88rem" height="0.88rem" name="download"></pngx-bs-icon>
-                          </a>
-                        </div>
-                      }
-                    </td>
-                  }
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    } @else if (displayMode() === DisplayMode.SMALL_CARDS) {
-      @if (!loading() && documents().length === 0) {
-        <div class="rd-widget-empty" i18n>Keine Dokumente in dieser Ansicht</div>
-      } @else {
-        <div class="row row-cols-paperless-cards rd-cards-grid my-n2">
+        <div class="rd-doc-list-group">
           @if (loading() && !documents().length) {
-            @for (row of placeholderRows; track row) {
-              <pngx-document-card-small
-                class="p-0"
-                [ngStyle]="{ opacity: 1 - (row * 1 / placeholderRows.length) }"
-                [document]="null"
-                [displayFields]="displayFields()"
-              >
-              </pngx-document-card-small>
+            @for (item of skeletonItems(); track item) {
+              <div class="rd-row-skeleton" aria-hidden="true">
+                <div class="rd-row-skeleton__thumb"></div>
+                <div class="rd-row-skeleton__main">
+                  <div class="rd-skeleton-line rd-skeleton-line--title"></div>
+                  <div class="rd-skeleton-line rd-skeleton-line--sub"></div>
+                </div>
+                <div class="rd-row-skeleton__tags">
+                  <span class="rd-skeleton-pill"></span>
+                  <span class="rd-skeleton-pill rd-skeleton-pill--sm"></span>
+                </div>
+                <div class="rd-row-skeleton__type">
+                  <span class="rd-skeleton-pill rd-skeleton-pill--md"></span>
+                </div>
+                <div class="rd-row-skeleton__pages">
+                  <span class="rd-skeleton-line rd-skeleton-line--xs"></span>
+                </div>
+                <div class="rd-row-skeleton__date">
+                  <span class="rd-skeleton-line rd-skeleton-line--date"></span>
+                </div>
+                <div class="rd-row-skeleton__action"></div>
+              </div>
             }
           }
-          @for (d of documents(); track d.id; let i = $index) {
-            <pngx-document-card-small
-              class="p-0"
-              [ngStyle]="{ opacity: show() ? 1 : 1 - (i * 1 / documents().length) }"
-              (click)="activateViewForNavigation()"
-              (dblClickDocument)="openDocumentDetail(d)"
-              [document]="d"
-              [displayFields]="displayFields()"
-              (clickTag)="clickTag($event)"
-              (clickCorrespondent)="clickCorrespondent($event)"
-              (clickStoragePath)="clickStoragePath($event)"
-              (clickDocumentType)="clickDocType($event)"
-            >
-            </pngx-document-card-small>
+          @for (doc of documents(); track doc.id; let i = $index) {
+            <pngx-redesign-document-list-row
+              [document]="doc"
+              [tagMap]="tagMap()"
+              [correspondentMap]="correspondentMap()"
+              [documentTypeMap]="documentTypeMap()"
+              [priority]="i < 6"
+              (rowClick)="openDocumentDetail(doc)"
+            ></pngx-redesign-document-list-row>
           }
         </div>
       }
-    } @else if (displayMode() === DisplayMode.LARGE_CARDS) {
+    } @else if (displayMode() === DisplayMode.SMALL_CARDS || displayMode() === DisplayMode.LARGE_CARDS) {
       @if (!loading() && documents().length === 0) {
         <div class="rd-widget-empty" i18n>Keine Dokumente in dieser Ansicht</div>
       } @else {
-        <div class="row rd-cards-grid my-n2">
+        <div
+          class="rd-doc-grid"
+          [class.rd-doc-grid--large]="displayMode() === DisplayMode.LARGE_CARDS"
+        >
           @if (loading() && !documents().length) {
-            @for (row of placeholderRows; track row) {
-              <pngx-document-card-large
-                [document]="null"
-                [ngStyle]="{ opacity: 1 - (row * 1 / placeholderRows.length) }"
-                [displayFields]="displayFields()"
-              >
-              </pngx-document-card-large>
+            @for (item of skeletonItems(); track item) {
+              <div class="rd-card-skeleton" aria-hidden="true">
+                <div class="rd-card-skeleton__sheet"></div>
+                <div class="rd-card-skeleton__info">
+                  <div class="rd-skeleton-line rd-skeleton-line--card-title"></div>
+                  <div class="rd-skeleton-line rd-skeleton-line--card-meta"></div>
+                </div>
+              </div>
             }
           }
-          @for (d of documents(); track d.id; let i = $index) {
-            <pngx-document-card-large
-              (click)="activateViewForNavigation()"
-              (dblClickDocument)="openDocumentDetail(d)"
-              [document]="d"
-              [ngStyle]="{ opacity: show() ? 1 : 1 - (i * 1 / documents().length) }"
-              [displayFields]="displayFields()"
-              (clickTag)="clickTag($event)"
-              (clickCorrespondent)="clickCorrespondent($event)"
-              (clickStoragePath)="clickStoragePath($event)"
-              (clickDocumentType)="clickDocType($event)"
-              (clickMoreLike)="clickMoreLike(d.id)"
-            >
-            </pngx-document-card-large>
+          @for (doc of documents(); track doc.id; let i = $index) {
+            <pngx-redesign-document-card
+              [document]="doc"
+              [tagMap]="tagMap()"
+              [documentTypeMap]="documentTypeMap()"
+              [priority]="i < 6"
+              (cardClick)="openDocumentDetail(doc)"
+            ></pngx-redesign-document-card>
           }
         </div>
       }

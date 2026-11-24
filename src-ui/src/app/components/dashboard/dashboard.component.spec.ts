@@ -1,4 +1,5 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
+import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
@@ -16,15 +17,15 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { LogoComponent } from '../common/logo/logo.component'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { DashboardComponent } from './dashboard.component'
 import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view-widget.component'
 import { StatisticsWidgetComponent } from './widgets/statistics-widget/statistics-widget.component'
-import { UploadFileWidgetComponent } from './widgets/upload-file-widget/upload-file-widget.component'
 import { WidgetFrameComponent } from './widgets/widget-frame/widget-frame.component'
 
 const saved_views = [
@@ -82,14 +83,12 @@ describe('DashboardComponent', () => {
         DragDropModule,
         DashboardComponent,
         StatisticsWidgetComponent,
-        PageHeaderComponent,
         WidgetFrameComponent,
-        UploadFileWidgetComponent,
         IfPermissionsDirective,
         SavedViewWidgetComponent,
-        LogoComponent,
       ],
       providers: [
+        DatePipe,
         PermissionsGuard,
         {
           provide: PermissionsService,
@@ -109,6 +108,39 @@ describe('DashboardComponent', () => {
             dashboardViews: saved_views.filter((v) => v.show_on_dashboard),
             allViews: saved_views,
             setDocumentCount: jest.fn(),
+          },
+        },
+        {
+          provide: TagService,
+          useValue: {
+            listAll: () =>
+              of({
+                all: [1],
+                count: 1,
+                results: [{ id: 1, name: 'Invoice', color: '#007aff' }],
+              }),
+          },
+        },
+        {
+          provide: CorrespondentService,
+          useValue: {
+            listAll: () =>
+              of({
+                all: [2],
+                count: 1,
+                results: [{ id: 2, name: 'Acme Corp' }],
+              }),
+          },
+        },
+        {
+          provide: DocumentTypeService,
+          useValue: {
+            listAll: () =>
+              of({
+                all: [3],
+                count: 1,
+                results: [{ id: 3, name: 'Receipt' }],
+              }),
           },
         },
         provideHttpClient(withInterceptorsFromDi()),
@@ -141,10 +173,19 @@ describe('DashboardComponent', () => {
     expect(component.subtitle).toEqual(`Welcome to Paperless-ngx`)
   })
 
-  it('should show dashboard widgets', () => {
-    expect(
-      fixture.debugElement.queryAll(By.directive(SavedViewWidgetComponent))
-    ).toHaveLength(saved_views.filter((v) => v.show_on_dashboard).length)
+  it('should show dashboard widgets and pass taxonomy lookup maps', () => {
+    const widgetDebugElements = fixture.debugElement.queryAll(
+      By.directive(SavedViewWidgetComponent)
+    )
+    expect(widgetDebugElements).toHaveLength(
+      saved_views.filter((v) => v.show_on_dashboard).length
+    )
+
+    const firstWidget = widgetDebugElements[0]
+      .componentInstance as SavedViewWidgetComponent
+    expect(firstWidget.tagMap().get(1)?.name).toEqual('Invoice')
+    expect(firstWidget.correspondentMap().get(2)?.name).toEqual('Acme Corp')
+    expect(firstWidget.documentTypeMap().get(3)?.name).toEqual('Receipt')
   })
 
   it('should end tour service if still running and welcome widget dismissed', () => {

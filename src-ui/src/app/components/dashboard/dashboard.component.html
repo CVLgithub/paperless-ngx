@@ -38,91 +38,82 @@
     </div>
   </header>
 
-  <div class="rd-dashboard-layout">
-    <div class="rd-dashboard-main">
-      @if (savedViewService.loading) {
-        <div class="rd-skeleton-stack" aria-hidden="true">
-          <div class="rd-skeleton-card">
-            <div class="rd-skeleton-card-header">
-              <div class="rd-skeleton-icon"></div>
-              <div class="rd-skeleton-title"></div>
-            </div>
-            <div class="rd-skeleton-card-body">
+  <div
+    class="rd-dashboard-kpi"
+    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"
+  >
+    <pngx-statistics-widget
+      (statisticsChange)="onStatisticsChange($event)"
+    ></pngx-statistics-widget>
+  </div>
+
+  <div class="rd-dashboard-content">
+    @if (savedViewService.loading) {
+      <div class="rd-skeleton-section" aria-hidden="true">
+        <div class="rd-skeleton-section-header">
+          <div class="rd-skeleton-icon"></div>
+          <div class="rd-skeleton-title"></div>
+        </div>
+        <div class="rd-skeleton-grid">
+          @for (item of [0, 1, 2, 3, 4, 5]; track item) {
+            <div class="rd-skeleton-doc">
+              <div class="rd-skeleton-doc-sheet"></div>
               <div class="rd-skeleton-line rd-skeleton-line--lg"></div>
-              <div class="rd-skeleton-line rd-skeleton-line--md"></div>
               <div class="rd-skeleton-line rd-skeleton-line--sm"></div>
             </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (settingsService.offerTour()) {
+      <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
+    }
+
+    <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+      @if (!savedViewService.loading && dashboardViews().length === 0) {
+        <section class="rd-empty-dashboard-card" aria-labelledby="rd-empty-dashboard-title">
+          <div class="rd-empty-dashboard-icon" aria-hidden="true">
+            <pngx-bs-icon name="window-stack" width="1.45rem" height="1.45rem"></pngx-bs-icon>
           </div>
-          <div class="rd-skeleton-card">
-            <div class="rd-skeleton-card-header">
-              <div class="rd-skeleton-icon"></div>
-              <div class="rd-skeleton-title rd-skeleton-title--short"></div>
-            </div>
-            <div class="rd-skeleton-card-body">
-              <div class="rd-skeleton-line rd-skeleton-line--md"></div>
-              <div class="rd-skeleton-line rd-skeleton-line--lg"></div>
-            </div>
+          <h2 id="rd-empty-dashboard-title" class="rd-empty-dashboard-title" i18n>
+            Noch keine Ansichten auf der Startseite
+          </h2>
+          <p class="rd-empty-dashboard-desc" i18n>
+            Aktiviere für deine gespeicherten Ansichten die Option „Auf der Startseite anzeigen“, um sie hier übersichtlich untereinander anzuheften.
+          </p>
+          <div class="rd-empty-dashboard-actions">
+            <a class="rd-btn-primary text-decoration-none" routerLink="/savedviews">
+              <pngx-bs-icon name="bookmark" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+              <span i18n>Gespeicherte Ansichten verwalten</span>
+            </a>
+            <a class="rd-btn-neutral text-decoration-none" routerLink="/documents">
+              <pngx-bs-icon name="files" width="0.88rem" height="0.88rem"></pngx-bs-icon>
+              <span i18n>Alle Dokumente</span>
+            </a>
           </div>
+        </section>
+      }
+
+      @if (dashboardViews().length > 0) {
+        <div
+          class="rd-dashboard-views-stack"
+          cdkDropList
+          [cdkDropListDisabled]="settingsService.globalDropzoneActive()"
+          (cdkDropListDropped)="onDrop($event)"
+        >
+          @for (v of dashboardViews(); track v.id) {
+            <pngx-saved-view-widget
+              [savedView]="v"
+              [tagMap]="tagMap()"
+              [correspondentMap]="correspondentMap()"
+              [documentTypeMap]="documentTypeMap()"
+              (cdkDragStarted)="onDragStart($event)"
+              (cdkDragEnded)="onDragEnd($event)"
+            ></pngx-saved-view-widget>
+          }
         </div>
       }
-
-      @if (settingsService.offerTour()) {
-        <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
-      }
-
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-        @if (!savedViewService.loading && dashboardViews().length === 0) {
-          <section class="rd-empty-dashboard-card" aria-labelledby="rd-empty-dashboard-title">
-            <div class="rd-empty-dashboard-icon" aria-hidden="true">
-              <pngx-bs-icon name="window-stack" width="1.45rem" height="1.45rem"></pngx-bs-icon>
-            </div>
-            <h2 id="rd-empty-dashboard-title" class="rd-empty-dashboard-title" i18n>
-              Noch keine Ansichten auf der Startseite
-            </h2>
-            <p class="rd-empty-dashboard-desc" i18n>
-              Aktiviere für deine gespeicherten Ansichten die Option „Auf der Startseite anzeigen“, um sie hier übersichtlich untereinander anzuheften.
-            </p>
-            <div class="rd-empty-dashboard-actions">
-              <a class="rd-btn-primary text-decoration-none" routerLink="/savedviews">
-                <pngx-bs-icon name="bookmark" width="0.88rem" height="0.88rem"></pngx-bs-icon>
-                <span i18n>Gespeicherte Ansichten verwalten</span>
-              </a>
-              <a class="rd-btn-neutral text-decoration-none" routerLink="/documents">
-                <pngx-bs-icon name="files" width="0.88rem" height="0.88rem"></pngx-bs-icon>
-                <span i18n>Alle Dokumente</span>
-              </a>
-            </div>
-          </section>
-        }
-
-        @if (dashboardViews().length > 0) {
-          <div
-            class="rd-dashboard-views-stack"
-            cdkDropList
-            [cdkDropListDisabled]="settingsService.globalDropzoneActive()"
-            (cdkDropListDropped)="onDrop($event)"
-          >
-            @for (v of dashboardViews(); track v.id) {
-              <pngx-saved-view-widget
-                [savedView]="v"
-                (cdkDragStarted)="onDragStart($event)"
-                (cdkDragEnded)="onDragEnd($event)"
-              ></pngx-saved-view-widget>
-            }
-          </div>
-        }
-      </ng-container>
-    </div>
-
-    <aside
-      class="rd-dashboard-aside"
-      *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"
-    >
-      <div class="rd-dashboard-aside-sticky">
-        <pngx-statistics-widget
-          (statisticsChange)="onStatisticsChange($event)"
-        ></pngx-statistics-widget>
-      </div>
-    </aside>
+    </ng-container>
   </div>
 </div>

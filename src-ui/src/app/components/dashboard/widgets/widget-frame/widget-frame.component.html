@@ -1,16 +1,26 @@
-@if (!cardless()) {
+@if (cardless()) {
+  <div class="fade" [class.show]="show()">
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+  </div>
+} @else {
   <section
-    class="rd-widget-card fade"
+    class="fade"
+    [class.rd-widget-section]="minimal()"
+    [class.rd-widget-card]="!minimal()"
     [class.show]="show()"
     cdkDrag
     [cdkDragDisabled]="!draggable()"
     cdkDragPreviewContainer="parent"
   >
-    <header class="rd-widget-header">
+    <header
+      [class.rd-widget-section-header]="minimal()"
+      [class.rd-widget-header]="!minimal()"
+    >
       <div class="rd-widget-header-main">
         @if (draggable()) {
           <div
             class="rd-widget-drag-handle"
+            [class.rd-widget-drag-handle--minimal]="minimal()"
             cdkDragHandle
             title="Reihenfolge ändern"
             i18n-title
@@ -21,11 +31,22 @@
           </div>
         }
         @if (titleIcon()) {
-          <span class="rd-widget-icon-chip" aria-hidden="true">
-            <pngx-bs-icon [name]="titleIcon()" width="0.9rem" height="0.9rem"></pngx-bs-icon>
+          <span
+            class="rd-widget-icon-chip"
+            [class.rd-widget-icon-chip--minimal]="minimal()"
+            aria-hidden="true"
+          >
+            <pngx-bs-icon
+              [name]="titleIcon()"
+              [width]="minimal() ? '0.85rem' : '0.9rem'"
+              [height]="minimal() ? '0.85rem' : '0.9rem'"
+            ></pngx-bs-icon>
           </span>
         }
-        <h2 class="rd-widget-title">{{ title() }}</h2>
+        <h2
+          class="rd-widget-title"
+          [class.rd-widget-title--minimal]="minimal()"
+        >{{ title() }}</h2>
         <ng-content select="[title-badge]"></ng-content>
         @if (badge() !== null && badge() !== undefined) {
           <span class="rd-widget-badge">{{ badge() }}</span>
@@ -39,14 +60,14 @@
         <ng-content select="[header-buttons]"></ng-content>
       </div>
     </header>
-    <div class="rd-widget-body" [class.rd-widget-body--flush]="flushBody()">
+    <div
+      [class.rd-widget-section-body]="minimal()"
+      [class.rd-widget-body]="!minimal()"
+      [class.rd-widget-body--flush]="!minimal() && flushBody()"
+    >
       <ng-container [ngTemplateOutlet]="content"></ng-container>
     </div>
   </section>
-} @else {
-  <div class="fade" [class.show]="show()">
-    <ng-container [ngTemplateOutlet]="content"></ng-container>
-  </div>
 }
 
 <ng-template #content>

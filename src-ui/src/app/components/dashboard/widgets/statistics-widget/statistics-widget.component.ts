@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import * as mimeTypeNames from 'mime-names'
 import { first, Subject, Subscription, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import {
   FILTER_HAS_TAGS_ANY,
@@ -45,6 +46,7 @@ interface DocumentFileType {
     NgbPopoverModule,
     DecimalPipe,
     RouterModule,
+    BootstrapIconComponent,
   ],
 })
 export class StatisticsWidgetComponent

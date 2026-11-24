@@ -13,9 +13,8 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
-import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
-import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { RedesignDocumentCardComponent } from 'src/app/components/redesign/redesign-document-card/redesign-document-card.component'
+import { RedesignDocumentListRowComponent } from 'src/app/components/redesign/redesign-document-list-row/redesign-document-list-row.component'
 import {
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
   DisplayField,
@@ -32,12 +31,11 @@ import {
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import {
+  DOCUMENT_LIST_FIELDS,
+  DocumentListViewService,
+} from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   FileStatus,
@@ -67,10 +65,7 @@ const savedView: SavedView = {
     DisplayField.TAGS,
     DisplayField.CORRESPONDENT,
     DisplayField.DOCUMENT_TYPE,
-    DisplayField.STORAGE_PATH,
     DisplayField.PAGE_COUNT,
-    `${DisplayField.CUSTOM_FIELD}11` as any,
-    `${DisplayField.CUSTOM_FIELD}15` as any,
   ],
 }
 
@@ -78,35 +73,30 @@ const documentResults = [
   {
     id: 2,
     title: 'doc2',
-    custom_fields: [
-      { id: 1, field: 11, created: new Date(), value: 'custom', document: 2 },
-    ],
+    created: '2024-01-10',
+    tags: [1],
+    correspondent: 1,
+    document_type: 1,
+    page_count: 2,
   },
   {
     id: 3,
     title: 'doc3',
+    created: '2024-01-11',
     correspondent: 0,
-    custom_fields: [],
+    tags: [],
   },
   {
     id: 4,
     title: 'doc4',
-    custom_fields: [
-      { id: 32, field: 3, created: new Date(), value: 'EUR123', document: 4 },
-    ],
+    created: '2024-01-12',
+    tags: [],
   },
   {
     id: 5,
     title: 'doc5',
-    custom_fields: [
-      {
-        id: 22,
-        field: 15,
-        created: new Date(),
-        value: [123, 456, 789],
-        document: 5,
-      },
-    ],
+    created: '2024-01-13',
+    tags: [],
   },
 ]
 
@@ -126,12 +116,9 @@ describe('SavedViewWidgetComponent', () => {
         DragDropModule,
         SavedViewWidgetComponent,
         WidgetFrameComponent,
+        RedesignDocumentCardComponent,
+        RedesignDocumentListRowComponent,
         IfPermissionsDirective,
-        CustomDatePipe,
-        DocumentTitlePipe,
-        SafeUrlPipe,
-        PreviewPopupComponent,
-        CustomFieldDisplayComponent,
       ],
       providers: [
         PermissionsGuard,
@@ -142,35 +129,7 @@ describe('SavedViewWidgetComponent', () => {
             currentUserCan: () => true,
           },
         },
-        CustomDatePipe,
         DatePipe,
-        {
-          provide: CustomFieldsService,
-          useValue: {
-            listAll: () =>
-              of({
-                all: [3, 11, 15],
-                count: 3,
-                results: [
-                  {
-                    id: 3,
-                    name: 'Custom field 3',
-                    data_type: CustomFieldDataType.Monetary,
-                  },
-                  {
-                    id: 11,
-                    name: 'Custom Field 11',
-                    data_type: CustomFieldDataType.String,
-                  },
-                  {
-                    id: 15,
-                    name: 'Custom Field 15',
-                    data_type: CustomFieldDataType.DocumentLink,
-                  },
-                ],
-              }),
-          },
-        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -182,17 +141,17 @@ describe('SavedViewWidgetComponent', () => {
     router = TestBed.inject(Router)
     fixture = TestBed.createComponent(SavedViewWidgetComponent)
     component = fixture.componentInstance
-    component.savedView = savedView
+    component.savedView = { ...savedView }
 
     fixture.detectChanges()
   })
 
-  it('should show a list of documents', async () => {
+  it('should show redesign list rows in table mode with preview link', async () => {
     jest.useFakeTimers()
     jest.spyOn(documentService, 'listFiltered').mockReturnValue(
       of({
-        all: [2, 3],
-        count: 2,
+        all: [2, 3, 4, 5],
+        count: 4,
         results: documentResults,
       })
     )
@@ -200,19 +159,71 @@ describe('SavedViewWidgetComponent', () => {
     jest.advanceTimersByTime(500)
     await fixture.whenStable()
     fixture.detectChanges()
+
+    const rows = fixture.debugElement.queryAll(
+      By.directive(RedesignDocumentListRowComponent)
+    )
+    expect(rows).toHaveLength(documentResults.length)
     expect(fixture.debugElement.nativeElement.textContent).toContain('doc2')
     expect(fixture.debugElement.nativeElement.textContent).toContain('doc3')
-    // preview + download buttons
-    expect(
-      fixture.debugElement.queryAll(By.css('td a.btn'))[0].attributes['href']
-    ).toEqual(documentService.getPreviewUrl(documentResults[0].id))
-    expect(
-      fixture.debugElement.queryAll(By.css('td a.btn'))[1].attributes['href']
-    ).toEqual(component.getDownloadUrl(documentResults[0]))
+
+    const previewLink = fixture.debugElement.query(
+      By.css('.rd-list-row__preview')
+    )
+    expect(previewLink).not.toBeNull()
+    expect(previewLink.attributes['href']).toEqual(
+      documentService.getPreviewUrl(documentResults[0].id)
+    )
     jest.useRealTimers()
   })
 
-  it('should call api endpoint and load results', () => {
+  it('should show redesign document cards in small and large card modes', () => {
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      of({
+        all: [2, 3, 4, 5],
+        count: 4,
+        results: documentResults,
+      })
+    )
+
+    component.savedView = {
+      ...savedView,
+      display_mode: DisplayMode.SMALL_CARDS,
+    }
+    component.ngOnInit()
+    fixture.detectChanges()
+
+    expect(
+      fixture.debugElement.queryAll(By.directive(RedesignDocumentCardComponent))
+    ).toHaveLength(documentResults.length)
+    expect(
+      fixture.debugElement.query(By.css('.rd-doc-grid--large'))
+    ).toBeNull()
+
+    const previewLink = fixture.debugElement.query(
+      By.css('.rd-doc-card__preview')
+    )
+    expect(previewLink).not.toBeNull()
+    expect(previewLink.attributes['href']).toEqual(
+      documentService.getPreviewUrl(documentResults[0].id)
+    )
+
+    component.savedView = {
+      ...savedView,
+      display_mode: DisplayMode.LARGE_CARDS,
+    }
+    component.ngOnInit()
+    fixture.detectChanges()
+
+    expect(
+      fixture.debugElement.query(By.css('.rd-doc-grid--large'))
+    ).not.toBeNull()
+    expect(
+      fixture.debugElement.queryAll(By.directive(RedesignDocumentCardComponent))
+    ).toHaveLength(documentResults.length)
+  })
+
+  it('should call api endpoint with DOCUMENT_LIST_FIELDS across all display modes', () => {
     const listAllSpy = jest.spyOn(documentService, 'listFiltered')
     listAllSpy.mockReturnValue(
       of({
@@ -228,12 +239,27 @@ describe('SavedViewWidgetComponent', () => {
       savedView.sort_field,
       savedView.sort_reverse,
       savedView.filter_rules,
-      {
-        truncate_content: true,
-      }
+      { fields: DOCUMENT_LIST_FIELDS.join(',') }
     )
+    const fields: string[] = (
+      listAllSpy.mock.calls.at(-1)[5] as { fields: string }
+    ).fields.split(',')
+    expect(fields).toEqual(expect.arrayContaining(DOCUMENT_LIST_FIELDS))
+    expect(fields).not.toContain('content')
     fixture.detectChanges()
     expect(component.documents()).toEqual(documentResults)
+
+    component.displayMode.set(DisplayMode.SMALL_CARDS)
+    component.reload()
+    expect(listAllSpy.mock.calls.at(-1)[5]).toEqual({
+      fields: DOCUMENT_LIST_FIELDS.join(','),
+    })
+
+    component.displayMode.set(DisplayMode.LARGE_CARDS)
+    component.reload()
+    expect(listAllSpy.mock.calls.at(-1)[5]).toEqual({
+      fields: DOCUMENT_LIST_FIELDS.join(','),
+    })
   })
 
   it('should show an error if documents fail to load', () => {
@@ -272,7 +298,7 @@ describe('SavedViewWidgetComponent', () => {
     const routerSpy = jest.spyOn(router, 'navigate')
     component.showAll()
     expect(routerSpy).toHaveBeenCalledWith(['view', savedView.id])
-    savedView.show_in_sidebar = false
+    component.savedView.show_in_sidebar = false
     component.showAll()
     expect(routerSpy).toHaveBeenCalledWith(['documents'], {
       queryParams: { view: savedView.id },
@@ -290,7 +316,7 @@ describe('SavedViewWidgetComponent', () => {
     expect(routerSpy).toHaveBeenCalledWith(['documents', documentResults[0].id])
   })
 
-  it('should hand its documents to the list service when opening a document', () => {
+  it('should hand its documents to the list service when opening a document row', () => {
     jest.spyOn(documentService, 'listFiltered').mockReturnValue(
       of({
         all: [2, 3],
@@ -298,16 +324,22 @@ describe('SavedViewWidgetComponent', () => {
         results: documentResults,
       })
     )
-    jest.spyOn(router, 'navigateByUrl').mockResolvedValue(true)
+    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true)
     const activateSpy = jest
       .spyOn(documentListViewService, 'activateSavedViewWithDocuments')
       .mockImplementation(() => {})
     component.ngOnInit()
     fixture.detectChanges()
     fixture.debugElement
-      .query(By.css('a[title="Open document"]'))
+      .query(By.css('.rd-list-row'))
       .nativeElement.click()
-    expect(activateSpy).toHaveBeenCalledWith(savedView, documentResults, 25, 20)
+    expect(activateSpy).toHaveBeenCalledWith(
+      component.savedView,
+      documentResults,
+      25,
+      20
+    )
+    expect(navigateSpy).toHaveBeenCalledWith(['documents', documentResults[0].id])
   })
 
   it('should fall back to the default dashboard page size', () => {
@@ -366,31 +398,5 @@ describe('SavedViewWidgetComponent', () => {
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: '11' },
     ])
-  })
-
-  it('should get correct column title', () => {
-    expect(component.getColumnTitle(DisplayField.TITLE)).toEqual('Title')
-    expect(component.getColumnTitle(DisplayField.CREATED)).toEqual('Created')
-    expect(component.getColumnTitle(DisplayField.ADDED)).toEqual('Added')
-    expect(component.getColumnTitle(DisplayField.TAGS)).toEqual('Tags')
-    expect(component.getColumnTitle(DisplayField.CORRESPONDENT)).toEqual(
-      'Correspondent'
-    )
-    expect(component.getColumnTitle(DisplayField.DOCUMENT_TYPE)).toEqual(
-      'Document type'
-    )
-    expect(component.getColumnTitle(DisplayField.STORAGE_PATH)).toEqual(
-      'Storage path'
-    )
-    expect(component.getColumnTitle(DisplayField.PAGE_COUNT)).toEqual('Pages')
-  })
-
-  it('should get correct column title for custom field', () => {
-    expect(
-      component.getColumnTitle((DisplayField.CUSTOM_FIELD + 11) as any)
-    ).toEqual('Custom Field 11')
-    expect(
-      component.getColumnTitle((DisplayField.CUSTOM_FIELD + 15) as any)
-    ).toEqual('Custom Field 15')
   })
 })

@@ -1,7 +1,8 @@
-import { AsyncPipe, NgClass, NgStyle } from '@angular/common'
 import {
   Component,
+  computed,
   inject,
+  input,
   Input,
   OnDestroy,
   OnInit,
@@ -10,20 +11,16 @@ import {
 import { Router, RouterModule } from '@angular/router'
 import { Subject, takeUntil } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
-import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
-import { TagComponent } from 'src/app/components/common/tag/tag.component'
-import { DocumentCardLargeComponent } from 'src/app/components/document-list/document-card-large/document-card-large.component'
-import { DocumentCardSmallComponent } from 'src/app/components/document-list/document-card-small/document-card-small.component'
 import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { RedesignDocumentCardComponent } from 'src/app/components/redesign/redesign-document-card/redesign-document-card.component'
+import { RedesignDocumentListRowComponent } from 'src/app/components/redesign/redesign-document-list-row/redesign-document-list-row.component'
+import { Correspondent } from 'src/app/data/correspondent'
 import {
-  DEFAULT_DASHBOARD_DISPLAY_FIELDS,
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
-  DEFAULT_DISPLAY_FIELDS,
-  DisplayField,
   DisplayMode,
   Document,
 } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
@@ -33,24 +30,14 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
+import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { DocumentTypeNamePipe } from 'src/app/pipes/document-type-name.pipe'
-import { StoragePathNamePipe } from 'src/app/pipes/storage-path-name.pipe'
-import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+  DOCUMENT_LIST_FIELDS,
+  DocumentListViewService,
+} from 'src/app/services/document-list-view.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { SettingsService } from 'src/app/services/settings.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
@@ -59,21 +46,10 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss'],
   imports: [
-    CustomFieldDisplayComponent,
-    DocumentCardSmallComponent,
-    DocumentCardLargeComponent,
-    TagComponent,
     WidgetFrameComponent,
+    RedesignDocumentCardComponent,
+    RedesignDocumentListRowComponent,
     IfPermissionsDirective,
-    UsernamePipe,
-    CorrespondentNamePipe,
-    DocumentTypeNamePipe,
-    StoragePathNamePipe,
-    AsyncPipe,
-    DocumentTitlePipe,
-    CustomDatePipe,
-    NgClass,
-    NgStyle,
     RouterModule,
     BootstrapIconComponent,
   ],
@@ -86,21 +62,17 @@ export class SavedViewWidgetComponent
   private router = inject(Router)
   private list = inject(DocumentListViewService)
   private websocketStatusService = inject(WebsocketStatusService)
-  openDocumentsService = inject(OpenDocumentsService)
   documentListViewService = inject(DocumentListViewService)
-  permissionsService = inject(PermissionsService)
-  private settingsService = inject(SettingsService)
-  private customFieldService = inject(CustomFieldsService)
   private savedViewService = inject(SavedViewService)
 
   public DisplayMode = DisplayMode
-  public DisplayField = DisplayField
-  public CustomFieldDataType = CustomFieldDataType
-
-  private customFields: CustomField[] = []
 
   @Input()
   savedView: SavedView
+
+  readonly tagMap = input<Map<number, Tag>>(new Map())
+  readonly correspondentMap = input<Map<number, Correspondent>>(new Map())
+  readonly documentTypeMap = input<Map<number, DocumentType>>(new Map())
 
   readonly documents = signal<Document[]>([])
 
@@ -108,52 +80,29 @@ export class SavedViewWidgetComponent
 
   readonly displayMode = signal<DisplayMode>(null)
 
-  readonly displayFields = signal<DisplayField[]>(
-    DEFAULT_DASHBOARD_DISPLAY_FIELDS
-  )
-
   readonly count = signal<number>(null)
 
   readonly error = signal<string | null>(null)
 
-  placeholderRows: number[] = []
+  private readonly resolvedPageSize = signal<number>(
+    DEFAULT_DASHBOARD_VIEW_PAGE_SIZE
+  )
+
+  readonly skeletonItems = computed(() => {
+    const mode = this.displayMode()
+    const maxCount =
+      mode === DisplayMode.LARGE_CARDS
+        ? 4
+        : mode === DisplayMode.TABLE
+          ? 5
+          : 6
+    const length = Math.max(1, Math.min(this.resolvedPageSize(), maxCount))
+    return Array.from({ length }, (_, index) => index)
+  })
 
   ngOnInit(): void {
-    this.placeholderRows = Array.from(
-      {
-        length: this.pageSize,
-      },
-      (_, index) => index
-    )
+    this.resolvedPageSize.set(this.pageSize)
     this.displayMode.set(this.savedView.display_mode ?? DisplayMode.TABLE)
-
-    if (
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.CustomField
-      )
-    ) {
-      this.customFieldService
-        .listAll()
-        .pipe(takeUntil(this.unsubscribeNotifier))
-        .subscribe((customFields) => {
-          this.customFields = customFields.results
-        })
-    }
-
-    if (
-      this.savedView.display_fields &&
-      this.savedView.display_fields.length > 0
-    ) {
-      this.displayFields.set(this.savedView.display_fields)
-    }
-
-    // filter by perms etc
-    this.displayFields.set(
-      this.displayFields().filter((field) =>
-        this.settingsService.allDisplayFields().some((f) => f.id === field)
-      )
-    )
 
     this.reload()
     this.websocketStatusService
@@ -180,7 +129,7 @@ export class SavedViewWidgetComponent
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
-        { truncate_content: true }
+        this.listParams()
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
@@ -218,6 +167,14 @@ export class SavedViewWidgetComponent
           this.show.set(true)
         },
       })
+  }
+
+  /**
+   * Request the exact lightweight field set needed by the redesign cards,
+   * list rows, and DocumentListViewService handoff across all display modes.
+   */
+  private listParams(): Record<string, string | boolean> {
+    return { fields: DOCUMENT_LIST_FIELDS.join(',') }
   }
 
   showAll() {
@@ -308,13 +265,5 @@ export class SavedViewWidgetComponent
 
   getDownloadUrl(document: Document): string {
     return this.documentService.getDownloadUrl(document.id)
-  }
-
-  public getColumnTitle(field: DisplayField): string {
-    if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
-      const id = field.split('_')[2]
-      return this.customFields.find((f) => f.id === parseInt(id))?.name
-    }
-    return DEFAULT_DISPLAY_FIELDS.find((f) => f.id === field)?.name
   }
 }
