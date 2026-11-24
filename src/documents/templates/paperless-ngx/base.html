@@ -5,6 +5,9 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="color-scheme" content="light dark">
+        <meta name="theme-color" content="#fefefe" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#151517" media="(prefers-color-scheme: dark)">
         <meta name="author" content="Paperless-ngx project and contributors">
         <meta name="robots" content="noindex,nofollow">
 
@@ -12,30 +15,417 @@
             {% block head_title %}
             {% endblock head_title %}
         </title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='64' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%231885f8'/%3E%3Cstop offset='52%25' stop-color='%230671e3'/%3E%3Cstop offset='100%25' stop-color='%23055ec2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='.5' y='.5' width='63' height='63' rx='15.5' fill='none' stroke='%23fff' stroke-opacity='.2'/%3E%3Cpath d='M20 12h16l12 12v24a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z' fill='%23fff'/%3E%3Cpath d='M36 12v8.5a3.5 3.5 0 0 0 3.5 3.5H48L36 12z' fill='%230671e3' fill-opacity='.28'/%3E%3Crect x='22' y='28' width='20' height='3.4' rx='1.7' fill='%230671e3'/%3E%3Crect x='22' y='36' width='20' height='3.4' rx='1.7' fill='%230671e3'/%3E%3Crect x='22' y='44' width='13' height='3.4' rx='1.7' fill='%230671e3'/%3E%3C/svg%3E">
+        <link rel="icon" type="image/x-icon" href="{% url 'favicon' %}">
         <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
         <link href="{% static 'base.css' %}" rel="stylesheet">
+        <style type="text/css">
+            /* Inline Redesign override so precompressed WhiteNoise base.css in stock container images cannot override auth styling */
+            :root {
+                --rd-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                --rd-bg-canvas: #fefefe;
+                --rd-bg-surface: #ffffff;
+                --rd-bg-subtle: #f2f2f5;
+                --rd-bg-subtle-hover: #e8e8ee;
+                --rd-input-bg: #f7f7fa;
+                --rd-input-bg-focus: #ffffff;
+                --rd-text-primary: #1c1c1e;
+                --rd-text-secondary: #68686e;
+                --rd-border-subtle: rgba(17, 17, 20, 0.08);
+                --rd-border-input: rgba(17, 17, 20, 0.14);
+                --rd-accent: #0671e3;
+                --rd-accent-rgb: 6, 113, 227;
+                --rd-accent-hover: #0560c4;
+                --rd-accent-active: #0452ab;
+                --rd-accent-ring: rgba(6, 113, 227, 0.28);
+                --rd-glow: rgba(6, 113, 227, 0.07);
+                --rd-shadow-panel: 0 2px 10px rgba(0, 0, 0, 0.04), 0 12px 32px rgba(0, 0, 0, 0.06);
+                --rd-emblem-shadow: 0 8px 22px rgba(6, 113, 227, 0.28), 0 2px 6px rgba(6, 113, 227, 0.16);
+                --rd-danger-bg: rgba(217, 48, 37, 0.09);
+                --rd-danger-border: rgba(217, 48, 37, 0.22);
+                --rd-danger-text: #b42318;
+                --rd-success-bg: rgba(22, 163, 74, 0.1);
+                --rd-success-border: rgba(22, 163, 74, 0.24);
+                --rd-success-text: #15803d;
+                --rd-info-bg: rgba(6, 113, 227, 0.09);
+                --rd-info-border: rgba(6, 113, 227, 0.22);
+                --rd-info-text: #055ec2;
+                --rd-warning-bg: rgba(217, 119, 6, 0.1);
+                --rd-warning-border: rgba(217, 119, 6, 0.24);
+                --rd-warning-text: #b45309;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --rd-bg-canvas: #151517;
+                    --rd-bg-surface: #26262b;
+                    --rd-bg-subtle: #222226;
+                    --rd-bg-subtle-hover: #2e2e34;
+                    --rd-input-bg: #1c1c20;
+                    --rd-input-bg-focus: #1f1f24;
+                    --rd-text-primary: #f5f5f7;
+                    --rd-text-secondary: #a1a1a8;
+                    --rd-border-subtle: rgba(255, 255, 255, 0.08);
+                    --rd-border-input: rgba(255, 255, 255, 0.14);
+                    --rd-accent: #1076eb;
+                    --rd-accent-rgb: 16, 118, 235;
+                    --rd-accent-hover: #2d8af5;
+                    --rd-accent-active: #0d66cc;
+                    --rd-accent-ring: rgba(16, 118, 235, 0.38);
+                    --rd-glow: rgba(16, 118, 235, 0.13);
+                    --rd-shadow-panel: 0 2px 14px rgba(0, 0, 0, 0.36), 0 16px 40px rgba(0, 0, 0, 0.45);
+                    --rd-emblem-shadow: 0 10px 26px rgba(0, 0, 0, 0.44), 0 2px 10px rgba(16, 118, 235, 0.26);
+                    --rd-danger-bg: rgba(255, 90, 95, 0.14);
+                    --rd-danger-border: rgba(255, 90, 95, 0.28);
+                    --rd-danger-text: #ff8a8e;
+                    --rd-success-bg: rgba(34, 197, 94, 0.14);
+                    --rd-success-border: rgba(34, 197, 94, 0.28);
+                    --rd-success-text: #6ee7a0;
+                    --rd-info-bg: rgba(16, 118, 235, 0.16);
+                    --rd-info-border: rgba(16, 118, 235, 0.3);
+                    --rd-info-text: #7cc0ff;
+                    --rd-warning-bg: rgba(245, 158, 11, 0.15);
+                    --rd-warning-border: rgba(245, 158, 11, 0.3);
+                    --rd-warning-text: #fcd34d;
+                }
+            }
+
+            html, body {
+                min-height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                --bs-body-font-family: var(--rd-font-sans);
+                --bs-body-bg: var(--rd-bg-canvas);
+                --bs-body-color: var(--rd-text-primary);
+                --bs-secondary-color: var(--rd-text-secondary);
+                --bs-border-color: var(--rd-border-input);
+                --bs-link-color: var(--rd-accent);
+                --bs-link-color-rgb: var(--rd-accent-rgb);
+                --bs-link-hover-color: var(--rd-accent-hover);
+                --pngx-primary: var(--rd-accent);
+                --pngx-primary-hover: var(--rd-accent-hover);
+                --pngx-primary-active: var(--rd-accent-active);
+                font-family: var(--rd-font-sans);
+                background: radial-gradient(ellipse 72% 48% at 50% 0%, var(--rd-glow), transparent 72%), var(--rd-bg-canvas);
+                color: var(--rd-text-primary);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px 16px;
+                box-sizing: border-box;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .rd-auth-card {
+                width: 100%;
+                max-width: 380px;
+                padding: 32px 28px 28px;
+                border-radius: 20px;
+                background: var(--rd-bg-surface);
+                border: 1px solid var(--rd-border-subtle);
+                box-shadow: var(--rd-shadow-panel);
+                text-align: center;
+            }
+
+            .rd-auth-brand {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .rd-auth-emblem {
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(180deg, #1885f8 0%, #0671e3 52%, #055ec2 100%);
+                box-shadow: var(--rd-emblem-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+            }
+
+            .rd-auth-title {
+                margin: 14px 0 0;
+                font-size: 1.375rem;
+                font-weight: 700;
+                letter-spacing: -0.025em;
+                line-height: 1.2;
+                color: var(--rd-text-primary);
+            }
+
+            .logo {
+                height: auto;
+                max-width: 100%;
+            }
+
+            .rd-auth-custom-logo {
+                max-width: 240px;
+                max-height: 72px;
+                object-fit: contain;
+            }
+
+            .byline {
+                margin-top: 4px;
+                font-size: 0.6875rem;
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                color: var(--rd-text-secondary);
+            }
+
+            .text-primary {
+                color: var(--rd-accent) !important;
+            }
+
+            .form-accounts {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+            }
+
+            .form-accounts p,
+            .rd-auth-after p {
+                font-size: 0.875rem;
+                line-height: 1.5;
+                color: var(--rd-text-secondary);
+                margin-bottom: 18px;
+            }
+
+            .form-accounts a:not(.btn),
+            .rd-auth-after a:not(.btn) {
+                color: var(--rd-accent);
+                font-weight: 500;
+                text-decoration: none;
+            }
+
+            .form-accounts a:not(.btn):hover,
+            .rd-auth-after a:not(.btn):hover {
+                color: var(--rd-accent-hover);
+                text-decoration: underline;
+            }
+
+            .form-accounts .form-floating {
+                --bs-body-bg: transparent;
+            }
+
+            .form-accounts .form-control {
+                background-color: var(--rd-input-bg);
+                border: 1px solid var(--rd-border-input);
+                border-radius: 12px;
+                color: var(--rd-text-primary);
+                font-size: 0.9375rem;
+                transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+            }
+
+            .form-accounts .form-control:focus {
+                background-color: var(--rd-input-bg-focus);
+                border-color: var(--rd-accent);
+                color: var(--rd-text-primary);
+                box-shadow: 0 0 0 3.5px var(--rd-accent-ring);
+            }
+
+            .form-accounts .form-control:-webkit-autofill,
+            .form-accounts .form-control:-webkit-autofill:hover,
+            .form-accounts .form-control:-webkit-autofill:focus {
+                -webkit-box-shadow: 0 0 0 1000px var(--rd-input-bg) inset;
+                -webkit-text-fill-color: var(--rd-text-primary);
+                caret-color: var(--rd-text-primary);
+            }
+
+            .form-accounts .form-floating > label {
+                color: var(--rd-text-secondary);
+                font-size: 0.875rem;
+            }
+
+            .form-accounts .form-floating > label::after {
+                background-color: transparent !important;
+            }
+
+            .form-accounts .form-floating > .form-control:focus ~ label,
+            .form-accounts .form-floating > .form-control:not(:placeholder-shown) ~ label {
+                color: var(--rd-text-secondary);
+            }
+
+            .form-accounts .form-floating > .form-control:focus ~ label {
+                color: var(--rd-accent);
+            }
+
+            .form-stacked-top input {
+                margin-bottom: -1px;
+                border-radius: 12px 12px 0 0 !important;
+            }
+
+            .form-stacked-middle input {
+                margin-bottom: -1px;
+                border-radius: 0 !important;
+            }
+
+            .form-stacked-bottom input {
+                border-radius: 0 0 12px 12px !important;
+            }
+
+            .form-accounts .form-floating input:focus {
+                position: relative;
+                z-index: 100;
+            }
+
+            .form-accounts .form-floating input:focus ~ label {
+                z-index: 101;
+            }
+
+            .btn {
+                border-radius: 12px;
+                font-weight: 600;
+                transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+            }
+
+            .btn.btn-primary {
+                --bs-btn-color: #ffffff;
+                --bs-btn-bg: var(--rd-accent);
+                --bs-btn-border-color: var(--rd-accent);
+                --bs-btn-hover-color: #ffffff;
+                --bs-btn-hover-bg: var(--rd-accent-hover);
+                --bs-btn-hover-border-color: var(--rd-accent-hover);
+                --bs-btn-active-color: #ffffff;
+                --bs-btn-active-bg: var(--rd-accent-active);
+                --bs-btn-active-border-color: var(--rd-accent-active);
+                --bs-btn-focus-shadow-rgb: var(--rd-accent-rgb);
+                min-height: 46px;
+                font-size: 0.9375rem;
+                box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.24);
+            }
+
+            .btn.btn-primary:hover {
+                box-shadow: 0 4px 12px rgba(var(--rd-accent-rgb), 0.32);
+            }
+
+            .btn.btn-primary:active {
+                transform: scale(0.99);
+            }
+
+            .btn.btn-secondary {
+                --bs-btn-color: var(--rd-text-primary);
+                --bs-btn-bg: var(--rd-bg-subtle);
+                --bs-btn-border-color: var(--rd-border-subtle);
+                --bs-btn-hover-color: var(--rd-text-primary);
+                --bs-btn-hover-bg: var(--rd-bg-subtle-hover);
+                --bs-btn-hover-border-color: var(--rd-border-input);
+                --bs-btn-active-color: var(--rd-text-primary);
+                --bs-btn-active-bg: var(--rd-bg-subtle-hover);
+                --bs-btn-active-border-color: var(--rd-border-input);
+                min-height: 42px;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            .btn-link {
+                --bs-btn-color: var(--rd-accent);
+                --bs-btn-hover-color: var(--rd-accent-hover);
+                --bs-btn-active-color: var(--rd-accent-active);
+                font-size: 0.84375rem;
+                font-weight: 500;
+                text-decoration: none;
+            }
+
+            .btn-link:hover {
+                text-decoration: underline;
+            }
+
+            .alert {
+                border-radius: 12px;
+                font-size: 0.84375rem;
+                line-height: 1.45;
+                padding: 11px 14px;
+                text-align: left;
+                border-width: 1px;
+                margin-bottom: 16px;
+            }
+
+            .alert-danger,
+            .alert-error {
+                background-color: var(--rd-danger-bg);
+                border-color: var(--rd-danger-border);
+                color: var(--rd-danger-text);
+            }
+
+            .alert-success {
+                background-color: var(--rd-success-bg);
+                border-color: var(--rd-success-border);
+                color: var(--rd-success-text);
+            }
+
+            .alert-info {
+                background-color: var(--rd-info-bg);
+                border-color: var(--rd-info-border);
+                color: var(--rd-info-text);
+            }
+
+            .alert-warning {
+                background-color: var(--rd-warning-bg);
+                border-color: var(--rd-warning-border);
+                color: var(--rd-warning-text);
+            }
+
+            .rd-auth-after ul {
+                list-style: none;
+            }
+
+            .rd-auth-after p {
+                font-size: 0.8125rem;
+                margin-bottom: 4px;
+            }
+
+            @media (max-width: 420px) {
+                .rd-auth-card {
+                    padding: 26px 20px 22px;
+                    border-radius: 18px;
+                }
+            }
+        </style>
     </head>
 
     <body class="text-center">
-        <div class="position-absolute top-50 start-50 translate-middle">
+        <main class="rd-auth-card">
             <form class="form-accounts" id="form-account" method="post">
                 {% csrf_token %}
                 {% if not APP_LOGO and not APP_TITLE %}
-                    {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
+                    <div class="rd-auth-brand">
+                        <span class="rd-auth-emblem" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 44" width="24" height="30" fill="none">
+                                <path d="M5 2h15l11 11v26a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z" fill="#ffffff"/>
+                                <path d="M20 2v8a3 3 0 0 0 3 3h8L20 2z" fill="#0671e3" fill-opacity="0.28"/>
+                                <rect x="8" y="18" width="17" height="3" rx="1.5" fill="#0671e3"/>
+                                <rect x="8" y="25" width="17" height="3" rx="1.5" fill="#0671e3"/>
+                                <rect x="8" y="32" width="11" height="3" rx="1.5" fill="#0671e3"/>
+                            </svg>
+                        </span>
+                        <h1 class="rd-auth-title">Paperless</h1>
+                    </div>
                 {% else %}
                     {% if APP_LOGO %}
-                        <img src="{{APP_LOGO}}" width="300" class="logo mb-1" />
-                        <div class="d-flex flex-column align-items-end mb-4">
-                            <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
+                        <div class="rd-auth-brand">
+                            <img src="{{ APP_LOGO }}" class="logo rd-auth-custom-logo mb-1" alt="{{ APP_TITLE|default:'Paperless' }}" />
+                            <span class="byline">by Paperless-ngx</span>
                         </div>
                     {% else %}
-                        <h1 class="font-weight-normal text-primary mb-1 d-flex justify-content-center align-items-start">
-                            {% include "paperless-ngx/snippets/svg_leaf.html" with extra_attrs="width='30' class='mt-2'" %}
-                            <div class="d-flex flex-column align-items-end mb-4">
-                                <span class="ms-2">{{ APP_TITLE }}</span>
-                                <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
-                            </div>
-                        </h1>
+                        <div class="rd-auth-brand">
+                            <span class="rd-auth-emblem" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 44" width="24" height="30" fill="none">
+                                    <path d="M5 2h15l11 11v26a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z" fill="#ffffff"/>
+                                    <path d="M20 2v8a3 3 0 0 0 3 3h8L20 2z" fill="#0671e3" fill-opacity="0.28"/>
+                                    <rect x="8" y="18" width="17" height="3" rx="1.5" fill="#0671e3"/>
+                                    <rect x="8" y="25" width="17" height="3" rx="1.5" fill="#0671e3"/>
+                                    <rect x="8" y="32" width="11" height="3" rx="1.5" fill="#0671e3"/>
+                                </svg>
+                            </span>
+                            <h1 class="rd-auth-title">{{ APP_TITLE }}</h1>
+                            <span class="byline">by Paperless-ngx</span>
+                        </div>
                     {% endif %}
                 {% endif %}
                 {% for message in messages %}
@@ -66,8 +456,10 @@
                 {% block form_content %}
                 {% endblock form_content %}
             </form>
-            {% block after_form_content %}
-            {% endblock after_form_content %}
-        </div>
+            <div class="rd-auth-after">
+                {% block after_form_content %}
+                {% endblock after_form_content %}
+            </div>
+        </main>
     </body>
 </html>

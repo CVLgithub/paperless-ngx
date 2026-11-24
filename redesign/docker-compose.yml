@@ -44,6 +44,9 @@ services:
       - export:/usr/src/paperless/export
       - consume:/usr/src/paperless/consume
       - ../src/documents/static/frontend:/usr/src/paperless/static/frontend:ro
+      - ../src/documents/templates/index.html:/usr/src/paperless/src/documents/templates/index.html:ro
+      - ../src/documents/templates/paperless-ngx/base.html:/usr/src/paperless/src/documents/templates/paperless-ngx/base.html:ro
+      - ../src/paperless/static/paperless/img/favicon.ico:/usr/src/paperless/src/paperless/static/paperless/img/favicon.ico:ro
     env_file:
       - .env
     environment:
