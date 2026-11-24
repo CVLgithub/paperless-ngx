@@ -1,6 +1,7 @@
 import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -50,6 +51,8 @@ import { FilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+  FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
@@ -119,6 +122,35 @@ const CORRESPONDENT_DOT_COLORS = [
   '#0b7285',
 ]
 
+function collectFilterRuleIds(
+  rules: FilterRule[],
+  ruleTypes: number[]
+): Set<number> {
+  const ids = new Set<number>()
+  for (const rule of rules || []) {
+    if (
+      ruleTypes.includes(rule.rule_type) &&
+      rule.value !== null &&
+      rule.value !== ''
+    ) {
+      const parsed = Number(rule.value)
+      if (Number.isFinite(parsed) && parsed > 0) {
+        ids.add(parsed)
+      }
+    }
+  }
+  return ids
+}
+
+function setsEqual(a: Set<number>, b: Set<number>): boolean {
+  if (a === b) return true
+  if (a.size !== b.size) return false
+  for (const value of a) {
+    if (!b.has(value)) return false
+  }
+  return true
+}
+
 @Component({
   selector: 'pngx-document-list',
   templateUrl: './document-list.component.html',
@@ -183,6 +215,32 @@ export class DocumentListComponent
 
   readonly selectionMode = signal(false)
   readonly showAdvancedFilters = signal(false)
+  readonly isRefreshing = signal(false)
+  readonly quickFilterExcludeMode = signal(false)
+
+  /**
+   * Ensure manual refresh state settles even if a reload fails or is superseded
+   * without invoking its onFinish callback.
+   */
+  private readonly refreshSettlementEffect = effect(() => {
+    void this.list.activeSavedViewId
+    if (this.isRefreshing() && !this.list.isReloading) {
+      this.isRefreshing.set(false)
+    }
+  })
+
+  /**
+   * Selection data (document counts) is only consumed by the filter editor in
+   * the advanced filter panel, so only request it from the backend while the
+   * panel is open.
+   */
+  private readonly selectionDataDemandEffect = effect((onCleanup) => {
+    if (!this.showAdvancedFilters()) {
+      return
+    }
+    untracked(() => this.list.retainSelectionData())
+    onCleanup(() => this.list.releaseSelectionData())
+  })
   readonly allTags = signal<Tag[]>([])
   readonly allCorrespondents = signal<Correspondent[]>([])
   readonly allDocumentTypes = signal<DocumentType[]>([])
@@ -386,7 +444,73 @@ export class DocumentListComponent
   readonly correspondentsHasOverflow = signal(false)
   readonly correspondentsExpandedHeight = signal(29)
   private correspondentsResizing = false
-  private lastHiddenActiveCorrespondent = false
+  private readonly hiddenActiveCorrespondent = signal(false)
+
+  private measureHiddenActiveCorrespondent(
+    trackEl: HTMLElement,
+    isExpanded: boolean
+  ): boolean {
+    if (
+      isExpanded ||
+      (this.activeCorrespondentFilterIds.size === 0 &&
+        this.excludedCorrespondentFilterIds.size === 0)
+    ) {
+      return false
+    }
+    const activeButtons = trackEl.querySelectorAll<HTMLElement>(
+      '.rd-filter-pill-correspondent.is-active, .rd-filter-pill-correspondent.is-excluded'
+    )
+    return Array.from(activeButtons).some((btn) => btn.offsetTop >= 30)
+  }
+
+  /**
+   * Re-measures whether an active or excluded correspondent pill is hidden in
+   * the collapsed row whenever the active/excluded correspondents, the
+   * expanded state or the pills change. Measuring reads layout, so it runs
+   * once after the DOM has been updated instead of on every change detection
+   * pass.
+   */
+  private readonly hiddenActiveCorrespondentEffect = effect((onCleanup) => {
+    const trackEl = this.correspondentsTrack()?.nativeElement
+    const isExpanded = this.correspondentsRowExpanded()
+    const activeIds = this.activeCorrespondentFilterIdsSignal()
+    const excludedIds = this.excludedCorrespondentFilterIdsSignal()
+    this.allCorrespondents()
+
+    if (
+      !trackEl ||
+      isExpanded ||
+      (activeIds.size === 0 && excludedIds.size === 0)
+    ) {
+      this.hiddenActiveCorrespondent.set(false)
+      return
+    }
+
+    const measure = () => {
+      if (this.correspondentsResizing) {
+        // the resize observer measures once resizing settled
+        return
+      }
+      this.hiddenActiveCorrespondent.set(
+        this.measureHiddenActiveCorrespondent(
+          trackEl,
+          untracked(() => this.correspondentsRowExpanded())
+        )
+      )
+    }
+
+    if (typeof requestAnimationFrame === 'function') {
+      const rafId = requestAnimationFrame(() => untracked(measure))
+      onCleanup(() => {
+        if (typeof cancelAnimationFrame === 'function') {
+          cancelAnimationFrame(rafId)
+        }
+      })
+    } else {
+      const timerId = setTimeout(() => untracked(measure))
+      onCleanup(() => clearTimeout(timerId))
+    }
+  })
 
   private readonly correspondentsLayoutEffect = effect((onCleanup) => {
     const trackEl = this.correspondentsTrack()?.nativeElement
@@ -394,19 +518,14 @@ export class DocumentListComponent
     if (!trackEl) {
       this.correspondentsHasOverflow.set(false)
       this.correspondentsExpandedHeight.set(29)
-      this.lastHiddenActiveCorrespondent = false
+      this.hiddenActiveCorrespondent.set(false)
       return
     }
 
-    const computeHiddenActive = (isExpanded: boolean): boolean => {
-      if (isExpanded || this.activeCorrespondentFilterIds.size === 0) {
-        return false
-      }
-      const activeButtons = trackEl.querySelectorAll<HTMLElement>(
-        '.rd-filter-pill-correspondent.is-active'
+    const computeHiddenActive = (isExpanded: boolean): boolean =>
+      untracked(() =>
+        this.measureHiddenActiveCorrespondent(trackEl, isExpanded)
       )
-      return Array.from(activeButtons).some((btn) => btn.offsetTop >= 30)
-    }
 
     const applyMeasurement = () => {
       const fullHeight = Math.max(29, Math.ceil(trackEl.scrollHeight))
@@ -419,7 +538,7 @@ export class DocumentListComponent
         fullHeight !== untracked(() => this.correspondentsExpandedHeight()) ||
         hasOverflow !== untracked(() => this.correspondentsHasOverflow()) ||
         shouldCollapse ||
-        hiddenActive !== this.lastHiddenActiveCorrespondent
+        hiddenActive !== untracked(() => this.hiddenActiveCorrespondent())
 
       this.correspondentsResizing = false
 
@@ -428,7 +547,7 @@ export class DocumentListComponent
       }
 
       this.ngZone.run(() => {
-        this.lastHiddenActiveCorrespondent = hiddenActive
+        this.hiddenActiveCorrespondent.set(hiddenActive)
         this.correspondentsExpandedHeight.set(fullHeight)
         this.correspondentsHasOverflow.set(hasOverflow)
         if (shouldCollapse) {
@@ -505,64 +624,60 @@ export class DocumentListComponent
   }
 
   get hasHiddenActiveCorrespondent(): boolean {
-    if (
-      this.correspondentsRowExpanded() ||
-      this.activeCorrespondentFilterIds.size === 0
-    ) {
-      this.lastHiddenActiveCorrespondent = false
-      return false
-    }
-    if (this.correspondentsResizing) {
-      return this.lastHiddenActiveCorrespondent
-    }
-    const trackEl = this.correspondentsTrack()?.nativeElement
-    if (!trackEl) {
-      this.lastHiddenActiveCorrespondent = false
-      return false
-    }
-    const activeButtons = trackEl.querySelectorAll<HTMLElement>(
-      '.rd-filter-pill-correspondent.is-active'
-    )
-    this.lastHiddenActiveCorrespondent = Array.from(activeButtons).some(
-      (btn) => btn.offsetTop >= 30
-    )
-    return this.lastHiddenActiveCorrespondent
+    return this.hiddenActiveCorrespondent()
   }
 
+  // Memoized: the template reads these once per pill on every change
+  // detection pass. They only recompute when the list state changes and keep
+  // returning the same Set instance while the contained ids are unchanged.
+  private readonly activeDocumentTypeFilterIdsSignal = computed(
+    () =>
+      collectFilterRuleIds(this.list.filterRules, [
+        FILTER_DOCUMENT_TYPE,
+        FILTER_HAS_DOCUMENT_TYPE_ANY,
+      ]),
+    { equal: setsEqual }
+  )
+
+  private readonly activeCorrespondentFilterIdsSignal = computed(
+    () =>
+      collectFilterRuleIds(this.list.filterRules, [
+        FILTER_CORRESPONDENT,
+        FILTER_HAS_CORRESPONDENT_ANY,
+      ]),
+    { equal: setsEqual }
+  )
+
+  private readonly excludedDocumentTypeFilterIdsSignal = computed(
+    () =>
+      collectFilterRuleIds(this.list.filterRules, [
+        FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+      ]),
+    { equal: setsEqual }
+  )
+
+  private readonly excludedCorrespondentFilterIdsSignal = computed(
+    () =>
+      collectFilterRuleIds(this.list.filterRules, [
+        FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+      ]),
+    { equal: setsEqual }
+  )
+
   get activeDocumentTypeFilterIds(): Set<number> {
-    const ids = new Set<number>()
-    for (const rule of this.list.filterRules || []) {
-      if (
-        (rule.rule_type === FILTER_DOCUMENT_TYPE ||
-          rule.rule_type === FILTER_HAS_DOCUMENT_TYPE_ANY) &&
-        rule.value !== null &&
-        rule.value !== ''
-      ) {
-        const parsed = Number(rule.value)
-        if (Number.isFinite(parsed) && parsed > 0) {
-          ids.add(parsed)
-        }
-      }
-    }
-    return ids
+    return this.activeDocumentTypeFilterIdsSignal()
   }
 
   get activeCorrespondentFilterIds(): Set<number> {
-    const ids = new Set<number>()
-    for (const rule of this.list.filterRules || []) {
-      if (
-        (rule.rule_type === FILTER_CORRESPONDENT ||
-          rule.rule_type === FILTER_HAS_CORRESPONDENT_ANY) &&
-        rule.value !== null &&
-        rule.value !== ''
-      ) {
-        const parsed = Number(rule.value)
-        if (Number.isFinite(parsed) && parsed > 0) {
-          ids.add(parsed)
-        }
-      }
-    }
-    return ids
+    return this.activeCorrespondentFilterIdsSignal()
+  }
+
+  get excludedDocumentTypeFilterIds(): Set<number> {
+    return this.excludedDocumentTypeFilterIdsSignal()
+  }
+
+  get excludedCorrespondentFilterIds(): Set<number> {
+    return this.excludedCorrespondentFilterIdsSignal()
   }
 
   isQuickDocumentTypeActive(documentTypeId: number): boolean {
@@ -573,18 +688,33 @@ export class DocumentListComponent
     return this.activeCorrespondentFilterIds.has(correspondentId)
   }
 
+  isQuickDocumentTypeExcluded(documentTypeId: number): boolean {
+    return this.excludedDocumentTypeFilterIds.has(documentTypeId)
+  }
+
+  isQuickCorrespondentExcluded(correspondentId: number): boolean {
+    return this.excludedCorrespondentFilterIds.has(correspondentId)
+  }
+
   get hasQuickPillFilter(): boolean {
     return (
       this.activeDocumentTypeFilterIds.size > 0 ||
-      this.activeCorrespondentFilterIds.size > 0
+      this.excludedDocumentTypeFilterIds.size > 0 ||
+      this.activeCorrespondentFilterIds.size > 0 ||
+      this.excludedCorrespondentFilterIds.size > 0
     )
+  }
+
+  toggleQuickFilterExcludeMode(): void {
+    this.quickFilterExcludeMode.update((mode) => !mode)
   }
 
   clearQuickDocumentTypes(): void {
     const remaining = (this.list.filterRules || []).filter(
       (r) =>
         r.rule_type !== FILTER_DOCUMENT_TYPE &&
-        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY
+        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE
     )
     this.list.setFilterRules(remaining)
   }
@@ -593,7 +723,8 @@ export class DocumentListComponent
     const remaining = (this.list.filterRules || []).filter(
       (r) =>
         r.rule_type !== FILTER_CORRESPONDENT &&
-        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_CORRESPONDENT
     )
     this.list.setFilterRules(remaining)
   }
@@ -603,14 +734,50 @@ export class DocumentListComponent
       (r) =>
         r.rule_type !== FILTER_DOCUMENT_TYPE &&
         r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE &&
         r.rule_type !== FILTER_CORRESPONDENT &&
-        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_CORRESPONDENT
     )
     this.list.setFilterRules(remaining)
   }
 
-  toggleQuickDocumentType(documentTypeId: number): void {
-    const nextIds = new Set(this.activeDocumentTypeFilterIds)
+  toggleQuickDocumentTypeExclude(documentTypeId: number): void {
+    const nextExcluded = new Set(this.excludedDocumentTypeFilterIds)
+    if (nextExcluded.has(documentTypeId)) {
+      nextExcluded.delete(documentTypeId)
+    } else {
+      nextExcluded.add(documentTypeId)
+    }
+    const withoutType = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_DOCUMENT_TYPE &&
+        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE
+    )
+    const excludeRules: FilterRule[] = Array.from(nextExcluded).map((id) => ({
+      rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+      value: id.toString(),
+    }))
+    this.list.setFilterRules([...withoutType, ...excludeRules])
+  }
+
+  toggleQuickDocumentType(documentTypeId: number, event?: MouseEvent): void {
+    if (event?.altKey || this.quickFilterExcludeMode()) {
+      this.toggleQuickDocumentTypeExclude(documentTypeId)
+      return
+    }
+    const activeIds = this.activeDocumentTypeFilterIds
+    const excludedIds = this.excludedDocumentTypeFilterIds
+    if (
+      excludedIds.has(documentTypeId) ||
+      (excludedIds.size > 0 && activeIds.size === 0) ||
+      (activeIds.size === 1 && activeIds.has(documentTypeId))
+    ) {
+      this.toggleQuickDocumentTypeExclude(documentTypeId)
+      return
+    }
+    const nextIds = new Set(activeIds)
     if (nextIds.has(documentTypeId)) {
       nextIds.delete(documentTypeId)
     } else {
@@ -619,7 +786,8 @@ export class DocumentListComponent
     const withoutType = (this.list.filterRules || []).filter(
       (r) =>
         r.rule_type !== FILTER_DOCUMENT_TYPE &&
-        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY
+        r.rule_type !== FILTER_HAS_DOCUMENT_TYPE_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE
     )
     const typeRules: FilterRule[] = Array.from(nextIds).map((id) => ({
       rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
@@ -628,8 +796,42 @@ export class DocumentListComponent
     this.list.setFilterRules([...withoutType, ...typeRules])
   }
 
-  toggleQuickCorrespondent(correspondentId: number): void {
-    const nextIds = new Set(this.activeCorrespondentFilterIds)
+  toggleQuickCorrespondentExclude(correspondentId: number): void {
+    const nextExcluded = new Set(this.excludedCorrespondentFilterIds)
+    if (nextExcluded.has(correspondentId)) {
+      nextExcluded.delete(correspondentId)
+    } else {
+      nextExcluded.add(correspondentId)
+    }
+    const withoutCorr = (this.list.filterRules || []).filter(
+      (r) =>
+        r.rule_type !== FILTER_CORRESPONDENT &&
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_CORRESPONDENT
+    )
+    const excludeRules: FilterRule[] = Array.from(nextExcluded).map((id) => ({
+      rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+      value: id.toString(),
+    }))
+    this.list.setFilterRules([...withoutCorr, ...excludeRules])
+  }
+
+  toggleQuickCorrespondent(correspondentId: number, event?: MouseEvent): void {
+    if (event?.altKey || this.quickFilterExcludeMode()) {
+      this.toggleQuickCorrespondentExclude(correspondentId)
+      return
+    }
+    const activeIds = this.activeCorrespondentFilterIds
+    const excludedIds = this.excludedCorrespondentFilterIds
+    if (
+      excludedIds.has(correspondentId) ||
+      (excludedIds.size > 0 && activeIds.size === 0) ||
+      (activeIds.size === 1 && activeIds.has(correspondentId))
+    ) {
+      this.toggleQuickCorrespondentExclude(correspondentId)
+      return
+    }
+    const nextIds = new Set(activeIds)
     if (nextIds.has(correspondentId)) {
       nextIds.delete(correspondentId)
     } else {
@@ -638,7 +840,8 @@ export class DocumentListComponent
     const withoutCorr = (this.list.filterRules || []).filter(
       (r) =>
         r.rule_type !== FILTER_CORRESPONDENT &&
-        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY
+        r.rule_type !== FILTER_HAS_CORRESPONDENT_ANY &&
+        r.rule_type !== FILTER_DOES_NOT_HAVE_CORRESPONDENT
     )
     const corrRules: FilterRule[] = Array.from(nextIds).map((id) => ({
       rule_type: FILTER_HAS_CORRESPONDENT_ANY,
@@ -647,8 +850,63 @@ export class DocumentListComponent
     this.list.setFilterRules([...withoutCorr, ...corrRules])
   }
 
+  getQuickDocumentTypeTooltip(documentTypeId: number): string {
+    return this.getQuickPillTooltip(
+      this.isQuickDocumentTypeActive(documentTypeId),
+      this.isQuickDocumentTypeExcluded(documentTypeId),
+      this.activeDocumentTypeFilterIds.size,
+      this.excludedDocumentTypeFilterIds.size
+    )
+  }
+
+  getQuickCorrespondentTooltip(correspondentId: number): string {
+    return this.getQuickPillTooltip(
+      this.isQuickCorrespondentActive(correspondentId),
+      this.isQuickCorrespondentExcluded(correspondentId),
+      this.activeCorrespondentFilterIds.size,
+      this.excludedCorrespondentFilterIds.size
+    )
+  }
+
+  private getQuickPillTooltip(
+    isActive: boolean,
+    isExcluded: boolean,
+    activeCount: number,
+    excludedCount: number
+  ): string {
+    if (isExcluded) {
+      return $localize`Ausgeblendet · Klick: zurücksetzen`
+    }
+    if (
+      this.quickFilterExcludeMode() ||
+      (excludedCount > 0 && activeCount === 0)
+    ) {
+      return $localize`Klick: ausblenden`
+    }
+    if (isActive) {
+      return activeCount === 1
+        ? $localize`Gefiltert · Klick: ausblenden`
+        : $localize`Gefiltert · Klick: entfernen · Rechtsklick: ausblenden`
+    }
+    return $localize`Klick: filtern · Rechtsklick: ausblenden`
+  }
+
   getCorrespondentColor(id: number): string {
     return CORRESPONDENT_DOT_COLORS[Math.abs(id) % CORRESPONDENT_DOT_COLORS.length]
+  }
+
+  refreshDocuments(): void {
+    this.isRefreshing.set(true)
+    this.loadTaxonomyLookups(true)
+    this.list.reload(() => {
+      if (this.activeSavedView) {
+        this.savedViewService.setDocumentCount(
+          this.activeSavedView,
+          this.list.collectionSize
+        )
+      }
+      this.isRefreshing.set(false)
+    })
   }
 
   toggleSelectionMode(): void {
@@ -679,13 +937,16 @@ export class DocumentListComponent
     })
   }
 
-  private loadTaxonomyLookups(): void {
+  private loadTaxonomyLookups(forceRefresh: boolean = false): void {
     if (
       this.permissionService.currentUserCan(
         PermissionAction.View,
         PermissionType.Tag
       )
     ) {
+      if (forceRefresh) {
+        this.tagService.clearCache()
+      }
       this.tagService
         .listAll()
         .pipe(
@@ -705,6 +966,9 @@ export class DocumentListComponent
         PermissionType.Correspondent
       )
     ) {
+      if (forceRefresh) {
+        this.correspondentService.clearCache()
+      }
       this.correspondentService
         .listAll()
         .pipe(
@@ -724,6 +988,9 @@ export class DocumentListComponent
         PermissionType.DocumentType
       )
     ) {
+      if (forceRefresh) {
+        this.documentTypeService.clearCache()
+      }
       this.documentTypeService
         .listAll()
         .pipe(

@@ -23,6 +23,19 @@
     </div>
 
     <div class="rd-page-controls">
+      <button
+        type="button"
+        class="rd-icon-control"
+        [class.is-refreshing]="isRefreshing()"
+        [disabled]="isRefreshing()"
+        (click)="refreshDashboard()"
+        title="Aktualisieren"
+        i18n-title
+        aria-label="Aktualisieren"
+        i18n-aria-label
+      >
+        <pngx-bs-icon name="arrow-clockwise" width="14" height="14"></pngx-bs-icon>
+      </button>
       <a class="rd-header-pill" routerLink="/documents">
         <pngx-bs-icon name="files" width="0.88rem" height="0.88rem"></pngx-bs-icon>
         <span i18n>Alle Dokumente</span>

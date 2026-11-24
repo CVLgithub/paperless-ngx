@@ -456,7 +456,11 @@ export class BulkEditorComponent
 
   openTagsDropdown() {
     // If none excluded, use the selection data already available in the list view, otherwise fetch
-    if (this.list.allSelected && this.list.excluded.size === 0) {
+    if (
+      this.list.allSelected &&
+      this.list.excluded.size === 0 &&
+      this.list.selectionData
+    ) {
       const selectionData = this.list.selectionData
       this.tagDocumentCounts.set(selectionData?.selected_tags ?? [])
       this.applySelectionData(this.tagDocumentCounts(), this.tagSelectionModel)
@@ -473,7 +477,11 @@ export class BulkEditorComponent
   }
 
   openDocumentTypeDropdown() {
-    if (this.list.allSelected && this.list.excluded.size === 0) {
+    if (
+      this.list.allSelected &&
+      this.list.excluded.size === 0 &&
+      this.list.selectionData
+    ) {
       const selectionData = this.list.selectionData
       this.documentTypeDocumentCounts.set(
         selectionData?.selected_document_types ?? []
@@ -498,7 +506,11 @@ export class BulkEditorComponent
   }
 
   openCorrespondentDropdown() {
-    if (this.list.allSelected && this.list.excluded.size === 0) {
+    if (
+      this.list.allSelected &&
+      this.list.excluded.size === 0 &&
+      this.list.selectionData
+    ) {
       const selectionData = this.list.selectionData
       this.correspondentDocumentCounts.set(
         selectionData?.selected_correspondents ?? []
@@ -523,7 +535,11 @@ export class BulkEditorComponent
   }
 
   openStoragePathDropdown() {
-    if (this.list.allSelected && this.list.excluded.size === 0) {
+    if (
+      this.list.allSelected &&
+      this.list.excluded.size === 0 &&
+      this.list.selectionData
+    ) {
       const selectionData = this.list.selectionData
       this.storagePathDocumentCounts.set(
         selectionData?.selected_storage_paths ?? []
@@ -548,7 +564,11 @@ export class BulkEditorComponent
   }
 
   openCustomFieldsDropdown() {
-    if (this.list.allSelected && this.list.excluded.size === 0) {
+    if (
+      this.list.allSelected &&
+      this.list.excluded.size === 0 &&
+      this.list.selectionData
+    ) {
       const selectionData = this.list.selectionData
       this.customFieldDocumentCounts.set(
         selectionData?.selected_custom_fields ?? []

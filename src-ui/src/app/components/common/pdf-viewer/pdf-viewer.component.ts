@@ -12,16 +12,13 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core'
-import {
-  AnnotationMode,
-  getDocument,
-  GlobalWorkerOptions,
+// Only types are imported statically, pdf.js itself is loaded lazily (see pdfjs-loader.ts)
+import type {
   PDFDocumentLoadingTask,
   PDFDocumentProxy,
 } from 'pdfjs-dist/legacy/build/pdf.mjs'
-import {
+import type {
   EventBus,
-  LinkTarget,
   PDFFindController,
   PDFLinkService,
   PDFSinglePageViewer,
@@ -33,6 +30,7 @@ import {
   PdfZoomScale,
   PngxPdfDocumentProxy,
 } from './pdf-viewer.types'
+import { getLoadedPdfJs, loadPdfJs, PdfJsModules } from './pdfjs-loader'
 
 @Component({
   selector: 'pngx-pdf-viewer',
@@ -74,18 +72,48 @@ export class PngxPdfViewerComponent
   private hasRenderedPage = false
   private lastFindQuery = ''
   private lastViewerPage?: number
+  private loadId = 0
+  private destroyed = false
 
-  private readonly eventBus = new EventBus()
-  private readonly linkService = new PDFLinkService({
-    eventBus: this.eventBus,
-    externalLinkTarget: LinkTarget.BLANK,
-    externalLinkRel: 'noopener noreferrer nofollow',
-  })
-  private readonly findController = new PDFFindController({
-    eventBus: this.eventBus,
-    linkService: this.linkService,
-    updateMatchesCountOnProgress: false,
-  })
+  private pdfjs?: PdfJsModules
+  private eventBus?: EventBus
+  private linkService?: PDFLinkService
+  private findController?: PDFFindController
+
+  constructor() {
+    // pdf.js may already be loaded by a previous viewer instance
+    const pdfjs = getLoadedPdfJs()
+    if (pdfjs) {
+      this.setupPdfJs(pdfjs)
+    }
+  }
+
+  private setupPdfJs(pdfjs: PdfJsModules): void {
+    if (this.pdfjs) {
+      return
+    }
+    this.pdfjs = pdfjs
+    const { EventBus, LinkTarget, PDFFindController, PDFLinkService } =
+      pdfjs.viewer
+    this.eventBus = new EventBus()
+    this.linkService = new PDFLinkService({
+      eventBus: this.eventBus,
+      externalLinkTarget: LinkTarget.BLANK,
+      externalLinkRel: 'noopener noreferrer nofollow',
+    })
+    this.findController = new PDFFindController({
+      eventBus: this.eventBus,
+      linkService: this.linkService,
+      updateMatchesCountOnProgress: false,
+    })
+  }
+
+  private async ensurePdfJs(): Promise<PdfJsModules> {
+    if (!this.pdfjs) {
+      this.setupPdfJs(await loadPdfJs())
+    }
+    return this.pdfjs!
+  }
 
   private readonly onPageRendered = () => {
     this.hasRenderedPage = true
@@ -135,6 +163,26 @@ export class PngxPdfViewerComponent
 
   ngAfterViewInit(): void {
     this.setupResizeObserver()
+    if (this.pdfjs) {
+      this.afterPdfJsReady()
+      return
+    }
+    this.ensurePdfJs().then(
+      () => {
+        if (!this.destroyed) {
+          this.afterPdfJsReady()
+        }
+      },
+      (err) => {
+        // if a document load is pending, loadDocument() reports the error
+        if (!this.destroyed && !this.hasLoaded) {
+          this.loadError.emit(err)
+        }
+      }
+    )
+  }
+
+  private afterPdfJsReady(): void {
     this.initViewer()
     if (!this.hasLoaded) {
       this.loadDocument()
@@ -146,9 +194,10 @@ export class PngxPdfViewerComponent
   }
 
   ngOnDestroy(): void {
-    this.eventBus.off('pagerendered', this.onPageRendered)
-    this.eventBus.off('pagesinit', this.onPagesInit)
-    this.eventBus.off('pagechanging', this.onPageChanging)
+    this.destroyed = true
+    this.eventBus?.off('pagerendered', this.onPageRendered)
+    this.eventBus?.off('pagesinit', this.onPagesInit)
+    this.eventBus?.off('pagechanging', this.onPageChanging)
     this.resizeObserver?.disconnect()
     this.loadingTask?.destroy()
     this.pdfViewer?.cleanup()
@@ -163,7 +212,7 @@ export class PngxPdfViewerComponent
     this.loadingTask?.destroy()
     this.loadingTask = undefined
     this.pdf = undefined
-    this.linkService.setDocument(null)
+    this.linkService?.setDocument(null)
     if (this.pdfViewer) {
       this.pdfViewer.setDocument(null)
       this.pdfViewer.currentPageNumber = 1
@@ -180,7 +229,24 @@ export class PngxPdfViewerComponent
     this.lastFindQuery = ''
     this.loadingTask?.destroy()
 
-    GlobalWorkerOptions.workerSrc = new URL(
+    const loadId = ++this.loadId
+    let pdfjs = this.pdfjs
+    if (!pdfjs) {
+      try {
+        pdfjs = await this.ensurePdfJs()
+      } catch (err) {
+        if (!this.destroyed && loadId === this.loadId) {
+          this.loadError.emit(err)
+        }
+        return
+      }
+      // bail out if destroyed or the source changed while loading pdf.js
+      if (this.destroyed || loadId !== this.loadId || !this.hasLoaded) {
+        return
+      }
+    }
+
+    pdfjs.lib.GlobalWorkerOptions.workerSrc = new URL(
       'assets/js/pdf.worker.min.mjs',
       this.document.baseURI
     ).toString()
@@ -192,12 +258,12 @@ export class PngxPdfViewerComponent
       iccUrl: new URL('assets/iccs/', this.document.baseURI).toString(),
       cMapUrl: new URL('assets/cmaps/', this.document.baseURI).toString(),
     }
-    this.loadingTask = getDocument(initOptions)
+    this.loadingTask = pdfjs.lib.getDocument(initOptions)
     try {
       const pdf = await this.loadingTask.promise
       this.pdf = pdf
-      this.linkService.setDocument(pdf)
-      this.findController.onIsPageVisible = () => true
+      this.linkService!.setDocument(pdf)
+      this.findController!.onIsPageVisible = () => true
       this.pdfViewer?.setDocument(pdf)
       this.applyViewerState()
       this.afterLoadComplete.emit(pdf)
@@ -215,6 +281,12 @@ export class PngxPdfViewerComponent
   }
 
   private initViewer(): void {
+    if (!this.pdfjs) {
+      // will be initialized once pdf.js has been loaded, see ngAfterViewInit
+      return
+    }
+    const { PDFSinglePageViewer, PDFViewer } = this.pdfjs.viewer
+    const eventBus = this.eventBus!
     this.viewer.nativeElement.innerHTML = ''
     this.pdfViewer?.cleanup()
     this.hasRenderedPage = false
@@ -224,11 +296,11 @@ export class PngxPdfViewerComponent
     const options = {
       container: this.container.nativeElement,
       viewer: this.viewer.nativeElement,
-      eventBus: this.eventBus,
+      eventBus,
       linkService: this.linkService,
       findController: this.findController,
       textLayerMode,
-      annotationMode: AnnotationMode.ENABLE,
+      annotationMode: this.pdfjs.lib.AnnotationMode.ENABLE,
       enableSelectionRendering: false,
       removePageBorders: true,
     }
@@ -237,14 +309,14 @@ export class PngxPdfViewerComponent
       this.renderMode === PdfRenderMode.Single
         ? new PDFSinglePageViewer(options)
         : new PDFViewer(options)
-    this.linkService.setViewer(this.pdfViewer)
+    this.linkService!.setViewer(this.pdfViewer)
 
-    this.eventBus.off('pagerendered', this.onPageRendered)
-    this.eventBus.off('pagesinit', this.onPagesInit)
-    this.eventBus.off('pagechanging', this.onPageChanging)
-    this.eventBus.on('pagerendered', this.onPageRendered)
-    this.eventBus.on('pagesinit', this.onPagesInit)
-    this.eventBus.on('pagechanging', this.onPageChanging)
+    eventBus.off('pagerendered', this.onPageRendered)
+    eventBus.off('pagesinit', this.onPagesInit)
+    eventBus.off('pagechanging', this.onPageChanging)
+    eventBus.on('pagerendered', this.onPageRendered)
+    eventBus.on('pagesinit', this.onPagesInit)
+    eventBus.on('pagechanging', this.onPageChanging)
 
     if (this.pdf) {
       this.pdfViewer.setDocument(this.pdf)
@@ -305,7 +377,7 @@ export class PngxPdfViewerComponent
       return
     }
     this.lastFindQuery = query
-    this.eventBus.dispatch('find', {
+    this.eventBus?.dispatch('find', {
       query,
       caseSensitive: false,
       highlightAll: query?.length > 0,

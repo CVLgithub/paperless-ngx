@@ -573,7 +573,10 @@ describe('BulkEditorComponent', () => {
       parameters: { add_tags: [101], remove_tags: [] },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -624,7 +627,10 @@ describe('BulkEditorComponent', () => {
       parameters: { add_tags: [101], remove_tags: [] },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
   })
 
@@ -653,7 +659,10 @@ describe('BulkEditorComponent', () => {
       .expectOne(`${environment.apiBaseUrl}documents/bulk_edit/`)
       .flush(true)
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -706,7 +715,10 @@ describe('BulkEditorComponent', () => {
     )
     expect(toast.mock.calls.at(-1)[0].actionName).toBeUndefined()
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -819,7 +831,10 @@ describe('BulkEditorComponent', () => {
       parameters: { correspondent: 101 },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -851,7 +866,10 @@ describe('BulkEditorComponent', () => {
       .expectOne(`${environment.apiBaseUrl}documents/bulk_edit/`)
       .flush(true)
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -918,7 +936,10 @@ describe('BulkEditorComponent', () => {
       parameters: { document_type: 101 },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -950,7 +971,10 @@ describe('BulkEditorComponent', () => {
       .expectOne(`${environment.apiBaseUrl}documents/bulk_edit/`)
       .flush(true)
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1017,7 +1041,10 @@ describe('BulkEditorComponent', () => {
       parameters: { storage_path: 101 },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1049,7 +1076,10 @@ describe('BulkEditorComponent', () => {
       .expectOne(`${environment.apiBaseUrl}documents/bulk_edit/`)
       .flush(true)
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1116,7 +1146,10 @@ describe('BulkEditorComponent', () => {
       parameters: { add_custom_fields: [101], remove_custom_fields: [102] },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1148,7 +1181,10 @@ describe('BulkEditorComponent', () => {
       .expectOne(`${environment.apiBaseUrl}documents/bulk_edit/`)
       .flush(true)
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1262,7 +1298,10 @@ describe('BulkEditorComponent', () => {
     })
     expect(trackSpy).toHaveBeenCalledWith('delete-1', 2, [3, 4])
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1281,7 +1320,10 @@ describe('BulkEditorComponent', () => {
     // ids aren't known when all matching documents are selected, so no undo
     expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 2, null)
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
   })
 
@@ -1366,7 +1408,10 @@ describe('BulkEditorComponent', () => {
       from_webui: true,
     })
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1411,7 +1456,10 @@ describe('BulkEditorComponent', () => {
       from_webui: true,
     })
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1453,7 +1501,10 @@ describe('BulkEditorComponent', () => {
       from_webui: true,
     })
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1473,7 +1524,10 @@ describe('BulkEditorComponent', () => {
       from_webui: true,
     })
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1494,7 +1548,10 @@ describe('BulkEditorComponent', () => {
       from_webui: true,
     })
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1581,7 +1638,10 @@ describe('BulkEditorComponent', () => {
 
     expect(mergeAsVersionsSpy).toHaveBeenCalledWith([3, 4], 4)
     httpTestingController.match(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -1796,7 +1856,10 @@ describe('BulkEditorComponent', () => {
       },
     })
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
@@ -2103,7 +2166,10 @@ describe('BulkEditorComponent', () => {
     expect(toastServiceShowInfoSpy).not.toHaveBeenCalled()
     expect(listReloadSpy).not.toHaveBeenCalled()
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+      (req) =>
+        req.urlWithParams.startsWith(
+          `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created`
+        )
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`

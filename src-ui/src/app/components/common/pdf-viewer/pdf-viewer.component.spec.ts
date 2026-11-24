@@ -8,6 +8,7 @@ import {
 } from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { PngxPdfViewerComponent } from './pdf-viewer.component'
 import { PdfRenderMode, PdfZoomLevel, PdfZoomScale } from './pdf-viewer.types'
+import { loadPdfJs } from './pdfjs-loader'
 
 describe('PngxPdfViewerComponent', () => {
   let fixture: ComponentFixture<PngxPdfViewerComponent>
@@ -29,6 +30,9 @@ describe('PngxPdfViewerComponent', () => {
   }
 
   beforeEach(async () => {
+    // pdf.js is loaded lazily, make sure it is available before the component
+    // is created so the viewer behaves synchronously like in the app once loaded
+    await loadPdfJs()
     await TestBed.configureTestingModule({
       imports: [PngxPdfViewerComponent],
     }).compileComponents()
@@ -60,6 +64,44 @@ describe('PngxPdfViewerComponent', () => {
     )
     expect(renderedSpy).toHaveBeenCalled()
     expect((component as any).pdfViewer).toBeInstanceOf(PDFViewer)
+  })
+
+  it('loads pdf.js lazily when it is not yet available', async () => {
+    // simulate a viewer created before pdf.js was loaded
+    ;(component as any).pdfjs = undefined
+    ;(component as any).eventBus = undefined
+    ;(component as any).linkService = undefined
+    ;(component as any).findController = undefined
+    const loadSpy = jest.fn()
+    component.afterLoadComplete.subscribe(loadSpy)
+
+    await initComponent()
+    await loadPdfJs()
+    await new Promise((resolve) => setTimeout(resolve))
+
+    expect((component as any).pdfjs).toBeDefined()
+    expect((component as any).pdfViewer).toBeInstanceOf(PDFViewer)
+    expect(loadSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ numPages: 1 })
+    )
+  })
+
+  it('does not load a document if destroyed while pdf.js is loading', async () => {
+    ;(component as any).pdfjs = undefined
+    ;(component as any).eventBus = undefined
+    ;(component as any).linkService = undefined
+    ;(component as any).findController = undefined
+    const getDocumentSpy = jest.spyOn(pdfjs, 'getDocument')
+    const callCount = getDocumentSpy.mock.calls.length
+
+    component.src = 'test.pdf'
+    fixture.detectChanges()
+    component.ngOnDestroy()
+    await loadPdfJs()
+    await new Promise((resolve) => setTimeout(resolve))
+
+    expect(getDocumentSpy).toHaveBeenCalledTimes(callCount)
+    expect((component as any).pdfViewer).toBeUndefined()
   })
 
   it('opens external links in a new tab', () => {

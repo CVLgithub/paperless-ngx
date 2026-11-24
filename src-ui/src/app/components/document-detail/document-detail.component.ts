@@ -36,6 +36,7 @@ import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
+  defaultIfEmpty,
   distinctUntilChanged,
   filter,
   finalize,
@@ -111,7 +112,7 @@ import { WebsocketStatusService } from 'src/app/services/websocket-status.servic
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
-import { DocumentDetailFieldID } from '../admin/settings/settings.component'
+import { DocumentDetailFieldID } from 'src/app/data/document-detail-field-id'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
@@ -418,6 +419,17 @@ export class DocumentDetailComponent
     this.titleSubject.next(event.target?.value)
   }
 
+  onTitleKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      if (this.isDirtySignal() && this.userCanEdit && !this.networkActive()) {
+        this.save()
+      } else {
+        ;(event.target as HTMLElement | null)?.blur()
+      }
+    }
+  }
+
   get useNativePdfViewer(): boolean {
     return this.useNativePdfViewerSetting()
   }
@@ -507,6 +519,7 @@ export class DocumentDetailComponent
           if (this.archiveContentRenderType === ContentRenderType.TIFF) {
             this.tryRenderTiff()
           }
+          this.loadPreviewTextIfNeeded()
           if (
             this.archiveContentRenderType !== ContentRenderType.PDF ||
             this.useNativePdfViewer
@@ -516,11 +529,38 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.metadata.set({}) // allow display to fallback to <object> tag
+          this.loadPreviewTextIfNeeded()
           this.toastService.showError(
             $localize`Error retrieving metadata`,
             error
           )
         },
+      })
+  }
+
+  /**
+   * Fetch the preview as text only when it is rendered as text. For PDFs and
+   * images the viewer loads the file itself, so fetching it here would
+   * download the whole file a second time.
+   */
+  private loadPreviewTextIfNeeded() {
+    if (this.archiveContentRenderType !== ContentRenderType.Text) return
+    this.http
+      .get(this.previewUrl(), { responseType: 'text' })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
+      )
+      .subscribe({
+        next: (res) => this.previewText.set(res.toString()),
+        error: (err) =>
+          this.previewText.set(
+            $localize`An error occurred loading content: ${
+              err.message ?? err.toString()
+            }`
+          ),
       })
   }
 
@@ -610,23 +650,7 @@ export class DocumentDetailComponent
       this.documentsService.getPreviewUrl(this.selectedVersionId())
     )
     this.updatePdfSource()
-    this.http
-      .get(this.previewUrl(), { responseType: 'text' })
-      .pipe(
-        first(),
-        takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier),
-        takeUntil(this.versionChangeNotifier)
-      )
-      .subscribe({
-        next: (res) => this.previewText.set(res.toString()),
-        error: (err) =>
-          this.previewText.set(
-            $localize`An error occurred loading content: ${
-              err.message ?? err.toString()
-            }`
-          ),
-      })
+    // previewText is fetched once the render type is known, see loadMetadataForSelectedVersion
     this.thumbUrl.set(
       this.documentsService.getThumbUrl(this.selectedVersionId())
     )
@@ -1129,24 +1153,7 @@ export class DocumentDetailComponent
           )
         },
       })
-    // For text previews, refresh content
-    this.http
-      .get(this.previewUrl(), { responseType: 'text' })
-      .pipe(
-        first(),
-        takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier),
-        takeUntil(this.versionChangeNotifier)
-      )
-      .subscribe({
-        next: (res) => this.previewText.set(res.toString()),
-        error: (err) =>
-          this.previewText.set(
-            $localize`An error occurred loading content: ${
-              err.message ?? err.toString()
-            }`
-          ),
-      })
+    // Text previews are refreshed via loadMetadataForSelectedVersion
   }
 
   onVersionSelected(versionId: number) {
@@ -1501,45 +1508,63 @@ export class DocumentDetailComponent
 
   saveEditNext() {
     this.networkActive.set(true)
-    this.store.next(this.documentForm.value)
+    ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
       .patch(this.getChangedFields(), this.selectedVersionId())
       .pipe(
         switchMap((updateResult) => {
+          this.closeIncomingUpdateModal()
+          this.lastLocalSaveModified = updateResult?.modified ?? null
+          if (updateResult) {
+            this.documentForm.patchValue(updateResult)
+          }
+          const newValues = Object.assign({}, this.documentForm.value)
+          if (Array.isArray(updateResult?.tags)) {
+            newValues.tags = [...updateResult.tags]
+          }
+          if (Array.isArray(updateResult?.custom_fields)) {
+            newValues.custom_fields = [...updateResult.custom_fields]
+          }
+          this.store?.next(newValues)
+          this.openDocumentService.setDirty(this.document(), false)
+          this.isDirtySignal.set(false)
+          this.openDocumentService.save()
           this.savedViewService.maybeRefreshDocumentCounts()
           return this.documentListViewService.getNext(this.documentId()).pipe(
+            defaultIfEmpty(null),
             map((nextDocId) => ({ nextDocId, updateResult })),
             takeUntil(this.unsubscribeNotifier)
           )
-        })
-      )
-      .pipe(
+        }),
         switchMap(({ nextDocId, updateResult }) => {
           if (nextDocId && updateResult) {
-            this.openDocumentService.setDirty(this.document(), false)
-            this.isDirtySignal.set(false)
-            return this.openDocumentService
-              .closeDocument(this.document())
-              .pipe(
-                map(
-                  (closeResult) => ({ updateResult, nextDocId, closeResult }),
-                  takeUntil(this.unsubscribeNotifier)
-                )
-              )
+            return this.openDocumentService.closeDocument(this.document()).pipe(
+              map((closeResult) => ({ updateResult, nextDocId, closeResult })),
+              takeUntil(this.unsubscribeNotifier)
+            )
           }
-        })
+          return of({ updateResult, nextDocId: null, closeResult: false })
+        }),
+        first()
       )
-      .pipe(first())
       .subscribe({
         next: ({ updateResult, nextDocId, closeResult }) => {
           this.closeIncomingUpdateModal()
           this.error.set(null)
           this.networkActive.set(false)
           this.pendingIncomingUpdate = null
-          this.lastLocalSaveModified = null
+          this.lastLocalSaveModified = updateResult?.modified ?? null
+          const savedTitle = updateResult?.title ?? this.document()?.title ?? ''
+          this.toastService.showSuccess(
+            $localize`Document "${savedTitle}" saved successfully.`
+          )
           if (closeResult && updateResult && nextDocId) {
             this.router.navigate(['documents', nextDocId])
             this.titleInput?.focus()
+          } else {
+            this.openDocumentService.refreshDocument(this.documentId())
+            this.syncTopbarConfig()
+            this.flushPendingIncomingUpdate()
           }
         },
         error: (error) => {
@@ -2014,6 +2039,14 @@ export class DocumentDetailComponent
     return this.customFields()?.find((f) => f.id === instance.field)
   }
 
+  public isMultilineCustomField(field?: CustomField): boolean {
+    return (
+      field?.data_type === CustomFieldDataType.String ||
+      field?.data_type === CustomFieldDataType.LongText ||
+      field?.data_type === CustomFieldDataType.Url
+    )
+  }
+
   public getCustomFieldError(index: number) {
     const fieldError = this.error()?.custom_fields?.[index]
     return fieldError?.['non_field_errors'] ?? fieldError?.['value']
@@ -2337,6 +2370,7 @@ export class DocumentDetailComponent
       onPrevious: () => this.previousDoc(),
       onNext: () => this.nextDoc(),
       onSave: () => this.save(),
+      onSaveAndNext: () => this.saveEditNext(),
       onDiscard: () => this.discard(),
       onDownload: () => this.download(),
       onShare: () => {
@@ -2366,10 +2400,26 @@ export class DocumentDetailComponent
     this.mergedBanner.set(null)
   }
 
+  // Memoized by page count: the template calls this on every change detection
+  // pass, and a stable array lets @for skip diffing work. Not a computed()
+  // because document() is mutated in place (e.g. on remote reload).
+  private pageNumbersCache: { count: number; pages: number[] } = {
+    count: 0,
+    pages: [],
+  }
+
   getPageNumbers(): number[] {
-    const count = this.previewNumPages() || this.document()?.page_count || 0
-    if (count <= 0) return []
-    return Array.from({ length: Math.min(count, 50) }, (_, i) => i + 1)
+    const count = Math.max(
+      0,
+      Math.min(this.previewNumPages() || this.document()?.page_count || 0, 50)
+    )
+    if (count !== this.pageNumbersCache.count) {
+      this.pageNumbersCache = {
+        count,
+        pages: Array.from({ length: count }, (_, i) => i + 1),
+      }
+    }
+    return this.pageNumbersCache.pages
   }
 
   selectPreviewPage(page: number): void {
@@ -2557,6 +2607,13 @@ export class DocumentDetailComponent
     )
     this.documentForm.get('tags')?.setValue(current)
     this.documentForm.get('tags')?.markAsDirty()
+  }
+
+  onNoteKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      this.submitQuickNote()
+    }
   }
 
   submitQuickNote(): void {

@@ -144,7 +144,7 @@
 
         <!-- Mode: Document Detail Controls -->
         @else if (topbar.mode() === 'document-detail' && topbar.detailConfig(); as detail) {
-          <!-- Unsaved Changes Actions (Verwerfen / Speichern) -->
+          <!-- Unsaved Changes Actions (Verwerfen / Speichern / Speichern & Weiter) -->
           @if (detail.isDirty && detail.canEdit) {
             <div class="rd-detail-save-actions" role="group" aria-label="Änderungen speichern" i18n-aria-label>
               <button
@@ -167,6 +167,19 @@
                 }
                 <span i18n>Speichern</span>
               </button>
+              @if (detail.hasNext && detail.onSaveAndNext) {
+                <button
+                  type="button"
+                  class="rd-btn-soft-accent rd-topbar-action-btn rd-save-next-btn"
+                  (click)="detail.onSaveAndNext()"
+                  [disabled]="detail.isSaving"
+                  title="Speichern & nächstes Dokument öffnen (Strg+Umschalt+S)"
+                  i18n-title
+                >
+                  <span i18n>Speichern &amp; Weiter</span>
+                  <pngx-bs-icon name="arrow-right" width="0.82rem" height="0.82rem"></pngx-bs-icon>
+                </button>
+              }
             </div>
           }
 

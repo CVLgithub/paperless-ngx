@@ -1,7 +1,11 @@
+@let doc = document();
+@let docTitle = doc.title | documentTitle;
+@let correspondent = correspondentName();
+@let typeName = documentTypeName();
 <div
   class="rd-list-row"
-  [class.rd-list-row--selected]="selected"
-  [class.rd-list-row--select-mode]="selectionMode"
+  [class.rd-list-row--selected]="selected()"
+  [class.rd-list-row--select-mode]="selectionMode()"
   (click)="onRowClick($event)"
   role="button"
   tabindex="0"
@@ -10,37 +14,45 @@
   <button
     type="button"
     class="rd-list-row__check"
-    [class.rd-list-row__check--checked]="selected"
+    [class.rd-list-row__check--checked]="selected()"
     (click)="onCheckClick($event)"
-    [attr.aria-label]="selected ? 'Auswahl aufheben' : 'Dokument auswählen'"
-    [attr.aria-pressed]="selected"
+    [attr.aria-label]="selected() ? 'Auswahl aufheben' : 'Dokument auswählen'"
+    [attr.aria-pressed]="selected()"
   >
-    @if (selected) {
+    @if (selected()) {
       <pngx-bs-icon name="check" width="0.88rem" height="0.88rem"></pngx-bs-icon>
     }
   </button>
 
-  <div class="rd-list-row__thumb-wrap">
+  <div
+    class="rd-list-row__thumb-wrap"
+    [class.rd-thumb-frame--loading]="thumbState() === 'loading'"
+    [class.rd-thumb-frame--error]="thumbState() === 'error'"
+  >
+    <!-- loading/fetchpriority are bound before [src] so they apply before the fetch starts -->
     <img
       class="rd-list-row__thumb rd-doc-thumb-img"
-      [src]="thumbUrl"
-      [alt]="document.title | documentTitle"
-      loading="lazy"
+      [attr.loading]="priority() ? 'eager' : 'lazy'"
+      [attr.fetchpriority]="priority() ? 'high' : 'low'"
       decoding="async"
+      [src]="thumbUrl()"
+      [alt]="docTitle"
+      (load)="onThumbLoad()"
+      (error)="onThumbError()"
     />
   </div>
 
   <div class="rd-list-row__main">
-    <div class="rd-list-row__title" [title]="document.title | documentTitle">
-      {{ document.title | documentTitle }}
+    <div class="rd-list-row__title" [title]="docTitle">
+      {{ docTitle }}
     </div>
-    @if (correspondentName) {
-      <div class="rd-list-row__correspondent">{{ correspondentName }}</div>
+    @if (correspondent) {
+      <div class="rd-list-row__correspondent">{{ correspondent }}</div>
     }
   </div>
 
   <div class="rd-list-row__tags">
-    @for (tag of resolvedTags; track tag.id) {
+    @for (tag of resolvedTags(); track tag.id) {
       <span class="rd-list-row__tag-pill">
         <span class="rd-list-row__tag-dot" [style.background-color]="tag.color || '#6b7280'"></span>
         <span>{{ tag.name }}</span>
@@ -49,24 +61,24 @@
   </div>
 
   <div class="rd-list-row__type">
-    @if (documentTypeName) {
-      <span class="rd-list-row__type-badge">{{ documentTypeName }}</span>
+    @if (typeName) {
+      <span class="rd-list-row__type-badge">{{ typeName }}</span>
     }
   </div>
 
   <div class="rd-list-row__pages">
-    @if (document.page_count) {
-      <span>{{ document.page_count }} S.</span>
+    @if (doc.page_count) {
+      <span>{{ doc.page_count }} S.</span>
     }
   </div>
 
   <div class="rd-list-row__date">
-    {{ document.created | customDate:'mediumDate' }}
+    {{ doc.created | customDate:'mediumDate' }}
   </div>
 
   <a
     class="rd-list-row__preview"
-    [href]="previewUrl"
+    [href]="previewUrl()"
     target="_blank"
     rel="noopener noreferrer"
     (click)="$event.stopPropagation()"

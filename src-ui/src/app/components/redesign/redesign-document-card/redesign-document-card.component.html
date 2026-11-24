@@ -1,26 +1,38 @@
+@let doc = document();
+@let docTitle = doc.title | documentTitle;
+@let typeName = documentTypeName();
+@let tags = resolvedTags();
 <article
   class="rd-doc-card"
-  [class.rd-doc-card--selected]="selected"
-  [class.rd-doc-card--select-mode]="selectionMode"
+  [class.rd-doc-card--selected]="selected()"
+  [class.rd-doc-card--select-mode]="selectionMode()"
   (click)="onCardClick($event)"
   role="button"
   tabindex="0"
   (keydown.enter)="onCardClick($any($event))"
 >
-  <div class="rd-doc-card__sheet">
+  <div
+    class="rd-doc-card__sheet"
+    [class.rd-thumb-frame--loading]="thumbState() === 'loading'"
+    [class.rd-thumb-frame--error]="thumbState() === 'error'"
+  >
+    <!-- loading/fetchpriority are bound before [src] so they apply before the fetch starts -->
     <img
       class="rd-doc-card__thumb rd-doc-thumb-img"
-      [src]="thumbUrl"
-      [alt]="document.title | documentTitle"
-      loading="lazy"
+      [attr.loading]="priority() ? 'eager' : 'lazy'"
+      [attr.fetchpriority]="priority() ? 'high' : 'low'"
       decoding="async"
+      [src]="thumbUrl()"
+      [alt]="docTitle"
+      (load)="onThumbLoad()"
+      (error)="onThumbError()"
     />
 
     <!-- Native browser PDF preview (top left, hidden during selection mode) -->
-    @if (!selectionMode) {
+    @if (!selectionMode()) {
       <a
         class="rd-doc-card__preview"
-        [href]="previewUrl"
+        [href]="previewUrl()"
         target="_blank"
         rel="noopener noreferrer"
         (click)="$event.stopPropagation()"
@@ -36,36 +48,36 @@
     <button
       type="button"
       class="rd-doc-card__check"
-      [class.rd-doc-card__check--checked]="selected"
+      [class.rd-doc-card__check--checked]="selected()"
       (click)="onCheckClick($event)"
-      [attr.aria-label]="selected ? 'Auswahl aufheben' : 'Dokument auswählen'"
-      [attr.aria-pressed]="selected"
+      [attr.aria-label]="selected() ? 'Auswahl aufheben' : 'Dokument auswählen'"
+      [attr.aria-pressed]="selected()"
     >
-      @if (selected) {
+      @if (selected()) {
         <pngx-bs-icon name="check" width="0.95rem" height="0.95rem"></pngx-bs-icon>
       }
     </button>
 
     <!-- Document type pill (bottom left) -->
-    @if (documentTypeName) {
-      <span class="rd-doc-card__type" [title]="documentTypeName">{{ documentTypeName }}</span>
+    @if (typeName) {
+      <span class="rd-doc-card__type" [title]="typeName">{{ typeName }}</span>
     }
 
     <!-- Page count pill (bottom right) -->
-    @if (document.page_count && document.page_count > 0) {
-      <span class="rd-doc-card__pages">{{ document.page_count }} S.</span>
+    @if (doc.page_count && doc.page_count > 0) {
+      <span class="rd-doc-card__pages">{{ doc.page_count }} S.</span>
     }
   </div>
 
   <div class="rd-doc-card__info">
-    <h3 class="rd-doc-card__title" [title]="document.title | documentTitle">
-      {{ document.title | documentTitle }}
+    <h3 class="rd-doc-card__title" [title]="docTitle">
+      {{ docTitle }}
     </h3>
     <div class="rd-doc-card__meta">
-      <span class="rd-doc-card__date">{{ document.created | customDate:'mediumDate' }}</span>
-      @if (resolvedTags.length > 0) {
+      <span class="rd-doc-card__date">{{ doc.created | customDate:'mediumDate' }}</span>
+      @if (tags.length > 0) {
         <span class="rd-doc-card__dots" aria-label="Tags">
-          @for (tag of resolvedTags; track tag.id) {
+          @for (tag of tags; track tag.id) {
             <span
               class="rd-doc-card__dot"
               [style.background-color]="tag.color || '#6b7280'"

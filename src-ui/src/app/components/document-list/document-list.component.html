@@ -52,6 +52,20 @@
       <button
         type="button"
         class="rd-icon-control"
+        [class.is-refreshing]="isRefreshing() || list.isReloading"
+        [disabled]="isRefreshing() || list.isReloading"
+        (click)="refreshDocuments()"
+        title="Aktualisieren"
+        i18n-title
+        aria-label="Aktualisieren"
+        i18n-aria-label
+      >
+        <pngx-bs-icon class="rd-refresh-icon" name="arrow-clockwise" width="14" height="14"></pngx-bs-icon>
+      </button>
+
+      <button
+        type="button"
+        class="rd-icon-control"
         [class.is-active]="showAdvancedFilters()"
         (click)="showAdvancedFilters.set(!showAdvancedFilters())"
         title="Erweiterte Filter"
@@ -114,13 +128,28 @@
 
   @if (allDocumentTypes().length > 0 || allCorrespondents().length > 0) {
     <div class="rd-filter-pills-stack" role="toolbar" aria-label="Schnellfilter" i18n-aria-label>
+      <ng-template #excludeModeToggle>
+        <button
+          type="button"
+          class="rd-filter-pill rd-filter-pill--exclude-mode"
+          [class.is-active]="quickFilterExcludeMode()"
+          [attr.aria-pressed]="quickFilterExcludeMode()"
+          (click)="toggleQuickFilterExcludeMode()"
+          title="Modus wechseln: Klicks auf Filter blenden Dokumente aus"
+          i18n-title
+        >
+          <pngx-bs-icon class="rd-pill-exclude-icon" name="dash-circle" width="12" height="12" aria-hidden="true"></pngx-bs-icon>
+          <span i18n>Ausblenden</span>
+        </button>
+      </ng-template>
+
       @if (allDocumentTypes().length > 0) {
         <div class="rd-filter-pills-row" role="group" aria-label="Dokumenttypen" i18n-aria-label>
           <button
             type="button"
             class="rd-filter-pill"
-            [class.is-active]="activeDocumentTypeFilterIds.size === 0"
-            [attr.aria-pressed]="activeDocumentTypeFilterIds.size === 0"
+            [class.is-active]="activeDocumentTypeFilterIds.size === 0 && excludedDocumentTypeFilterIds.size === 0"
+            [attr.aria-pressed]="activeDocumentTypeFilterIds.size === 0 && excludedDocumentTypeFilterIds.size === 0"
             (click)="clearQuickDocumentTypes()"
             i18n
           >Alle Typen</button>
@@ -130,10 +159,20 @@
               type="button"
               class="rd-filter-pill"
               [class.is-active]="isQuickDocumentTypeActive(dt.id)"
-              [attr.aria-pressed]="isQuickDocumentTypeActive(dt.id)"
-              (click)="toggleQuickDocumentType(dt.id)"
-            >{{ dt.name }}</button>
+              [class.is-excluded]="isQuickDocumentTypeExcluded(dt.id)"
+              [attr.aria-pressed]="isQuickDocumentTypeActive(dt.id) || isQuickDocumentTypeExcluded(dt.id)"
+              [title]="getQuickDocumentTypeTooltip(dt.id)"
+              (click)="toggleQuickDocumentType(dt.id, $event)"
+              (contextmenu)="$event.preventDefault(); toggleQuickDocumentTypeExclude(dt.id)"
+            >
+              @if (isQuickDocumentTypeExcluded(dt.id)) {
+                <pngx-bs-icon class="rd-pill-exclude-icon" name="dash-circle" width="11" height="11" aria-hidden="true"></pngx-bs-icon>
+              }
+              <span class="rd-pill-label">{{ dt.name }}</span>
+            </button>
           }
+
+          <ng-container [ngTemplateOutlet]="excludeModeToggle"></ng-container>
         </div>
       }
 
@@ -153,8 +192,8 @@
               <button
                 type="button"
                 class="rd-filter-pill"
-                [class.is-active]="activeCorrespondentFilterIds.size === 0"
-                [attr.aria-pressed]="activeCorrespondentFilterIds.size === 0"
+                [class.is-active]="activeCorrespondentFilterIds.size === 0 && excludedCorrespondentFilterIds.size === 0"
+                [attr.aria-pressed]="activeCorrespondentFilterIds.size === 0 && excludedCorrespondentFilterIds.size === 0"
                 (click)="clearQuickCorrespondents()"
                 i18n
               >Alle Korrespondenten</button>
@@ -164,19 +203,30 @@
                   type="button"
                   class="rd-filter-pill rd-filter-pill-correspondent"
                   [class.is-active]="isQuickCorrespondentActive(corr.id)"
-                  [attr.aria-pressed]="isQuickCorrespondentActive(corr.id)"
-                  (click)="toggleQuickCorrespondent(corr.id)"
+                  [class.is-excluded]="isQuickCorrespondentExcluded(corr.id)"
+                  [attr.aria-pressed]="isQuickCorrespondentActive(corr.id) || isQuickCorrespondentExcluded(corr.id)"
+                  [title]="getQuickCorrespondentTooltip(corr.id)"
+                  (click)="toggleQuickCorrespondent(corr.id, $event)"
+                  (contextmenu)="$event.preventDefault(); toggleQuickCorrespondentExclude(corr.id)"
                 >
-                  <span
-                    class="rd-pill-dot"
-                    [style.background-color]="getCorrespondentColor(corr.id)"
-                    aria-hidden="true"
-                  ></span>
-                  <span>{{ corr.name }}</span>
+                  @if (isQuickCorrespondentExcluded(corr.id)) {
+                    <pngx-bs-icon class="rd-pill-exclude-icon" name="dash-circle" width="11" height="11" aria-hidden="true"></pngx-bs-icon>
+                  } @else {
+                    <span
+                      class="rd-pill-dot"
+                      [style.background-color]="getCorrespondentColor(corr.id)"
+                      aria-hidden="true"
+                    ></span>
+                  }
+                  <span class="rd-pill-label">{{ corr.name }}</span>
                 </button>
               }
             </div>
           </div>
+
+          @if (allDocumentTypes().length === 0) {
+            <ng-container [ngTemplateOutlet]="excludeModeToggle"></ng-container>
+          }
 
           <button
             type="button"
@@ -243,7 +293,9 @@
           </div>
         </div>
       } @else if (redesignDisplayMode === 'list') {
-        @for (group of documentGroups; track group.key) {
+        @for (group of documentGroups; track group.key; let groupIndex = $index) {
+          <!-- Global index of the group's first doc (max. 3 groups: today/week/older) -> first ~12 thumbnails load eagerly -->
+          @let groupOffset = groupIndex === 0 ? 0 : groupIndex === 1 ? documentGroups[0].documents.length : documentGroups[0].documents.length + documentGroups[1].documents.length;
           <section class="rd-doc-group">
             @if (group.label) {
               <div class="rd-group-header">
@@ -260,6 +312,7 @@
                   [tagMap]="tagMap"
                   [correspondentMap]="correspondentMap"
                   [documentTypeMap]="documentTypeMap"
+                  [priority]="groupOffset + $index < 12"
                   (rowClick)="openDocumentDetail(doc)"
                   (toggleSelect)="toggleSelected(doc, $event)"
                 ></pngx-redesign-document-list-row>
@@ -268,7 +321,9 @@
           </section>
         }
       } @else {
-        @for (group of documentGroups; track group.key) {
+        @for (group of documentGroups; track group.key; let groupIndex = $index) {
+          <!-- Global index of the group's first doc (max. 3 groups: today/week/older) -> first ~12 thumbnails load eagerly -->
+          @let groupOffset = groupIndex === 0 ? 0 : groupIndex === 1 ? documentGroups[0].documents.length : documentGroups[0].documents.length + documentGroups[1].documents.length;
           <section class="rd-doc-group">
             @if (group.label) {
               <div class="rd-group-header">
@@ -284,6 +339,7 @@
                   [selectionMode]="selectionMode() || list.hasSelection"
                   [tagMap]="tagMap"
                   [documentTypeMap]="documentTypeMap"
+                  [priority]="groupOffset + $index < 12"
                   (cardClick)="openDocumentDetail(doc)"
                   (toggleSelect)="toggleSelected(doc, $event)"
                 ></pngx-redesign-document-card>

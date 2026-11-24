@@ -76,7 +76,50 @@ services:
       - |
         corepack enable && corepack prepare pnpm@latest --activate
         pnpm install --frozen-lockfile
-        pnpm exec ng build --configuration redesign
+        pnpm exec ng build --configuration redesign || exit 1
+        # Precompress text assets (.br + .gz siblings) so WhiteNoise serves them
+        # directly instead of compressing on the fly. Idempotent: rewrites
+        # existing siblings and removes orphaned/obsolete ones.
+        node -e '
+        const fs = require("fs"), path = require("path"), zlib = require("zlib");
+        const root = "/workspace/src/documents/static/frontend";
+        const exts = new Set([".js", ".mjs", ".css", ".html", ".svg", ".json", ".webmanifest", ".txt", ".wasm"]);
+        const MIN = 1024;
+        let count = 0, before = 0, after = 0;
+        const put = (file, data, size) => {
+          if (data.length < size * 0.95) fs.writeFileSync(file, data);
+          else fs.rmSync(file, { force: true });
+        };
+        const walk = (dir) => {
+          for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+            const p = path.join(dir, e.name);
+            if (e.isDirectory()) { walk(p); continue; }
+            const ext = path.extname(e.name);
+            if (ext === ".br" || ext === ".gz") {
+              const src = p.slice(0, -ext.length);
+              if (exts.has(path.extname(src)) && !fs.existsSync(src)) fs.rmSync(p, { force: true });
+              continue;
+            }
+            if (!exts.has(ext)) continue;
+            const buf = fs.readFileSync(p);
+            if (buf.length < MIN) {
+              fs.rmSync(p + ".br", { force: true });
+              fs.rmSync(p + ".gz", { force: true });
+              continue;
+            }
+            const br = zlib.brotliCompressSync(buf, { params: {
+              [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+              [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+              [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buf.length,
+            } });
+            put(p + ".br", br, buf.length);
+            put(p + ".gz", zlib.gzipSync(buf, { level: 9 }), buf.length);
+            count++; before += buf.length; after += br.length;
+          }
+        };
+        walk(root);
+        console.log("precompressed " + count + " files: " + (before / 1048576).toFixed(1) + " MB -> " + (after / 1048576).toFixed(1) + " MB (brotli)");
+        '
 
 volumes:
   data:

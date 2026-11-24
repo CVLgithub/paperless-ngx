@@ -18,7 +18,12 @@ import {
 } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormsModule } from '@angular/forms'
-import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  Router,
+  RouterModule,
+} from '@angular/router'
 import {
   NgbCollapseModule,
   NgbDropdownModule,
@@ -70,7 +75,6 @@ import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.compone
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
-import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { RedesignSidebarComponent } from '../redesign/redesign-sidebar/redesign-sidebar.component'
 import { RedesignTopbarService } from '../redesign/redesign-topbar.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -506,7 +510,7 @@ export class AppFrameComponent
             route = route.firstChild
           }
           if (
-            route.component == DocumentDetailComponent &&
+            this.isDocumentDetailRoute(route) &&
             route.params['id'] == d.id
           ) {
             this.router.navigate([''])
@@ -525,15 +529,24 @@ export class AppFrameComponent
           this.closeMenu()
 
           // TODO: is there a better way to do this?
-          let route = this.activatedRoute
+          let route = this.activatedRoute.snapshot
           while (route.firstChild) {
             route = route.firstChild
           }
-          if (route.component === DocumentDetailComponent) {
+          if (this.isDocumentDetailRoute(route)) {
             this.router.navigate([''])
           }
         }
       })
+  }
+
+  /**
+   * Checks route data instead of comparing against the DocumentDetailComponent
+   * class so the (lazy-loaded) document detail page is not pulled into the
+   * initial bundle.
+   */
+  private isDocumentDetailRoute(route: ActivatedRouteSnapshot): boolean {
+    return route?.data?.['componentName'] === 'DocumentDetailComponent'
   }
 
   onDragStart(event: CdkDragStart) {

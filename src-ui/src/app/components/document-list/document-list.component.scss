@@ -117,15 +117,44 @@
     display: none;
   }
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--rd-bg-surface-hover);
     color: var(--rd-text-primary);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.72;
   }
 
   &.is-active {
     background: var(--rd-accent-soft);
     color: var(--rd-accent);
     border-color: transparent;
+  }
+
+  &.is-refreshing {
+    color: var(--rd-accent);
+
+    .rd-refresh-icon {
+      animation: rd-spin 750ms linear infinite;
+    }
+  }
+}
+
+.rd-refresh-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes rd-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -235,6 +264,10 @@
   .rd-correspondents-expand-icon {
     transition-duration: 0.01ms !important;
   }
+
+  .rd-icon-control.is-refreshing .rd-refresh-icon {
+    animation: none;
+  }
 }
 
 .rd-filter-pill {
@@ -263,6 +296,54 @@
     color: var(--rd-text-pill-active);
     font-weight: 600;
   }
+
+  &.is-excluded {
+    background: var(--rd-danger-soft);
+    border-color: var(--rd-danger-border);
+    color: var(--rd-danger);
+    font-weight: 600;
+
+    &:hover {
+      background: var(--rd-danger-soft-hover);
+    }
+
+    .rd-pill-label {
+      text-decoration: line-through;
+      text-decoration-thickness: 1.25px;
+      text-decoration-color: currentColor;
+    }
+  }
+}
+
+.rd-filter-pill--exclude-mode {
+  flex-shrink: 0;
+  gap: 5px;
+  background: transparent;
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-secondary);
+
+  &:hover {
+    background: var(--rd-bg-pill-hover);
+    color: var(--rd-text-primary);
+  }
+
+  &.is-active {
+    background: var(--rd-danger-soft);
+    border-color: var(--rd-danger-border);
+    color: var(--rd-danger);
+    font-weight: 600;
+
+    &:hover {
+      background: var(--rd-danger-soft-hover);
+    }
+  }
+}
+
+.rd-pill-exclude-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .rd-pill-dot {

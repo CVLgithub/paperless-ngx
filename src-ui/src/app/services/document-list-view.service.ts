@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core'
 import { ParamMap, Router, UrlTree } from '@angular/router'
-import { Observable, Subject, takeUntil } from 'rxjs'
+import { Observable, Subject, Subscription, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -24,6 +24,32 @@ import { SettingsService } from './settings.service'
 const LIST_DEFAULT_DISPLAY_FIELDS: DisplayField[] = DEFAULT_DISPLAY_FIELDS.map(
   (f) => f.id
 ).filter((f) => f !== DisplayField.ADDED)
+
+/**
+ * Document fields requested for the document list. Restricting the payload
+ * spares the backend serializing (and prefetching) content, notes, custom
+ * fields, versions etc. for every row. Every consumer of `documents` must be
+ * covered here:
+ * - redesign card / list row: id, title, created, tags, document_type,
+ *   correspondent, page_count (thumb / preview URLs are built from the id)
+ * - recency grouping (redesign-document-groups): added, created
+ * - bulk editor: owner + user_can_change (permission checks),
+ *   archived_file_name (email dialog), title (share link bundle dialog)
+ * - next / previous navigation, selection: id
+ */
+export const DOCUMENT_LIST_FIELDS: string[] = [
+  'id',
+  'title',
+  'created',
+  'added',
+  'tags',
+  'document_type',
+  'correspondent',
+  'page_count',
+  'owner',
+  'user_can_change',
+  'archived_file_name',
+]
 
 const RESTORABLE_LIST_VIEW_STATE_KEYS: (keyof ListViewState)[] = [
   'title',
@@ -128,9 +154,29 @@ export class DocumentListViewService {
   rangeSelectionAnchorIndex: number
   lastRangeSelectionToIndex: number
 
+  /**
+   * Document counts per tag / correspondent / etc. for the current filter.
+   * Computing these is the most expensive part of the list request, so they
+   * are only requested while a consumer needs them, see
+   * {@link retainSelectionData}. Null while not loaded or stale.
+   */
   selectionData?: SelectionData
 
   private unsubscribeNotifier: Subject<any> = new Subject()
+
+  /** Number of active consumers that need {@link selectionData}. */
+  private selectionDataConsumers = 0
+
+  /** True when {@link selectionData} does not match the current list state. */
+  private selectionDataStale = true
+
+  /**
+   * Whether the in-flight reload requests selection data, null when no reload
+   * is in flight.
+   */
+  private pendingReloadIncludesSelectionData: boolean | null = null
+
+  private selectionDataSubscription: Subscription = null
 
   private listViewStates: Map<number, ListViewState> = new Map()
 
@@ -251,6 +297,81 @@ export class DocumentListViewService {
 
   public cancelPending(): void {
     this.unsubscribeNotifier.next(true)
+    this.pendingReloadIncludesSelectionData = null
+    this.cancelSelectionDataRequest()
+  }
+
+  /**
+   * True if a consumer needs selection data: e.g. the (visible) filter editor
+   * or the bulk editor when the whole filtered set is selected.
+   */
+  get selectionDataRequired(): boolean {
+    return this.selectionDataConsumers > 0 || this.allSelected
+  }
+
+  /**
+   * Register a consumer of {@link selectionData}. While at least one consumer is
+   * registered, list reloads include selection data. Fetches it right away if
+   * it is missing or stale. Each call must be paired with
+   * {@link releaseSelectionData}.
+   */
+  retainSelectionData(): void {
+    this.selectionDataConsumers++
+    this.ensureSelectionData()
+  }
+
+  releaseSelectionData(): void {
+    this.selectionDataConsumers = Math.max(0, this.selectionDataConsumers - 1)
+  }
+
+  private invalidateSelectionData(): void {
+    this.cancelSelectionDataRequest()
+    this.selectionDataStale = true
+    this.selectionData = null
+  }
+
+  private cancelSelectionDataRequest(): void {
+    this.selectionDataSubscription?.unsubscribe()
+    this.selectionDataSubscription = null
+  }
+
+  /**
+   * Loads selection data for the current filter rules if it is needed and
+   * missing / stale. Uses the list endpoint (same semantics as the data
+   * delivered with a reload) with a minimal page.
+   */
+  private ensureSelectionData(): void {
+    if (!this.selectionDataRequired || !this.selectionDataStale) {
+      return
+    }
+    if (this.pendingReloadIncludesSelectionData !== null) {
+      // the pending reload either delivers selection data or calls this again
+      return
+    }
+    if (
+      this.selectionDataSubscription &&
+      !this.selectionDataSubscription.closed
+    ) {
+      return
+    }
+    const activeListViewState = this.activeListViewState
+    this.selectionDataSubscription = this.documentService
+      .listFiltered(1, 1, null, null, activeListViewState.filterRules, {
+        include_selection_data: true,
+        fields: 'id',
+      })
+      .subscribe({
+        next: (result) => {
+          this.selectionDataSubscription = null
+          this.selectionData =
+            (result as DocumentResults).selection_data ?? null
+          this.selectionDataStale = false
+          this.markChanged()
+        },
+        error: () => {
+          this.selectionDataSubscription = null
+        },
+      })
   }
 
   activateSavedView(view: SavedView) {
@@ -288,6 +409,7 @@ export class DocumentListViewService {
     this.activeListViewState.currentPage = 1
     this.activeListViewState.documents = documents
     this.activeListViewState.collectionSize = collectionSize
+    this.invalidateSelectionData()
     this.markChanged()
   }
 
@@ -353,6 +475,20 @@ export class DocumentListViewService {
     this.error = null
     this.markChanged()
     let activeListViewState = this.activeListViewState
+    const includeSelectionData = this.selectionDataRequired
+    // keep showing the previous selection data until the reload replaces it,
+    // but drop it if this reload won't deliver new data
+    this.selectionDataStale = true
+    if (!includeSelectionData) {
+      this.selectionData = null
+    }
+    this.pendingReloadIncludesSelectionData = includeSelectionData
+    const extraParams: Record<string, string | boolean> = {
+      fields: DOCUMENT_LIST_FIELDS.join(','),
+    }
+    if (includeSelectionData) {
+      extraParams.include_selection_data = true
+    }
     this.documentService
       .listFiltered(
         activeListViewState.currentPage,
@@ -360,19 +496,25 @@ export class DocumentListViewService {
         activeListViewState.sortField,
         activeListViewState.sortReverse,
         activeListViewState.filterRules,
-        { truncate_content: true, include_selection_data: true }
+        extraParams
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          const resultWithSelectionData = result as DocumentResults
+          this.pendingReloadIncludesSelectionData = null
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
-          this.selectionData = resultWithSelectionData.selection_data ?? null
+          if (includeSelectionData) {
+            this.selectionData =
+              (result as DocumentResults).selection_data ?? null
+            this.selectionDataStale = false
+          }
           this.syncSelectedToCurrentPage()
           this.markChanged()
+          // a consumer may have registered while this reload was in flight
+          this.ensureSelectionData()
 
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
@@ -394,6 +536,7 @@ export class DocumentListViewService {
           this.markChanged()
         },
         error: (error) => {
+          this.pendingReloadIncludesSelectionData = null
           this.isReloading = false
           if (activeListViewState.currentPage != 1 && error.status == 404) {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
@@ -409,7 +552,7 @@ export class DocumentListViewService {
             // e.g. field was deleted
             this.sortField = 'created'
           } else {
-            this.selectionData = null
+            this.invalidateSelectionData()
             let errorMessage
             if (
               typeof error.error === 'object' &&
@@ -735,6 +878,8 @@ export class DocumentListViewService {
     this.excluded.clear()
     this.syncSelectedToCurrentPage()
     this.markChanged()
+    // the bulk editor reads list selection data while all documents are selected
+    this.ensureSelectionData()
   }
 
   selectPage() {

@@ -11,7 +11,7 @@ import {
   TourNgBootstrap,
   TourService,
 } from 'ngx-ui-tour-ng-bootstrap'
-import { of, throwError } from 'rxjs'
+import { of, Subject, throwError } from 'rxjs'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -241,5 +241,66 @@ describe('DashboardComponent', () => {
       SavedView[]
     >)
     expect(toastSpy).toHaveBeenCalled()
+  })
+
+  it('should refresh views, taxonomy lookups, statistics, and saved view widgets', () => {
+    const savedViewService = TestBed.inject(SavedViewService)
+    const tagService = TestBed.inject(TagService)
+    const correspondentService = TestBed.inject(CorrespondentService)
+    const documentTypeService = TestBed.inject(DocumentTypeService)
+
+    const refreshSubject = new Subject<any>()
+    const savedViewsSpy = jest
+      .spyOn(savedViewService, 'listAll')
+      .mockReturnValue(refreshSubject.asObservable())
+    const tagSpy = jest.spyOn(tagService, 'listAll')
+    const correspondentSpy = jest.spyOn(correspondentService, 'listAll')
+    const documentTypeSpy = jest.spyOn(documentTypeService, 'listAll')
+
+    const statsWidget = component.statisticsWidget()
+    expect(statsWidget).toBeDefined()
+    const statsReloadSpy = jest.spyOn(statsWidget, 'reload')
+
+    const viewWidgets = component.savedViewWidgets()
+    expect(viewWidgets).toHaveLength(
+      saved_views.filter((v) => v.show_on_dashboard).length
+    )
+    const viewReloadSpies = viewWidgets.map((w) => jest.spyOn(w, 'reload'))
+
+    const refreshButton = fixture.debugElement.query(
+      By.css('button.rd-icon-control')
+    )
+    expect(refreshButton).not.toBeNull()
+
+    refreshButton.nativeElement.click()
+    fixture.detectChanges()
+
+    expect(component.isRefreshing()).toBe(true)
+    expect(refreshButton.nativeElement.disabled).toBe(true)
+    expect(refreshButton.nativeElement.classList).toContain('is-refreshing')
+    expect(savedViewsSpy).toHaveBeenCalledTimes(1)
+    expect(tagSpy).toHaveBeenCalledTimes(1)
+    expect(correspondentSpy).toHaveBeenCalledTimes(1)
+    expect(documentTypeSpy).toHaveBeenCalledTimes(1)
+    expect(statsReloadSpy).toHaveBeenCalledTimes(1)
+    for (const spy of viewReloadSpies) {
+      expect(spy).toHaveBeenCalledTimes(1)
+    }
+
+    // Re-entrant call while refreshing should be ignored
+    component.refreshDashboard()
+    expect(savedViewsSpy).toHaveBeenCalledTimes(1)
+
+    refreshSubject.next({
+      all: saved_views.map((v) => v.id),
+      count: saved_views.length,
+      results: saved_views,
+    })
+    refreshSubject.complete()
+    fixture.detectChanges()
+
+    expect(component.isRefreshing()).toBe(false)
+    expect(refreshButton.nativeElement.disabled).toBe(false)
+    expect(refreshButton.nativeElement.classList).not.toContain('is-refreshing')
   })
 })

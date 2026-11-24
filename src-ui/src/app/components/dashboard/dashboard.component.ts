@@ -5,10 +5,16 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { Component, inject, signal } from '@angular/core'
+import {
+  Component,
+  inject,
+  signal,
+  viewChild,
+  viewChildren,
+} from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { TourNgBootstrap, TourService } from 'ngx-ui-tour-ng-bootstrap'
-import { catchError, first, of } from 'rxjs'
+import { catchError, finalize, first, of } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -60,11 +66,15 @@ export class DashboardComponent extends ComponentWithPermissions {
   private tourService = inject(TourService)
   private toastService = inject(ToastService)
 
+  readonly statisticsWidget = viewChild(StatisticsWidgetComponent)
+  readonly savedViewWidgets = viewChildren(SavedViewWidgetComponent)
+
   readonly dashboardViews = signal<SavedView[]>([])
   readonly totalDocuments = signal<number | null>(null)
   readonly tagMap = signal<Map<number, Tag>>(new Map())
   readonly correspondentMap = signal<Map<number, Correspondent>>(new Map())
   readonly documentTypeMap = signal<Map<number, DocumentType>>(new Map())
+  readonly isRefreshing = signal(false)
 
   constructor() {
     super()
@@ -74,6 +84,30 @@ export class DashboardComponent extends ComponentWithPermissions {
     })
 
     this.loadTaxonomyLookups()
+  }
+
+  refreshDashboard(): void {
+    if (this.isRefreshing()) return
+
+    this.isRefreshing.set(true)
+    this.loadTaxonomyLookups()
+    this.statisticsWidget()?.reload()
+    for (const widget of this.savedViewWidgets()) {
+      widget.reload()
+    }
+
+    this.savedViewService
+      .listAll()
+      .pipe(
+        first(),
+        catchError(() => of(null)),
+        finalize(() => this.isRefreshing.set(false))
+      )
+      .subscribe((res) => {
+        if (res) {
+          this.dashboardViews.set(this.savedViewService.dashboardViews)
+        }
+      })
   }
 
   private loadTaxonomyLookups(): void {

@@ -277,15 +277,17 @@
         @if (inspectorSection() === 'details') {
           <div class="rd-inspector-section">
             <div class="rd-inspector-heading" i18n>Titel</div>
-            <input
-              type="text"
+            <textarea
               class="rd-title-input"
+              rows="1"
               formControlName="title"
               (keyup)="titleKeyUp($event)"
+              (keydown)="onTitleKeydown($event)"
+              [readonly]="!userCanEdit"
               [attr.aria-label]="'Dokumenttitel'"
               i18n-placeholder
               placeholder="Ohne Titel"
-            />
+            ></textarea>
             <div class="rd-doc-file-meta">
               <span>{{ getFileFormatLabel() }}</span>
               @if (previewNumPages() || document()?.page_count) {
@@ -538,49 +540,102 @@
                 <div class="rd-custom-fields-list">
                   @for (fieldInstance of document()?.custom_fields; track fieldInstance.field; let i = $index) {
                     @if (customFieldFormFields.controls[i]) {
-                      <div class="rd-cf-row" [formGroup]="customFieldFormFields.controls[i]">
-                        <span class="rd-info-label">{{ getCustomFieldFromInstance(fieldInstance)?.name }}</span>
-                        <div class="rd-cf-value">
-                          @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
-                            @case (CustomFieldDataType.Boolean) {
-                              <div class="form-check form-switch m-0">
-                                <input type="checkbox" class="form-check-input" formControlName="value" />
-                              </div>
+                      @let cf = getCustomFieldFromInstance(fieldInstance);
+                      @if (isMultilineCustomField(cf)) {
+                        <div class="rd-cf-row rd-cf-row--multiline" [formGroup]="customFieldFormFields.controls[i]">
+                          <div class="rd-cf-header">
+                            <label class="rd-info-label" [for]="'rd-cf-' + fieldInstance.field">{{ cf?.name }}</label>
+                            @if (userCanEdit) {
+                              <button
+                                type="button"
+                                class="rd-cf-remove"
+                                (click)="removeField(fieldInstance)"
+                                title="Feld entfernen"
+                                i18n-title
+                              >
+                                <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                              </button>
                             }
-                            @case (CustomFieldDataType.Date) {
-                              <input type="date" class="rd-inline-input" formControlName="value" />
+                          </div>
+                          @switch (cf?.data_type) {
+                            @case (CustomFieldDataType.LongText) {
+                              <textarea
+                                [id]="'rd-cf-' + fieldInstance.field"
+                                class="rd-cf-textarea rd-cf-textarea--long"
+                                rows="3"
+                                formControlName="value"
+                                [readonly]="!userCanEdit"
+                                [attr.aria-label]="cf?.name"
+                              ></textarea>
                             }
-                            @case (CustomFieldDataType.Integer) {
-                              <input type="number" class="rd-inline-input" formControlName="value" />
-                            }
-                            @case (CustomFieldDataType.Float) {
-                              <input type="number" step="0.01" class="rd-inline-input" formControlName="value" />
-                            }
-                            @case (CustomFieldDataType.Select) {
-                              <select class="rd-inline-select" formControlName="value">
-                                <option [ngValue]="null">—</option>
-                                @for (opt of getCustomFieldFromInstance(fieldInstance)?.extra_data?.select_options; track opt.id) {
-                                  <option [ngValue]="opt.id">{{ opt.label }}</option>
-                                }
-                              </select>
+                            @case (CustomFieldDataType.Url) {
+                              <textarea
+                                [id]="'rd-cf-' + fieldInstance.field"
+                                class="rd-cf-textarea rd-cf-textarea--url"
+                                rows="2"
+                                formControlName="value"
+                                [readonly]="!userCanEdit"
+                                (keydown.enter)="$event.preventDefault()"
+                                [attr.aria-label]="cf?.name"
+                              ></textarea>
                             }
                             @default {
-                              <input type="text" class="rd-inline-input" formControlName="value" />
+                              <textarea
+                                [id]="'rd-cf-' + fieldInstance.field"
+                                class="rd-cf-textarea"
+                                rows="2"
+                                formControlName="value"
+                                [readonly]="!userCanEdit"
+                                [attr.aria-label]="cf?.name"
+                              ></textarea>
                             }
                           }
-                          @if (userCanEdit) {
-                            <button
-                              type="button"
-                              class="rd-cf-remove"
-                              (click)="removeField(fieldInstance)"
-                              title="Feld entfernen"
-                              i18n-title
-                            >
-                              <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
-                            </button>
-                          }
                         </div>
-                      </div>
+                      } @else {
+                        <div class="rd-cf-row" [formGroup]="customFieldFormFields.controls[i]">
+                          <span class="rd-info-label">{{ cf?.name }}</span>
+                          <div class="rd-cf-value">
+                            @switch (cf?.data_type) {
+                              @case (CustomFieldDataType.Boolean) {
+                                <div class="form-check form-switch m-0">
+                                  <input type="checkbox" class="form-check-input" formControlName="value" />
+                                </div>
+                              }
+                              @case (CustomFieldDataType.Date) {
+                                <input type="date" class="rd-inline-input" formControlName="value" />
+                              }
+                              @case (CustomFieldDataType.Integer) {
+                                <input type="number" class="rd-inline-input" formControlName="value" />
+                              }
+                              @case (CustomFieldDataType.Float) {
+                                <input type="number" step="0.01" class="rd-inline-input" formControlName="value" />
+                              }
+                              @case (CustomFieldDataType.Select) {
+                                <select class="rd-inline-select" formControlName="value">
+                                  <option [ngValue]="null">—</option>
+                                  @for (opt of cf?.extra_data?.select_options; track opt.id) {
+                                    <option [ngValue]="opt.id">{{ opt.label }}</option>
+                                  }
+                                </select>
+                              }
+                              @default {
+                                <input type="text" class="rd-inline-input" formControlName="value" />
+                              }
+                            }
+                            @if (userCanEdit) {
+                              <button
+                                type="button"
+                                class="rd-cf-remove"
+                                (click)="removeField(fieldInstance)"
+                                title="Feld entfernen"
+                                i18n-title
+                              >
+                                <pngx-bs-icon name="x" width="12" height="12"></pngx-bs-icon>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
                     }
                   }
                 </div>
@@ -625,18 +680,18 @@
 
               @if (userCanEdit) {
                 <div class="rd-note-composer">
-                  <input
-                    type="text"
+                  <textarea
                     class="rd-note-input"
+                    rows="2"
                     [ngModel]="newNoteText()"
                     (ngModelChange)="newNoteText.set($event)"
                     [ngModelOptions]="{ standalone: true }"
-                    (keydown.enter)="$event.preventDefault(); submitQuickNote()"
+                    (keydown)="onNoteKeydown($event)"
                     placeholder="Notiz hinzufügen …"
                     i18n-placeholder
                     aria-label="Notiz hinzufügen"
                     i18n-aria-label
-                  />
+                  ></textarea>
                   <button
                     type="button"
                     class="rd-note-send"

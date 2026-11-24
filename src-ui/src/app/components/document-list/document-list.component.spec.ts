@@ -25,8 +25,12 @@ import {
   Document,
 } from 'src/app/data/document'
 import {
+  FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+  FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_TAGS_ANY,
 } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
@@ -39,8 +43,11 @@ import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import {
@@ -917,5 +924,383 @@ describe('DocumentListComponent', () => {
       new KeyboardEvent('keydown', { key: 'ArrowLeft', ctrlKey: true })
     )
     expect(component.list.currentPage).toEqual(1)
+  })
+  it('should only request selection data while the advanced filters are shown', () => {
+    const retainSpy = jest.spyOn(documentListService, 'retainSelectionData')
+    const releaseSpy = jest.spyOn(documentListService, 'releaseSelectionData')
+    fixture.detectChanges()
+    expect(retainSpy).not.toHaveBeenCalled()
+    expect(documentListService.selectionDataRequired).toBeFalsy()
+
+    component.showAdvancedFilters.set(true)
+    fixture.detectChanges()
+    expect(retainSpy).toHaveBeenCalledTimes(1)
+    expect(documentListService.selectionDataRequired).toBeTruthy()
+
+    component.showAdvancedFilters.set(false)
+    fixture.detectChanges()
+    expect(releaseSpy).toHaveBeenCalledTimes(1)
+    expect(documentListService.selectionDataRequired).toBeFalsy()
+
+    component.showAdvancedFilters.set(true)
+    fixture.detectChanges()
+    expect(retainSpy).toHaveBeenCalledTimes(2)
+    fixture.destroy()
+    expect(releaseSpy).toHaveBeenCalledTimes(2)
+    expect(documentListService.selectionDataRequired).toBeFalsy()
+  })
+
+  it('should memoize active quick filter ids while filter rules are unchanged', () => {
+    jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
+    documentListService.setFilterRules([
+      { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: '3' },
+      { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: '5' },
+    ])
+    const documentTypeIds = component.activeDocumentTypeFilterIds
+    const correspondentIds = component.activeCorrespondentFilterIds
+    expect(documentTypeIds).toEqual(new Set([3]))
+    expect(correspondentIds).toEqual(new Set([5]))
+    expect(component.activeDocumentTypeFilterIds).toBe(documentTypeIds)
+    expect(component.activeCorrespondentFilterIds).toBe(correspondentIds)
+
+    // unrelated list state change keeps the same instances
+    documentListService.selectNone()
+    expect(component.activeDocumentTypeFilterIds).toBe(documentTypeIds)
+    expect(component.activeCorrespondentFilterIds).toBe(correspondentIds)
+
+    documentListService.setFilterRules([
+      { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: '4' },
+    ])
+    expect(component.activeDocumentTypeFilterIds).toEqual(new Set([4]))
+    expect(component.activeCorrespondentFilterIds.size).toEqual(0)
+    expect(component.isQuickDocumentTypeActive(4)).toBeTruthy()
+    expect(component.isQuickDocumentTypeActive(3)).toBeFalsy()
+    expect(component.isQuickCorrespondentActive(5)).toBeFalsy()
+  })
+
+  it('should compute the hidden active correspondent only when it can change', () => {
+    const rafCallbacks: FrameRequestCallback[] = []
+    jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((cb: FrameRequestCallback) => {
+        rafCallbacks.push(cb)
+        return rafCallbacks.length
+      })
+    const flushAnimationFrames = () =>
+      rafCallbacks.splice(0).forEach((cb) => cb(0))
+    jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
+    documentListService.setFilterRules([])
+
+    fixture.detectChanges()
+    component.allCorrespondents.set([
+      { id: 1, name: 'Correspondent 1' },
+      { id: 2, name: 'Correspondent 2' },
+    ] as any)
+    fixture.detectChanges()
+    flushAnimationFrames()
+    expect(component.hasHiddenActiveCorrespondent).toBeFalsy()
+
+    // the active pill wrapped into the hidden second row
+    const offsetTopSpy = jest
+      .spyOn(HTMLElement.prototype, 'offsetTop', 'get')
+      .mockReturnValue(40)
+    documentListService.setFilterRules([
+      { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: '2' },
+    ])
+    fixture.detectChanges()
+    flushAnimationFrames()
+    expect(component.hasHiddenActiveCorrespondent).toBeTruthy()
+
+    // reading the getter does not touch the DOM
+    offsetTopSpy.mockClear()
+    for (let i = 0; i < 5; i++) {
+      expect(component.hasHiddenActiveCorrespondent).toBeTruthy()
+    }
+    expect(offsetTopSpy).not.toHaveBeenCalled()
+
+    // expanded row shows all pills
+    component.toggleCorrespondentsRowExpanded()
+    fixture.detectChanges()
+    expect(component.hasHiddenActiveCorrespondent).toBeFalsy()
+    component.toggleCorrespondentsRowExpanded()
+    fixture.detectChanges()
+    flushAnimationFrames()
+    expect(component.hasHiddenActiveCorrespondent).toBeTruthy()
+
+    // clearing the filter resets it
+    documentListService.setFilterRules([])
+    fixture.detectChanges()
+    expect(component.hasHiddenActiveCorrespondent).toBeFalsy()
+    offsetTopSpy.mockRestore()
+  })
+
+  it('should refresh documents and clear taxonomy caches via refreshDocuments()', () => {
+    permissionService.initialize([], { is_superuser: true } as any)
+    const tagService = TestBed.inject(TagService)
+    const correspondentService = TestBed.inject(CorrespondentService)
+    const documentTypeService = TestBed.inject(DocumentTypeService)
+
+    const tagClearSpy = jest.spyOn(tagService, 'clearCache')
+    const corrClearSpy = jest.spyOn(correspondentService, 'clearCache')
+    const dtClearSpy = jest.spyOn(documentTypeService, 'clearCache')
+    jest
+      .spyOn(tagService, 'listAll')
+      .mockReturnValue(of({ count: 0, results: [] }))
+    jest
+      .spyOn(correspondentService, 'listAll')
+      .mockReturnValue(of({ count: 0, results: [] }))
+    jest
+      .spyOn(documentTypeService, 'listAll')
+      .mockReturnValue(of({ count: 0, results: [] }))
+
+    let finishCallback: (() => void) | undefined
+    const reloadSpy = jest
+      .spyOn(documentListService, 'reload')
+      .mockImplementation((onFinish?: () => void) => {
+        finishCallback = onFinish
+      })
+
+    component.refreshDocuments()
+
+    expect(component.isRefreshing()).toBeTruthy()
+    expect(reloadSpy).toHaveBeenCalledTimes(1)
+    expect(tagClearSpy).toHaveBeenCalledTimes(1)
+    expect(corrClearSpy).toHaveBeenCalledTimes(1)
+    expect(dtClearSpy).toHaveBeenCalledTimes(1)
+
+    finishCallback?.()
+    expect(component.isRefreshing()).toBeFalsy()
+  })
+
+  it('should clear isRefreshing when reload fails with an error', () => {
+    jest
+      .spyOn(documentService, 'listFiltered')
+      .mockReturnValue(
+        throwError(() => new HttpErrorResponse({ error: 'Network failure' }))
+      )
+    fixture.detectChanges()
+
+    component.refreshDocuments()
+    fixture.detectChanges()
+
+    expect(documentListService.isReloading).toBeFalsy()
+    expect(component.isRefreshing()).toBeFalsy()
+  })
+
+  it('should cycle document type and correspondent quick pills through Neutral -> Include -> Exclude -> Neutral', () => {
+    jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
+    documentListService.setFilterRules([])
+
+    // Document type tri-state cycle
+    component.toggleQuickDocumentType(1)
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: '1' },
+    ])
+    expect(component.isQuickDocumentTypeActive(1)).toBeTruthy()
+    expect(component.isQuickDocumentTypeExcluded(1)).toBeFalsy()
+    expect(component.hasQuickPillFilter).toBeTruthy()
+
+    component.toggleQuickDocumentType(1)
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '1' },
+    ])
+    expect(component.isQuickDocumentTypeActive(1)).toBeFalsy()
+    expect(component.isQuickDocumentTypeExcluded(1)).toBeTruthy()
+    expect(component.hasQuickPillFilter).toBeTruthy()
+
+    component.toggleQuickDocumentType(1)
+    expect(documentListService.filterRules).toEqual([])
+    expect(component.isQuickDocumentTypeActive(1)).toBeFalsy()
+    expect(component.isQuickDocumentTypeExcluded(1)).toBeFalsy()
+    expect(component.hasQuickPillFilter).toBeFalsy()
+
+    // Correspondent tri-state cycle
+    component.toggleQuickCorrespondent(7)
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: '7' },
+    ])
+    expect(component.isQuickCorrespondentActive(7)).toBeTruthy()
+    expect(component.isQuickCorrespondentExcluded(7)).toBeFalsy()
+
+    component.toggleQuickCorrespondent(7)
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '7' },
+    ])
+    expect(component.isQuickCorrespondentActive(7)).toBeFalsy()
+    expect(component.isQuickCorrespondentExcluded(7)).toBeTruthy()
+
+    component.toggleQuickCorrespondent(7)
+    expect(documentListService.filterRules).toEqual([])
+    expect(component.isQuickCorrespondentActive(7)).toBeFalsy()
+    expect(component.isQuickCorrespondentExcluded(7)).toBeFalsy()
+  })
+
+  it('should support multi-exclude via quickFilterExcludeMode, Alt+Click, right-click, and follow-up clicks', () => {
+    jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
+    documentListService.setFilterRules([])
+    fixture.detectChanges()
+
+    component.allDocumentTypes.set([
+      { id: 1, name: 'Invoice' },
+      { id: 2, name: 'Contract' },
+      { id: 3, name: 'Letter' },
+    ] as any)
+    component.allCorrespondents.set([
+      { id: 10, name: 'Acme' },
+      { id: 11, name: 'Bank' },
+    ] as any)
+    fixture.detectChanges()
+
+    // Exclude mode toggle allows multi-excluding document types & correspondents
+    component.toggleQuickFilterExcludeMode()
+    expect(component.quickFilterExcludeMode()).toBeTruthy()
+
+    component.toggleQuickDocumentType(1)
+    component.toggleQuickDocumentType(2)
+    component.toggleQuickCorrespondent(10)
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '1' },
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '2' },
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '10' },
+    ])
+
+    // Toggle mode back off and verify Alt+Click and right-click exclusion
+    component.toggleQuickFilterExcludeMode()
+    expect(component.quickFilterExcludeMode()).toBeFalsy()
+    documentListService.setFilterRules([
+      { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: '1' },
+    ])
+
+    // Alt+Click replaces include rule for document type with exclude rule
+    component.toggleQuickDocumentType(2, new MouseEvent('click', { altKey: true }))
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '2' },
+    ])
+
+    // While excluded rules exist on the row, normal-clicking another pill adds it to exclude
+    component.toggleQuickDocumentType(3)
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '2' },
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '3' },
+    ])
+
+    // Right-click on correspondent pill excludes it without touching document type exclusions
+    fixture.detectChanges()
+    const corrButtons = fixture.debugElement.queryAll(
+      By.css('.rd-filter-pill-correspondent')
+    )
+    const contextEvent = new MouseEvent('contextmenu', { cancelable: true })
+    corrButtons[1].nativeElement.dispatchEvent(contextEvent)
+    expect(contextEvent.defaultPrevented).toBeTruthy()
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '2' },
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '3' },
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '11' },
+    ])
+  })
+
+  it('should deactivate Alle pills when exclusions are active and clear excluded rules on reset', () => {
+    jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
+    fixture.detectChanges()
+    component.allDocumentTypes.set([{ id: 1, name: 'Invoice' }] as any)
+    component.allCorrespondents.set([{ id: 10, name: 'Acme' }] as any)
+    documentListService.setFilterRules([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '1' },
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '10' },
+      { rule_type: FILTER_HAS_TAGS_ANY, value: '99' },
+    ])
+    fixture.detectChanges()
+
+    const docTypeGroup = fixture.debugElement.query(
+      By.css('[role="group"][aria-label="Dokumenttypen"]')
+    )
+    const allTypesButton = docTypeGroup.query(By.css('.rd-filter-pill'))
+    expect(
+      allTypesButton.nativeElement.classList.contains('is-active')
+    ).toBeFalsy()
+    expect(allTypesButton.nativeElement.getAttribute('aria-pressed')).toBe(
+      'false'
+    )
+
+    const corrTrack = fixture.debugElement.query(By.css('.rd-correspondents-track'))
+    const allCorrsButton = corrTrack.query(By.css('.rd-filter-pill'))
+    expect(
+      allCorrsButton.nativeElement.classList.contains('is-active')
+    ).toBeFalsy()
+    expect(allCorrsButton.nativeElement.getAttribute('aria-pressed')).toBe(
+      'false'
+    )
+
+    // clearQuickDocumentTypes clears excluded document types only
+    component.clearQuickDocumentTypes()
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '10' },
+      { rule_type: FILTER_HAS_TAGS_ANY, value: '99' },
+    ])
+    fixture.detectChanges()
+    expect(
+      allTypesButton.nativeElement.classList.contains('is-active')
+    ).toBeTruthy()
+    expect(
+      allCorrsButton.nativeElement.classList.contains('is-active')
+    ).toBeFalsy()
+
+    // clearQuickCorrespondents clears excluded correspondents only
+    component.clearQuickCorrespondents()
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_HAS_TAGS_ANY, value: '99' },
+    ])
+    fixture.detectChanges()
+    expect(
+      allCorrsButton.nativeElement.classList.contains('is-active')
+    ).toBeTruthy()
+
+    // clearQuickPillFilters clears both document type and correspondent exclusions while preserving tags
+    documentListService.setFilterRules([
+      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '1' },
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '10' },
+      { rule_type: FILTER_HAS_TAGS_ANY, value: '99' },
+    ])
+    component.clearQuickPillFilters()
+    expect(documentListService.filterRules).toEqual([
+      { rule_type: FILTER_HAS_TAGS_ANY, value: '99' },
+    ])
+  })
+
+  it('should detect a hidden excluded correspondent in the collapsed row', () => {
+    const rafCallbacks: FrameRequestCallback[] = []
+    jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((cb: FrameRequestCallback) => {
+        rafCallbacks.push(cb)
+        return rafCallbacks.length
+      })
+    const flushAnimationFrames = () =>
+      rafCallbacks.splice(0).forEach((cb) => cb(0))
+    jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
+    documentListService.setFilterRules([])
+
+    fixture.detectChanges()
+    component.allCorrespondents.set([
+      { id: 1, name: 'Correspondent 1' },
+      { id: 2, name: 'Correspondent 2' },
+    ] as any)
+    fixture.detectChanges()
+    flushAnimationFrames()
+
+    const offsetTopSpy = jest
+      .spyOn(HTMLElement.prototype, 'offsetTop', 'get')
+      .mockReturnValue(40)
+    documentListService.setFilterRules([
+      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '2' },
+    ])
+    fixture.detectChanges()
+    flushAnimationFrames()
+    expect(component.hasHiddenActiveCorrespondent).toBeTruthy()
+
+    documentListService.setFilterRules([])
+    fixture.detectChanges()
+    expect(component.hasHiddenActiveCorrespondent).toBeFalsy()
+    offsetTopSpy.mockRestore()
   })
 })

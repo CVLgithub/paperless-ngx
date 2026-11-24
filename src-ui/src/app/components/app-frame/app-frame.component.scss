@@ -280,6 +280,21 @@
   white-space: nowrap;
 }
 
+.rd-save-next-btn {
+  border-color: rgba(var(--rd-accent-rgb), 0.22);
+  gap: 5px;
+  flex-shrink: 0;
+
+  @media (max-width: 1199.98px) {
+    padding: 0 11px;
+  }
+}
+
+:host-context([data-bs-theme='dark']) .rd-save-next-btn {
+  color: color-mix(in srgb, var(--rd-accent) 65%, #ffffff);
+  border-color: rgba(var(--rd-accent-rgb), 0.36);
+}
+
 .rd-main {
   flex: 1 1 auto;
   padding: 8px 24px 36px 16px;

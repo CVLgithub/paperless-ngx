@@ -23,7 +23,7 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { Subject, of, throwError } from 'rxjs'
+import { EMPTY, Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
@@ -69,6 +69,7 @@ import {
   PdfZoomLevel,
   PdfZoomScale,
 } from '../common/pdf-viewer/pdf-viewer.types'
+import { RedesignTopbarService } from '../redesign/redesign-topbar.service'
 import { DocumentDetailComponent } from './document-detail.component'
 
 const doc: Document = {
@@ -430,7 +431,7 @@ describe('DocumentDetailComponent', () => {
     )
 
     fixture.detectChanges()
-    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+    httpTestingController.expectNone(component.previewUrl())
 
     expect(getRootSpy).toHaveBeenCalledWith(10)
     expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'details'], {
@@ -462,7 +463,7 @@ describe('DocumentDetailComponent', () => {
     )
 
     fixture.detectChanges()
-    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+    httpTestingController.expectNone(component.previewUrl())
 
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
@@ -508,7 +509,7 @@ describe('DocumentDetailComponent', () => {
     )
 
     fixture.detectChanges()
-    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+    httpTestingController.expectNone(component.previewUrl())
     fixture.detectChanges()
 
     const deleteButtons = fixture.debugElement.queryAll(
@@ -1386,7 +1387,7 @@ describe('DocumentDetailComponent', () => {
     const metadataSpy = jest.spyOn(documentService, 'getMetadata')
     metadataSpy.mockReturnValue(of({ has_archive_version: true }))
     initNormally()
-    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+    httpTestingController.expectNone(component.previewUrl())
 
     expect(metadataSpy).toHaveBeenCalledWith(doc.id, null)
 
@@ -1402,7 +1403,7 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValue(of({ content: 'root' } as Document))
 
     component.selectVersion(doc.id)
-    httpTestingController.expectOne('preview-root').flush('root')
+    httpTestingController.expectNone('preview-root')
 
     expect(metadataSpy).toHaveBeenCalledWith(doc.id, doc.id)
   })
@@ -2207,6 +2208,12 @@ describe('DocumentDetailComponent', () => {
 
   it('selectVersion should update preview and handle preview failures', () => {
     const previewSpy = jest.spyOn(documentService, 'getPreviewUrl')
+    jest.spyOn(documentService, 'getMetadata').mockReturnValue(
+      of({
+        has_archive_version: false,
+        original_mime_type: 'text/plain',
+      } as any)
+    )
     initNormally()
     httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
@@ -2239,7 +2246,6 @@ describe('DocumentDetailComponent', () => {
 
   it('selectVersion should show toast if version content retrieval fails', () => {
     initNormally()
-    httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
     jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-ok')
     jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-ok')
@@ -2253,7 +2259,8 @@ describe('DocumentDetailComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showError')
 
     component.selectVersion(10)
-    httpTestingController.expectOne('preview-ok').flush('preview text')
+    // archived (PDF) version: the viewer loads the file, no text request
+    httpTestingController.expectNone('preview-ok')
 
     expect(toastSpy).toHaveBeenCalledWith(
       'Error retrieving version content',
@@ -2300,7 +2307,13 @@ describe('DocumentDetailComponent', () => {
     jest
       .spyOn(documentService, 'getMetadata')
       .mockReturnValueOnce(version10Metadata)
-      .mockReturnValueOnce(of({ lang: 'de' }))
+      .mockReturnValueOnce(
+        of({
+          lang: 'de',
+          has_archive_version: false,
+          original_mime_type: 'text/plain',
+        })
+      )
 
     component.selectVersion(10)
     component.selectVersion(12)
@@ -2315,10 +2328,11 @@ describe('DocumentDetailComponent', () => {
     expect(
       httpTestingController.expectOne(component.previewUrl()).cancelled
     ).toBeFalsy()
+    // version 10 was superseded before its metadata arrived, so its preview
+    // text is never requested
     expect(
-      httpTestingController.match((req) => req.url.includes('version=10'))[0]
-        ?.cancelled
-    ).toBeTruthy()
+      httpTestingController.match((req) => req.url.includes('version=10'))
+    ).toHaveLength(0)
   })
 
   it('should confirm before discarding unsaved content edits when switching versions', () => {
@@ -2539,8 +2553,8 @@ describe('DocumentDetailComponent', () => {
 
   it('should try to render tiff and show error if failed', () => {
     initNormally()
-    // just the text request
-    httpTestingController.expectOne(component.previewUrl())
+    // no text request for non-text documents
+    httpTestingController.expectNone(component.previewUrl())
 
     // invalid tiff
     component['tryRenderTiff']()
@@ -2727,6 +2741,12 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should set previewText', () => {
+    jest.spyOn(documentService, 'getMetadata').mockReturnValue(
+      of({
+        has_archive_version: false,
+        original_mime_type: 'text/plain',
+      } as any)
+    )
     initNormally()
     const previewText = 'Hello world, this is a test'
     httpTestingController.expectOne(component.previewUrl()).flush(previewText)
@@ -2734,6 +2754,12 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should set previewText to error message if preview fails', () => {
+    jest.spyOn(documentService, 'getMetadata').mockReturnValue(
+      of({
+        has_archive_version: false,
+        original_mime_type: 'text/plain',
+      } as any)
+    )
     initNormally()
     httpTestingController
       .expectOne(component.previewUrl())
@@ -2741,6 +2767,81 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewText()).toContain(
       'An error occurred loading content'
     )
+  })
+
+  it('should not fetch the preview as text for pdf documents', () => {
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(
+        of({ has_archive_version: true, original_mime_type: 'application/pdf' })
+      )
+    initNormally()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.PDF
+    )
+    expect(component.pdfSource()).toEqual(component.previewUrl())
+    httpTestingController.expectNone(component.previewUrl())
+    expect(component.previewText()).toBeUndefined()
+  })
+
+  it('should fetch the preview as text for text/plain documents', () => {
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(
+        of({ has_archive_version: false, original_mime_type: 'text/plain' })
+      )
+    initNormally()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.Text
+    )
+    const req = httpTestingController.expectOne(component.previewUrl())
+    expect(req.request.method).toEqual('GET')
+    expect(req.request.responseType).toEqual('text')
+    req.flush('plain text')
+    expect(component.previewText()).toEqual('plain text')
+  })
+
+  it('should fall back to the document mime type for text preview if metadata fails', () => {
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(throwError(() => new Error('metadata failed')))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(
+      of({
+        ...doc,
+        archived_file_name: null,
+        mime_type: 'text/plain',
+      } as Document)
+    )
+    initNormally()
+    httpTestingController
+      .expectOne(component.previewUrl())
+      .flush('fallback text')
+    expect(component.previewText()).toEqual('fallback text')
+  })
+
+  it('should not fetch the preview as text for tiff documents', () => {
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(
+        of({ has_archive_version: false, original_mime_type: 'image/tiff' })
+      )
+    initNormally()
+    // only the arraybuffer request from tryRenderTiff
+    const req = httpTestingController.expectOne(component.previewUrl())
+    expect(req.request.responseType).toEqual('arraybuffer')
+  })
+
+  it('should return a stable page number array', () => {
+    initNormally()
+    component.previewNumPages.set(3)
+    const pages = component.getPageNumbers()
+    expect(pages).toEqual([1, 2, 3])
+    expect(component.getPageNumbers()).toBe(pages)
+    component.previewNumPages.set(80)
+    expect(component.getPageNumbers()).toHaveLength(50)
+    component.previewNumPages.set(undefined)
+    component.document.set({ ...component.document(), page_count: 0 })
+    expect(component.getPageNumbers()).toEqual([])
   })
 
   it('should print document successfully', () => {
@@ -2926,5 +3027,230 @@ describe('DocumentDetailComponent', () => {
       createObjectURLSpy.mockRestore()
       revokeObjectURLSpy.mockRestore()
     })
+  })
+
+  it('should render String, LongText, and Url custom fields as stacked resizable textareas while keeping Integer inline', () => {
+    currentUserCan = true
+    currentUserHasObjectPermissions = true
+    currentUserOwnsObject = true
+
+    const richCustomFields = [
+      {
+        id: 0,
+        name: 'Text Field',
+        data_type: CustomFieldDataType.String,
+        created: new Date(),
+      },
+      {
+        id: 1,
+        name: 'Integer Field',
+        data_type: CustomFieldDataType.Integer,
+        created: new Date(),
+      },
+      {
+        id: 2,
+        name: 'Long Text Field',
+        data_type: CustomFieldDataType.LongText,
+        created: new Date(),
+      },
+      {
+        id: 3,
+        name: 'URL Field',
+        data_type: CustomFieldDataType.Url,
+        created: new Date(),
+      },
+    ]
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
+    jest
+      .spyOn(openDocumentsService, 'openDocument')
+      .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({ all: [0, 1, 2, 3], count: 4, results: richCustomFields })
+    )
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(
+      of({
+        ...doc,
+        custom_fields: [
+          { field: 0, value: 'Short note' },
+          { field: 1, value: 42 },
+          { field: 2, value: 'Line 1\nLine 2' },
+          { field: 3, value: 'https://example.com/very/long/path' },
+        ] as CustomFieldInstance[],
+      })
+    )
+
+    fixture.detectChanges()
+
+    const multilineRows = fixture.debugElement.queryAll(
+      By.css('.rd-cf-row.rd-cf-row--multiline')
+    )
+    expect(multilineRows).toHaveLength(3)
+
+    const textareas = fixture.debugElement.queryAll(
+      By.css('textarea.rd-cf-textarea')
+    )
+    expect(textareas).toHaveLength(3)
+    expect(textareas[0].nativeElement.getAttribute('rows')).toBe('2')
+    expect(textareas[0].nativeElement.value).toBe('Short note')
+    expect(textareas[1].nativeElement.getAttribute('rows')).toBe('3')
+    expect(
+      textareas[1].nativeElement.classList.contains('rd-cf-textarea--long')
+    ).toBe(true)
+    expect(textareas[1].nativeElement.value).toBe('Line 1\nLine 2')
+    expect(textareas[2].nativeElement.getAttribute('rows')).toBe('2')
+    expect(
+      textareas[2].nativeElement.classList.contains('rd-cf-textarea--url')
+    ).toBe(true)
+
+    const inlineNumberInput = fixture.debugElement.query(
+      By.css('.rd-cf-row:not(.rd-cf-row--multiline) input[type="number"]')
+    )
+    expect(inlineNumberInput).not.toBeNull()
+    expect(inlineNumberInput.nativeElement.value).toBe('42')
+
+    // Editing textarea updates reactive form value and marks control dirty
+    textareas[0].nativeElement.value = 'Updated custom text'
+    textareas[0].nativeElement.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    expect(component.customFieldFormFields.at(0).get('value').value).toBe(
+      'Updated custom text'
+    )
+    expect(component.customFieldFormFields.at(0).get('value').dirty).toBe(true)
+  })
+
+  it('should render notes composer as textarea and submit on Enter without Shift while allowing Shift+Enter', () => {
+    currentUserCan = true
+    currentUserHasObjectPermissions = true
+    currentUserOwnsObject = true
+    settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, true)
+
+    initNormally()
+    fixture.detectChanges()
+
+    const noteTextarea = fixture.debugElement.query(
+      By.css('textarea.rd-note-input')
+    )
+    expect(noteTextarea).not.toBeNull()
+    expect(noteTextarea.nativeElement.getAttribute('rows')).toBe('2')
+
+    const submitSpy = jest
+      .spyOn(component, 'submitQuickNote')
+      .mockImplementation(() => {})
+
+    const shiftEnterEvent = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      shiftKey: true,
+      cancelable: true,
+    })
+    noteTextarea.nativeElement.dispatchEvent(shiftEnterEvent)
+    expect(shiftEnterEvent.defaultPrevented).toBe(false)
+    expect(submitSpy).not.toHaveBeenCalled()
+
+    const enterEvent = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      shiftKey: false,
+      cancelable: true,
+    })
+    noteTextarea.nativeElement.dispatchEvent(enterEvent)
+    expect(enterEvent.defaultPrevented).toBe(true)
+    expect(submitSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should render title as resizable textarea and handle Enter without inserting newlines', () => {
+    currentUserCan = true
+    currentUserHasObjectPermissions = true
+    currentUserOwnsObject = true
+
+    initNormally()
+    fixture.detectChanges()
+
+    const titleTextarea = fixture.debugElement.query(
+      By.css('textarea.rd-title-input')
+    )
+    expect(titleTextarea).not.toBeNull()
+    expect(titleTextarea.nativeElement.getAttribute('rows')).toBe('1')
+
+    const saveSpy = jest.spyOn(component, 'save').mockImplementation(() => {})
+    const blurSpy = jest.spyOn(titleTextarea.nativeElement, 'blur')
+
+    // When clean, Enter prevents newline and blurs without saving
+    component.isDirtySignal.set(false)
+    const cleanEnter = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      cancelable: true,
+    })
+    titleTextarea.nativeElement.dispatchEvent(cleanEnter)
+    expect(cleanEnter.defaultPrevented).toBe(true)
+    expect(saveSpy).not.toHaveBeenCalled()
+    expect(blurSpy).toHaveBeenCalled()
+
+    // When dirty and editable, Enter prevents newline and triggers save
+    component.isDirtySignal.set(true)
+    const dirtyEnter = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      cancelable: true,
+    })
+    titleTextarea.nativeElement.dispatchEvent(dirtyEnter)
+    expect(dirtyEnter.defaultPrevented).toBe(true)
+    expect(saveSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should expose hasNext and onSaveAndNext in topbar detail config and delegate to saveEditNext', () => {
+    currentUserCan = true
+    currentUserHasObjectPermissions = true
+    currentUserOwnsObject = true
+
+    const topbar = TestBed.inject(RedesignTopbarService)
+    const hasNextSpy = jest
+      .spyOn(documentListViewService, 'hasNext')
+      .mockReturnValue(true)
+
+    initNormally()
+    fixture.detectChanges()
+
+    expect(hasNextSpy).toHaveBeenCalledWith(doc.id)
+    const config = topbar.detailConfig()
+    expect(config).not.toBeNull()
+    expect(config.hasNext).toBe(true)
+    expect(typeof config.onSaveAndNext).toBe('function')
+
+    const saveNextSpy = jest
+      .spyOn(component, 'saveEditNext')
+      .mockImplementation(() => {})
+    config.onSaveAndNext()
+    expect(saveNextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should handle saveEditNext cleanly when no next document exists and record lastLocalSaveModified', () => {
+    currentUserCan = true
+    currentUserHasObjectPermissions = true
+    currentUserOwnsObject = true
+
+    initNormally()
+    fixture.detectChanges()
+
+    const savedDoc: Document = {
+      ...doc,
+      title: 'Updated Doc 3',
+      modified: '2026-11-24T13:00:00Z',
+    }
+    jest.spyOn(documentService, 'patch').mockReturnValueOnce(of(savedDoc))
+    jest.spyOn(documentListViewService, 'getNext').mockReturnValueOnce(EMPTY)
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    const successToastSpy = jest.spyOn(toastService, 'showSuccess')
+    const errorToastSpy = jest.spyOn(toastService, 'showError')
+
+    component.isDirtySignal.set(true)
+    component.saveEditNext()
+
+    expect(component.networkActive()).toBe(false)
+    expect(component.isDirtySignal()).toBe(false)
+    expect(component['lastLocalSaveModified']).toBe('2026-11-24T13:00:00Z')
+    expect(navigateSpy).not.toHaveBeenCalled()
+    expect(errorToastSpy).not.toHaveBeenCalled()
+    expect(successToastSpy).toHaveBeenCalled()
   })
 })

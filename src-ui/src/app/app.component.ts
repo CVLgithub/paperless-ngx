@@ -2,6 +2,7 @@ import { Component, inject, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
 import { TourNgBootstrap, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { first, Subscription } from 'rxjs'
+import { prefetchPdfJsWhenIdle } from './components/common/pdf-viewer/pdfjs-loader'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
@@ -63,6 +64,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.websocketStatusService.connect()
+    // pdf.js is lazy loaded; warm it up so the first document preview is fast
+    prefetchPdfJsWhenIdle()
 
     this.successSubscription = this.websocketStatusService
       .onDocumentConsumptionFinished()

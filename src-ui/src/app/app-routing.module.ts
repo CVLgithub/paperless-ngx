@@ -1,22 +1,8 @@
 import { NgModule } from '@angular/core'
-import { RouterModule, Routes } from '@angular/router'
-import { ConfigComponent } from './components/admin/config/config.component'
-import { LogsComponent } from './components/admin/logs/logs.component'
-import { SettingsComponent } from './components/admin/settings/settings.component'
-import { TasksComponent } from './components/admin/tasks/tasks.component'
-import { TrashComponent } from './components/admin/trash/trash.component'
-import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
-import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
-import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
-import { DocumentAttributesComponent } from './components/manage/document-attributes/document-attributes.component'
-import { MailComponent } from './components/manage/mail/mail.component'
-import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
-import { ShareLinksComponent } from './components/manage/share-links/share-links.component'
-import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
-import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -68,7 +54,10 @@ export const routes: Routes = [
       },
       {
         path: 'documents/:id',
-        component: DocumentDetailComponent,
+        loadComponent: () =>
+          import('./components/document-detail/document-detail.component').then(
+            (m) => m.DocumentDetailComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -80,7 +69,10 @@ export const routes: Routes = [
       },
       {
         path: 'documents/:id/:section',
-        component: DocumentDetailComponent,
+        loadComponent: () =>
+          import('./components/document-detail/document-detail.component').then(
+            (m) => m.DocumentDetailComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -92,7 +84,10 @@ export const routes: Routes = [
       },
       {
         path: 'asn/:id',
-        component: DocumentAsnComponent,
+        loadComponent: () =>
+          import('./components/document-asn/document-asn.component').then(
+            (m) => m.DocumentAsnComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -104,7 +99,10 @@ export const routes: Routes = [
       },
       {
         path: 'attributes',
-        component: DocumentAttributesComponent,
+        loadComponent: () =>
+          import('./components/manage/document-attributes/document-attributes.component').then(
+            (m) => m.DocumentAttributesComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermissionAny: [
@@ -125,7 +123,10 @@ export const routes: Routes = [
       },
       {
         path: 'attributes/:section',
-        component: DocumentAttributesComponent,
+        loadComponent: () =>
+          import('./components/manage/document-attributes/document-attributes.component').then(
+            (m) => m.DocumentAttributesComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermissionAny: [
@@ -176,7 +177,10 @@ export const routes: Routes = [
       },
       {
         path: 'logs',
-        component: LogsComponent,
+        loadComponent: () =>
+          import('./components/admin/logs/logs.component').then(
+            (m) => m.LogsComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requireAdmin: true,
@@ -185,7 +189,10 @@ export const routes: Routes = [
       },
       {
         path: 'trash',
-        component: TrashComponent,
+        loadComponent: () =>
+          import('./components/admin/trash/trash.component').then(
+            (m) => m.TrashComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -210,7 +217,10 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        component: SettingsComponent,
+        loadComponent: () =>
+          import('./components/admin/settings/settings.component').then(
+            (m) => m.SettingsComponent
+          ),
         canDeactivate: [DirtyFormGuard],
         canActivate: [PermissionsGuard],
         data: {
@@ -223,7 +233,10 @@ export const routes: Routes = [
       },
       {
         path: 'settings/:section',
-        component: SettingsComponent,
+        loadComponent: () =>
+          import('./components/admin/settings/settings.component').then(
+            (m) => m.SettingsComponent
+          ),
         canDeactivate: [DirtyFormGuard],
         canActivate: [PermissionsGuard],
         data: {
@@ -236,7 +249,10 @@ export const routes: Routes = [
       },
       {
         path: 'config',
-        component: ConfigComponent,
+        loadComponent: () =>
+          import('./components/admin/config/config.component').then(
+            (m) => m.ConfigComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -248,7 +264,10 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
-        component: TasksComponent,
+        loadComponent: () =>
+          import('./components/admin/tasks/tasks.component').then(
+            (m) => m.TasksComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -265,7 +284,10 @@ export const routes: Routes = [
       },
       {
         path: 'workflows',
-        component: WorkflowsComponent,
+        loadComponent: () =>
+          import('./components/manage/workflows/workflows.component').then(
+            (m) => m.WorkflowsComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -277,7 +299,10 @@ export const routes: Routes = [
       },
       {
         path: 'mail',
-        component: MailComponent,
+        loadComponent: () =>
+          import('./components/manage/mail/mail.component').then(
+            (m) => m.MailComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -289,7 +314,10 @@ export const routes: Routes = [
       },
       {
         path: 'usersgroups',
-        component: UsersAndGroupsComponent,
+        loadComponent: () =>
+          import('./components/admin/users-groups/users-groups.component').then(
+            (m) => m.UsersAndGroupsComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -301,7 +329,10 @@ export const routes: Routes = [
       },
       {
         path: 'savedviews',
-        component: SavedViewsComponent,
+        loadComponent: () =>
+          import('./components/manage/saved-views/saved-views.component').then(
+            (m) => m.SavedViewsComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -313,7 +344,10 @@ export const routes: Routes = [
       },
       {
         path: 'share-links',
-        component: ShareLinksComponent,
+        loadComponent: () =>
+          import('./components/manage/share-links/share-links.component').then(
+            (m) => m.ShareLinksComponent
+          ),
         canActivate: [PermissionsGuard],
         data: {
           requiredPermissionAny: [
@@ -332,12 +366,22 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '404', component: NotFoundComponent },
+  {
+    path: '404',
+    loadComponent: () =>
+      import('./components/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent
+      ),
+  },
   { path: '**', redirectTo: '/404', pathMatch: 'full' },
 ]
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    // Lazy route chunks are fetched in the background once the first
+    // navigation has completed, so later navigation stays instant.
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

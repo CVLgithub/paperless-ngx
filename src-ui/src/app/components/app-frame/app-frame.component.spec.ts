@@ -41,7 +41,10 @@ import { WebsocketStatusService } from 'src/app/services/websocket-status.servic
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
-import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import {
+  RedesignDetailTopbarConfig,
+  RedesignTopbarService,
+} from '../redesign/redesign-topbar.service'
 import { AppFrameComponent } from './app-frame.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 
@@ -148,12 +151,11 @@ describe('AppFrameComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            firstChild: {
-              component: DocumentDetailComponent,
-            },
             snapshot: {
               firstChild: {
-                component: DocumentDetailComponent,
+                data: {
+                  componentName: 'DocumentDetailComponent',
+                },
                 params: {
                   id: document.id,
                 },
@@ -823,5 +825,86 @@ describe('AppFrameComponent', () => {
     component.toggleSlimSidebar()
 
     expect(component.attributesSectionsCollapsed).toBe(true)
+  })
+
+  it('should show Save & Next button in detail topbar only when dirty, editable, and hasNext, and invoke onSaveAndNext on click', () => {
+    const topbar = TestBed.inject(RedesignTopbarService)
+    const onSaveAndNext = jest.fn()
+    const baseConfig: RedesignDetailTopbarConfig = {
+      breadcrumbParent: 'Alle Dokumente',
+      breadcrumbTitle: 'Testdokument',
+      hasPrevious: false,
+      hasNext: false,
+      inspectorOpen: true,
+      canEdit: true,
+      isDirty: false,
+      isSaving: false,
+      previewUrl: null,
+      canDelete: false,
+      canShare: false,
+      onBackToList: jest.fn(),
+      onPrevious: jest.fn(),
+      onNext: jest.fn(),
+      onSave: jest.fn(),
+      onSaveAndNext,
+      onDiscard: jest.fn(),
+      onDownload: jest.fn(),
+      onShare: jest.fn(),
+      onDelete: jest.fn(),
+      onToggleInspector: jest.fn(),
+    }
+
+    // Hidden when clean
+    topbar.setDetailConfig({ ...baseConfig, isDirty: false, hasNext: true })
+    fixture.detectChanges()
+    expect(fixture.debugElement.query(By.css('.rd-save-next-btn'))).toBeNull()
+
+    // Hidden when user cannot edit
+    topbar.setDetailConfig({
+      ...baseConfig,
+      isDirty: true,
+      canEdit: false,
+      hasNext: true,
+    })
+    fixture.detectChanges()
+    expect(fixture.debugElement.query(By.css('.rd-save-next-btn'))).toBeNull()
+
+    // Hidden when no next document
+    topbar.setDetailConfig({
+      ...baseConfig,
+      isDirty: true,
+      canEdit: true,
+      hasNext: false,
+    })
+    fixture.detectChanges()
+    expect(fixture.debugElement.query(By.css('.rd-save-next-btn'))).toBeNull()
+
+    // Disabled while saving
+    topbar.setDetailConfig({
+      ...baseConfig,
+      isDirty: true,
+      canEdit: true,
+      hasNext: true,
+      isSaving: true,
+    })
+    fixture.detectChanges()
+    const savingBtn = fixture.debugElement.query(By.css('.rd-save-next-btn'))
+    expect(savingBtn).not.toBeNull()
+    expect(savingBtn.nativeElement.disabled).toBe(true)
+
+    // Enabled & clickable when dirty, editable, hasNext, and not saving
+    topbar.setDetailConfig({
+      ...baseConfig,
+      isDirty: true,
+      canEdit: true,
+      hasNext: true,
+      isSaving: false,
+    })
+    fixture.detectChanges()
+    const saveNextBtn = fixture.debugElement.query(By.css('.rd-save-next-btn'))
+    expect(saveNextBtn).not.toBeNull()
+    expect(saveNextBtn.nativeElement.disabled).toBe(false)
+    saveNextBtn.nativeElement.click()
+    expect(onSaveAndNext).toHaveBeenCalledTimes(1)
   })
 })

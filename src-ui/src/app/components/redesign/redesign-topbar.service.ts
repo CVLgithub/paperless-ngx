@@ -27,6 +27,7 @@ export interface RedesignDetailTopbarConfig {
   onPrevious: () => void
   onNext: () => void
   onSave: () => void
+  onSaveAndNext?: () => void
   onDiscard: () => void
   onDownload: () => void
   onShare: () => void

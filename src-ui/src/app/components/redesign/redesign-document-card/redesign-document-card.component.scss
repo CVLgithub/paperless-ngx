@@ -87,6 +87,55 @@
   object-position: top center;
   display: block;
   background: #ffffff;
+  transition: opacity 0.15s ease;
+}
+
+// ---------------------------------------------------------------------------
+// Thumbnail loading placeholder: neutral skeleton + shimmer until the <img>
+// fires `load`; on `error` the neutral surface stays (no broken-image icon).
+// The sheet has a fixed aspect-ratio, so nothing shifts.
+// ---------------------------------------------------------------------------
+.rd-doc-card__sheet.rd-thumb-frame--loading,
+.rd-doc-card__sheet.rd-thumb-frame--error {
+  background: var(--rd-bg-surface-subtle);
+
+  .rd-doc-card__thumb {
+    opacity: 0;
+  }
+}
+
+.rd-doc-card__sheet.rd-thumb-frame--loading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    var(--rd-bg-surface) 50%,
+    transparent 80%
+  );
+  opacity: 0.6;
+  transform: translateX(-100%);
+  animation: rd-thumb-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes rd-thumb-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-doc-card__thumb {
+    transition: none;
+  }
+
+  .rd-doc-card__sheet.rd-thumb-frame--loading::before {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 .rd-doc-card__preview {

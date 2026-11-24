@@ -40,6 +40,7 @@ import {
   tap,
 } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
+import { DocumentDetailFieldID } from 'src/app/data/document-detail-field-id'
 import { Group } from 'src/app/data/group'
 import {
   SystemStatus,
@@ -133,13 +134,8 @@ const systemDateFormat = {
   name: $localize`Use date format of display language`,
 }
 
-export enum DocumentDetailFieldID {
-  ArchiveSerialNumber = 'archive_serial_number',
-  Correspondent = 'correspondent',
-  DocumentType = 'document_type',
-  StoragePath = 'storage_path',
-  Tags = 'tags',
-}
+// re-exported for backwards compatibility, the enum lives in src/app/data
+export { DocumentDetailFieldID }
 
 const documentDetailFieldOptions = [
   {
