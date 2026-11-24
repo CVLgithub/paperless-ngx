@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common'
+import { AsyncPipe, NgClass } from '@angular/common'
 import {
   Component,
   computed,
@@ -179,7 +179,6 @@ function setsEqual(a: Set<number>, b: Set<number>): boolean {
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,
-    NgTemplateOutlet,
     NgbDropdownModule,
     NgbPaginationModule,
     NgClass,
@@ -216,7 +215,6 @@ export class DocumentListComponent
   readonly selectionMode = signal(false)
   readonly showAdvancedFilters = signal(false)
   readonly isRefreshing = signal(false)
-  readonly quickFilterExcludeMode = signal(false)
 
   /**
    * Ensure manual refresh state settles even if a reload fails or is superseded
@@ -705,10 +703,6 @@ export class DocumentListComponent
     )
   }
 
-  toggleQuickFilterExcludeMode(): void {
-    this.quickFilterExcludeMode.update((mode) => !mode)
-  }
-
   clearQuickDocumentTypes(): void {
     const remaining = (this.list.filterRules || []).filter(
       (r) =>
@@ -763,7 +757,7 @@ export class DocumentListComponent
   }
 
   toggleQuickDocumentType(documentTypeId: number, event?: MouseEvent): void {
-    if (event?.altKey || this.quickFilterExcludeMode()) {
+    if (event?.altKey) {
       this.toggleQuickDocumentTypeExclude(documentTypeId)
       return
     }
@@ -817,7 +811,7 @@ export class DocumentListComponent
   }
 
   toggleQuickCorrespondent(correspondentId: number, event?: MouseEvent): void {
-    if (event?.altKey || this.quickFilterExcludeMode()) {
+    if (event?.altKey) {
       this.toggleQuickCorrespondentExclude(correspondentId)
       return
     }
@@ -877,10 +871,7 @@ export class DocumentListComponent
     if (isExcluded) {
       return $localize`Ausgeblendet · Klick: zurücksetzen`
     }
-    if (
-      this.quickFilterExcludeMode() ||
-      (excludedCount > 0 && activeCount === 0)
-    ) {
+    if (excludedCount > 0 && activeCount === 0) {
       return $localize`Klick: ausblenden`
     }
     if (isActive) {

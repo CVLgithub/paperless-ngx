@@ -3093,14 +3093,14 @@ describe('DocumentDetailComponent', () => {
       By.css('textarea.rd-cf-textarea')
     )
     expect(textareas).toHaveLength(3)
-    expect(textareas[0].nativeElement.getAttribute('rows')).toBe('2')
+    expect(textareas[0].nativeElement.getAttribute('rows')).toBe('1')
     expect(textareas[0].nativeElement.value).toBe('Short note')
-    expect(textareas[1].nativeElement.getAttribute('rows')).toBe('3')
+    expect(textareas[1].nativeElement.getAttribute('rows')).toBe('1')
     expect(
       textareas[1].nativeElement.classList.contains('rd-cf-textarea--long')
     ).toBe(true)
     expect(textareas[1].nativeElement.value).toBe('Line 1\nLine 2')
-    expect(textareas[2].nativeElement.getAttribute('rows')).toBe('2')
+    expect(textareas[2].nativeElement.getAttribute('rows')).toBe('1')
     expect(
       textareas[2].nativeElement.classList.contains('rd-cf-textarea--url')
     ).toBe(true)
@@ -3111,14 +3111,19 @@ describe('DocumentDetailComponent', () => {
     expect(inlineNumberInput).not.toBeNull()
     expect(inlineNumberInput.nativeElement.value).toBe('42')
 
-    // Editing textarea updates reactive form value and marks control dirty
-    textareas[0].nativeElement.value = 'Updated custom text'
+    // Editing textarea updates reactive form value, marks control dirty, and auto-resizes to scrollHeight
+    Object.defineProperty(textareas[0].nativeElement, 'scrollHeight', {
+      configurable: true,
+      value: 148,
+    })
+    textareas[0].nativeElement.value = 'Updated custom text\nwith multiple lines'
     textareas[0].nativeElement.dispatchEvent(new Event('input'))
     fixture.detectChanges()
     expect(component.customFieldFormFields.at(0).get('value').value).toBe(
-      'Updated custom text'
+      'Updated custom text\nwith multiple lines'
     )
     expect(component.customFieldFormFields.at(0).get('value').dirty).toBe(true)
+    expect(textareas[0].nativeElement.style.height).toBe('148px')
   })
 
   it('should render notes composer as textarea and submit on Enter without Shift while allowing Shift+Enter', () => {

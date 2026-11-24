@@ -807,8 +807,7 @@
 .rd-cf-textarea {
   display: block;
   width: 100%;
-  min-height: 46px;
-  max-height: 520px;
+  min-height: 36px;
   padding: 7px 10px;
   border-radius: var(--rd-radius-sm);
   border: 1px solid var(--rd-border-subtle);
@@ -816,6 +815,7 @@
   color: var(--rd-text-primary);
   font-size: 12.5px;
   line-height: 1.45;
+  overflow-y: auto;
   resize: vertical;
   transition:
     background-color 140ms ease,
@@ -840,7 +840,7 @@
   }
 
   &--long {
-    min-height: 76px;
+    min-height: 40px;
   }
 
   &--url {

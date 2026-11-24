@@ -315,30 +315,6 @@
   }
 }
 
-.rd-filter-pill--exclude-mode {
-  flex-shrink: 0;
-  gap: 5px;
-  background: transparent;
-  border-color: var(--rd-border-subtle);
-  color: var(--rd-text-secondary);
-
-  &:hover {
-    background: var(--rd-bg-pill-hover);
-    color: var(--rd-text-primary);
-  }
-
-  &.is-active {
-    background: var(--rd-danger-soft);
-    border-color: var(--rd-danger-border);
-    color: var(--rd-danger);
-    font-weight: 600;
-
-    &:hover {
-      background: var(--rd-danger-soft-hover);
-    }
-  }
-}
-
 .rd-pill-exclude-icon {
   display: inline-flex;
   align-items: center;

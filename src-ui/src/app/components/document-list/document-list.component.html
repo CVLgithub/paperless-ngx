@@ -128,21 +128,6 @@
 
   @if (allDocumentTypes().length > 0 || allCorrespondents().length > 0) {
     <div class="rd-filter-pills-stack" role="toolbar" aria-label="Schnellfilter" i18n-aria-label>
-      <ng-template #excludeModeToggle>
-        <button
-          type="button"
-          class="rd-filter-pill rd-filter-pill--exclude-mode"
-          [class.is-active]="quickFilterExcludeMode()"
-          [attr.aria-pressed]="quickFilterExcludeMode()"
-          (click)="toggleQuickFilterExcludeMode()"
-          title="Modus wechseln: Klicks auf Filter blenden Dokumente aus"
-          i18n-title
-        >
-          <pngx-bs-icon class="rd-pill-exclude-icon" name="dash-circle" width="12" height="12" aria-hidden="true"></pngx-bs-icon>
-          <span i18n>Ausblenden</span>
-        </button>
-      </ng-template>
-
       @if (allDocumentTypes().length > 0) {
         <div class="rd-filter-pills-row" role="group" aria-label="Dokumenttypen" i18n-aria-label>
           <button
@@ -171,8 +156,6 @@
               <span class="rd-pill-label">{{ dt.name }}</span>
             </button>
           }
-
-          <ng-container [ngTemplateOutlet]="excludeModeToggle"></ng-container>
         </div>
       }
 
@@ -223,10 +206,6 @@
               }
             </div>
           </div>
-
-          @if (allDocumentTypes().length === 0) {
-            <ng-container [ngTemplateOutlet]="excludeModeToggle"></ng-container>
-          }
 
           <button
             type="button"

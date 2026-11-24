@@ -560,32 +560,38 @@
                           @switch (cf?.data_type) {
                             @case (CustomFieldDataType.LongText) {
                               <textarea
+                                #cfTextarea
                                 [id]="'rd-cf-' + fieldInstance.field"
                                 class="rd-cf-textarea rd-cf-textarea--long"
-                                rows="3"
+                                rows="1"
                                 formControlName="value"
                                 [readonly]="!userCanEdit"
+                                (input)="onCustomFieldTextareaInput($event)"
                                 [attr.aria-label]="cf?.name"
                               ></textarea>
                             }
                             @case (CustomFieldDataType.Url) {
                               <textarea
+                                #cfTextarea
                                 [id]="'rd-cf-' + fieldInstance.field"
                                 class="rd-cf-textarea rd-cf-textarea--url"
-                                rows="2"
+                                rows="1"
                                 formControlName="value"
                                 [readonly]="!userCanEdit"
+                                (input)="onCustomFieldTextareaInput($event)"
                                 (keydown.enter)="$event.preventDefault()"
                                 [attr.aria-label]="cf?.name"
                               ></textarea>
                             }
                             @default {
                               <textarea
+                                #cfTextarea
                                 [id]="'rd-cf-' + fieldInstance.field"
                                 class="rd-cf-textarea"
-                                rows="2"
+                                rows="1"
                                 formControlName="value"
                                 [readonly]="!userCanEdit"
+                                (input)="onCustomFieldTextareaInput($event)"
                                 [attr.aria-label]="cf?.name"
                               ></textarea>
                             }

@@ -1135,7 +1135,7 @@ describe('DocumentListComponent', () => {
     expect(component.isQuickCorrespondentExcluded(7)).toBeFalsy()
   })
 
-  it('should support multi-exclude via quickFilterExcludeMode, Alt+Click, right-click, and follow-up clicks', () => {
+  it('should support multi-exclude via Alt+Click, right-click, and follow-up clicks', () => {
     jest.spyOn(documentListService, 'reload').mockImplementation(() => {})
     documentListService.setFilterRules([])
     fixture.detectChanges()
@@ -1151,22 +1151,6 @@ describe('DocumentListComponent', () => {
     ] as any)
     fixture.detectChanges()
 
-    // Exclude mode toggle allows multi-excluding document types & correspondents
-    component.toggleQuickFilterExcludeMode()
-    expect(component.quickFilterExcludeMode()).toBeTruthy()
-
-    component.toggleQuickDocumentType(1)
-    component.toggleQuickDocumentType(2)
-    component.toggleQuickCorrespondent(10)
-    expect(documentListService.filterRules).toEqual([
-      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '1' },
-      { rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE, value: '2' },
-      { rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT, value: '10' },
-    ])
-
-    // Toggle mode back off and verify Alt+Click and right-click exclusion
-    component.toggleQuickFilterExcludeMode()
-    expect(component.quickFilterExcludeMode()).toBeFalsy()
     documentListService.setFilterRules([
       { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: '1' },
     ])

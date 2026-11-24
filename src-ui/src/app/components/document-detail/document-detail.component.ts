@@ -11,6 +11,7 @@ import {
   TemplateRef,
   viewChild,
   ViewChild,
+  viewChildren,
 } from '@angular/core'
 import {
   FormArray,
@@ -32,7 +33,15 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
+import {
+  BehaviorSubject,
+  fromEvent,
+  merge,
+  Observable,
+  of,
+  Subject,
+  timer,
+} from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -413,6 +422,19 @@ export class DocumentDetailComponent
     this.inspectorOpen()
     this.topbarTemplateVersion()
     this.syncTopbarConfig()
+  })
+
+  private readonly customFieldTextareas =
+    viewChildren<ElementRef<HTMLTextAreaElement>>('cfTextarea')
+  private customFieldResizeFrame: number | null = null
+
+  private readonly customFieldResizeEffect = effect(() => {
+    this.customFieldTextareas()
+    this.document()
+    this.customFields()
+    this.inspectorOpen()
+    this.inspectorSection()
+    this.scheduleCustomFieldTextareaResize()
   })
 
   titleKeyUp(event) {
@@ -1039,10 +1061,23 @@ export class DocumentDetailComponent
         }
       })
 
+    if (typeof window !== 'undefined') {
+      fromEvent(window, 'resize')
+        .pipe(debounceTime(100), takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => this.scheduleCustomFieldTextareaResize())
+    }
+
     this.syncTopbarConfig()
   }
 
   ngOnDestroy(): void {
+    if (
+      this.customFieldResizeFrame !== null &&
+      typeof cancelAnimationFrame === 'function'
+    ) {
+      cancelAnimationFrame(this.customFieldResizeFrame)
+      this.customFieldResizeFrame = null
+    }
     this.topbar.reset()
     this.cleanupPrintDocument()
     this.unsubscribeNotifier.next(this)
@@ -2047,6 +2082,48 @@ export class DocumentDetailComponent
     )
   }
 
+  public autoResizeTextarea(textarea: HTMLTextAreaElement): void {
+    if (!textarea) return
+    textarea.style.height = 'auto'
+    const computed =
+      typeof window !== 'undefined' ? window.getComputedStyle(textarea) : null
+    const borderY = computed
+      ? (parseFloat(computed.borderTopWidth) || 0) +
+        (parseFloat(computed.borderBottomWidth) || 0)
+      : 0
+    const nextHeight = Math.ceil(textarea.scrollHeight + borderY)
+    if (nextHeight > 0) {
+      textarea.style.height = `${nextHeight}px`
+    }
+  }
+
+  public onCustomFieldTextareaInput(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement | null
+    if (textarea) {
+      this.autoResizeTextarea(textarea)
+    }
+  }
+
+  public resizeAllCustomFieldTextareas(): void {
+    this.customFieldTextareas().forEach((ref) => {
+      this.autoResizeTextarea(ref.nativeElement)
+    })
+  }
+
+  private scheduleCustomFieldTextareaResize(): void {
+    if (typeof requestAnimationFrame === 'function') {
+      if (this.customFieldResizeFrame !== null) {
+        cancelAnimationFrame(this.customFieldResizeFrame)
+      }
+      this.customFieldResizeFrame = requestAnimationFrame(() => {
+        this.customFieldResizeFrame = null
+        this.resizeAllCustomFieldTextareas()
+      })
+    } else {
+      this.resizeAllCustomFieldTextareas()
+    }
+  }
+
   public getCustomFieldError(index: number) {
     const fieldError = this.error()?.custom_fields?.[index]
     return fieldError?.['non_field_errors'] ?? fieldError?.['value']
@@ -2063,6 +2140,7 @@ export class DocumentDetailComponent
         { emitEvent }
       )
     })
+    this.scheduleCustomFieldTextareaResize()
   }
 
   public addField(field: CustomField) {
