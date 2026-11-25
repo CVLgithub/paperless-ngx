@@ -84,6 +84,7 @@
         <button
           type="button"
           class="rd-icon-control"
+          [class.is-active]="!!list.activeSavedViewId"
           ngbDropdownToggle
           tourAnchor="tour.documents-views"
           title="Ansichten"
@@ -94,18 +95,28 @@
           <pngx-bs-icon name="bookmark" width="14" height="14"></pngx-bs-icon>
         </button>
         <div ngbDropdownMenu class="rd-views-menu">
-          @if (!list.activeSavedViewId && savedViewService.allViews.length > 0) {
+          @if (savedViewService.allViews.length > 0) {
+            <div class="dropdown-header" i18n>Gespeicherte Ansichten</div>
             @for (view of savedViewService.allViews; track view.id) {
-              <button type="button" ngbDropdownItem (click)="loadViewConfig(view.id)">
-                <pngx-bs-icon class="me-2" [name]="view.icon || 'bookmark'" width="14" height="14"></pngx-bs-icon>
-                <span>{{ view.name }}</span>
+              <button
+                type="button"
+                ngbDropdownItem
+                [class.active]="list.activeSavedViewId === view.id"
+                (click)="loadViewConfig(view.id)"
+              >
+                <pngx-bs-icon [name]="view.icon || 'bookmark'" width="14" height="14"></pngx-bs-icon>
+                <span class="text-truncate">{{ view.name }}</span>
+                @if (list.activeSavedViewId === view.id) {
+                  <pngx-bs-icon class="rd-views-menu__check" name="check-lg" width="13" height="13"></pngx-bs-icon>
+                }
               </button>
             }
             <div class="dropdown-divider"></div>
           }
           @if (list.activeSavedViewId && activeSavedViewCanChange) {
-            <button type="button" ngbDropdownItem (click)="saveViewConfig()" [disabled]="!savedViewIsModified" i18n>
-              „{{ list.activeSavedViewTitle }}“ speichern
+            <button type="button" ngbDropdownItem (click)="saveViewConfig()" [disabled]="!savedViewIsModified">
+              <pngx-bs-icon name="floppy" width="14" height="14"></pngx-bs-icon>
+              <span i18n>„{{ list.activeSavedViewTitle }}“ speichern</span>
             </button>
           }
           <button
@@ -113,14 +124,18 @@
             ngbDropdownItem
             (click)="saveViewConfigAs()"
             *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }"
-            i18n
-          >Als Favorit speichern …</button>
+          >
+            <pngx-bs-icon name="plus-circle" width="14" height="14"></pngx-bs-icon>
+            <span i18n>Als Favorit speichern …</span>
+          </button>
           <a
             ngbDropdownItem
             routerLink="/savedviews"
             *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }"
-            i18n
-          >Alle Ansichten verwalten</a>
+          >
+            <pngx-bs-icon name="sliders" width="14" height="14"></pngx-bs-icon>
+            <span i18n>Alle Ansichten verwalten</span>
+          </a>
         </div>
       </div>
     </div>

@@ -11,7 +11,6 @@ $form-file-button-hover-bg: var(--pngx-bg-alt);
 @include meta.load-css("theme");
 @import "@ng-select/ng-select/themes/default.theme.css";
 @include meta.load-css("print");
-@include meta.load-css("redesign-theme");
 
 // re-created bootstrap styles
 .mt-n2 {
@@ -931,3 +930,6 @@ canvas.hiddenCanvasElement {
     display: block;
   }
 }
+
+// Load Redesign design system last so it authoritatively overrides legacy Bootstrap/Paperless rules
+@include meta.load-css("redesign-theme");

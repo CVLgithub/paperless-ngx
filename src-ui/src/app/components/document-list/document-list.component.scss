@@ -127,10 +127,17 @@
     opacity: 0.72;
   }
 
-  &.is-active {
+  &.is-active,
+  &.show,
+  &[aria-expanded='true'] {
     background: var(--rd-accent-soft);
-    color: var(--rd-accent);
-    border-color: transparent;
+    color: var(--bs-link-color);
+    border-color: rgba(var(--rd-accent-rgb), 0.28);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
   }
 
   &.is-refreshing {

@@ -1,18 +1,27 @@
-
-
 .page-item {
   position: relative;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
+  border-radius: var(--rd-radius-sm) !important;
   background-origin: border-box;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+
+  &:hover {
+    background-color: var(--rd-bg-pill);
+  }
 
   &.selected {
-    background-color: var(--pngx-primary-darken-5);
+    background-color: var(--rd-accent-soft);
+    border-color: var(--rd-accent);
+    box-shadow: 0 0 0 2px var(--rd-accent-ring);
   }
 }
 
 .pdf-viewer-container {
-  background-color: gray;
+  background-color: var(--rd-bg-viewer-canvas);
+  border: 1px solid var(--rd-border-subtle);
+  border-radius: var(--rd-radius-xs);
+  overflow: hidden;
   height: 240px;
 
   pngx-pdf-viewer {
@@ -27,23 +36,50 @@
 
 .hover-actions {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
   display: none;
+
+  .btn-group {
+    border-radius: var(--rd-radius-pill);
+    overflow: hidden;
+    box-shadow: var(--rd-shadow-pill);
+  }
+
+  .btn-dark {
+    background: var(--rd-bg-glass-strong);
+    backdrop-filter: var(--rd-blur-sm);
+    -webkit-backdrop-filter: var(--rd-blur-sm);
+    border-color: var(--rd-border-subtle);
+    color: var(--rd-text-primary);
+
+    &:hover {
+      background: var(--rd-bg-pill-hover);
+      color: var(--rd-text-primary);
+    }
+
+    &.text-danger {
+      color: var(--rd-danger) !important;
+    }
+  }
 }
 
 .page-item:hover .hover-actions {
-  display: block;
+  display: flex;
 }
 
 .document-check {
   display: none;
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: 0.5rem;
-  border-top-left-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
+  top: 10px;
+  left: 10px;
+  padding: 5px 7px !important;
+  border-radius: var(--rd-radius-xs) !important;
+  background: var(--rd-bg-glass-strong) !important;
+  backdrop-filter: var(--rd-blur-sm);
+  -webkit-backdrop-filter: var(--rd-blur-sm);
+  border: 1px solid var(--rd-border-subtle) !important;
+  box-shadow: var(--rd-shadow-pill);
   pointer-events: none;
 
   .form-check {
@@ -57,14 +93,19 @@
   }
 }
 
-.page-item:hover .document-check, .selected .document-check {
+.page-item:hover .document-check,
+.selected .document-check {
   display: block;
 }
 
 .z-10 {
-    z-index: 10;
+  z-index: 10;
 }
 
 .split-after {
   writing-mode: vertical-rl;
+  background: var(--rd-accent) !important;
+  color: #ffffff !important;
+  border-radius: var(--rd-radius-xs) !important;
+  letter-spacing: 0.04em;
 }

@@ -172,10 +172,21 @@
     background: var(--rd-bg-pill);
     color: var(--rd-text-primary);
   }
+
+  &.show,
+  &[aria-expanded='true'] {
+    background: var(--rd-accent-soft);
+    color: var(--bs-link-color);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+  }
 }
 
 .rd-bulk-overflow-menu {
-  min-width: 240px;
+  min-width: 256px;
 }
 
 :host ::ng-deep .rd-bulk-dropdown {

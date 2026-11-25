@@ -133,7 +133,17 @@
   --pngx-bg-alt: var(--rd-bg-surface);
   --pngx-bg-darker: var(--rd-bg-sidebar-solid);
   --pngx-bg-alt2: var(--rd-bg-surface-subtle);
-  --pngx-toast-bg: var(--rd-bg-glass-strong);
+  --pngx-toast-bg: rgba(252, 252, 254, 0.94);
+  --pngx-toast-success: #15803d;
+  --pngx-toast-success-bg: rgba(240, 253, 244, 0.94);
+  --pngx-toast-info: var(--rd-accent);
+  --pngx-toast-error: var(--rd-danger);
+  --pngx-toast-error-bg: rgba(254, 242, 242, 0.95);
+  --pngx-toast-row-bg: var(--rd-bg-surface-subtle);
+  --pngx-toast-row-hover-bg: var(--rd-bg-pill-hover);
+  --rd-popover-bg: rgba(252, 252, 254, 0.95);
+  --rd-popover-arrow-bg: #fcfcfe;
+  --rd-btn-close-svg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231c1c1e'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
 }
 
 @mixin redesign-dark-tokens {
@@ -206,7 +216,17 @@
   --pngx-bg-alt: var(--rd-bg-surface);
   --pngx-bg-darker: #111113;
   --pngx-bg-alt2: var(--rd-bg-surface-subtle);
-  --pngx-toast-bg: var(--rd-bg-glass-strong);
+  --pngx-toast-bg: rgba(38, 38, 43, 0.95);
+  --pngx-toast-success: #4ade80;
+  --pngx-toast-success-bg: rgba(22, 52, 34, 0.94);
+  --pngx-toast-info: #60a5fa;
+  --pngx-toast-error: #ff6b70;
+  --pngx-toast-error-bg: rgba(66, 26, 30, 0.95);
+  --pngx-toast-row-bg: var(--rd-bg-pill);
+  --pngx-toast-row-hover-bg: var(--rd-bg-pill-hover);
+  --rd-popover-bg: rgba(40, 40, 46, 0.96);
+  --rd-popover-arrow-bg: #28282e;
+  --rd-btn-close-svg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23f5f5f7'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
 }
 
 [data-bs-theme='dark'] {
@@ -334,35 +354,254 @@ body {
   }
 }
 
-// Harmonized Bootstrap overrides for Settings, Workflows, Mail, Tasks, Trash, Modals
-.btn-primary {
+// ============================================================================
+// Deeper UI Layers: Buttons, Focus Rings, Modals, Dropdowns, Menus, Popovers,
+// Datepicker, Toasts, ng-select & Forms (Light & Dark Mode Harmonized)
+// ============================================================================
+
+@keyframes rd-overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 1. Harmonized Bootstrap Buttons & Focus Rings (beats legacy theme.scss dark rules)
+// ----------------------------------------------------------------------------
+.btn {
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+  }
+}
+
+html .btn-primary,
+[data-bs-theme] .btn-primary {
   --bs-btn-bg: var(--rd-accent);
   --bs-btn-border-color: var(--rd-accent);
   --bs-btn-hover-bg: var(--rd-accent-hover);
   --bs-btn-hover-border-color: var(--rd-accent-hover);
   --bs-btn-active-bg: var(--rd-accent-hover);
   --bs-btn-active-border-color: var(--rd-accent-hover);
+  --bs-btn-disabled-bg: var(--rd-accent);
+  --bs-btn-disabled-border-color: var(--rd-accent);
   --bs-btn-color: #ffffff;
   --bs-btn-hover-color: #ffffff;
   --bs-btn-active-color: #ffffff;
+  --bs-btn-disabled-color: #ffffff;
+  background-color: var(--rd-accent);
+  border-color: var(--rd-accent);
+  color: #ffffff !important;
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled),
+  &:active:not(:disabled),
+  &.active:not(:disabled) {
+    background-color: var(--rd-accent-hover) !important;
+    border-color: var(--rd-accent-hover) !important;
+    color: #ffffff !important;
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: var(--rd-accent) !important;
+    border-color: var(--rd-accent) !important;
+    color: #ffffff !important;
+    opacity: 0.48;
+  }
 }
 
-.btn-outline-primary {
-  --bs-btn-color: var(--rd-accent);
-  --bs-btn-border-color: var(--rd-accent);
-  --bs-btn-hover-bg: var(--rd-accent);
-  --bs-btn-hover-border-color: var(--rd-accent);
+html .btn-outline-primary,
+[data-bs-theme] .btn-outline-primary {
+  --bs-btn-color: var(--bs-link-color);
+  --bs-btn-border-color: rgba(var(--rd-accent-rgb), 0.36);
+  --bs-btn-hover-bg: var(--rd-accent-soft);
+  --bs-btn-hover-border-color: rgba(var(--rd-accent-rgb), 0.5);
+  --bs-btn-hover-color: var(--bs-link-color);
+  --bs-btn-active-bg: var(--rd-accent);
+  --bs-btn-active-border-color: var(--rd-accent);
+  --bs-btn-active-color: #ffffff;
+  color: var(--bs-link-color) !important;
+  border-color: rgba(var(--rd-accent-rgb), 0.36) !important;
+  background-color: transparent;
+
+  &:hover:not(:disabled) {
+    background-color: var(--rd-accent-soft) !important;
+    border-color: rgba(var(--rd-accent-rgb), 0.52) !important;
+    color: var(--bs-link-color) !important;
+  }
+
+  &:focus:not(:focus-visible):not(.active):not(.show) {
+    background-color: transparent !important;
+    color: var(--bs-link-color) !important;
+  }
+
+  &:active:not(:disabled),
+  &.active,
+  &.dropdown-toggle.show {
+    background-color: var(--rd-accent) !important;
+    border-color: var(--rd-accent) !important;
+    color: #ffffff !important;
+  }
+}
+
+.btn-check:checked + .btn-outline-primary,
+.btn-check:active + .btn-outline-primary,
+.dropdown.show > .btn-outline-primary {
+  background-color: var(--rd-accent) !important;
+  border-color: var(--rd-accent) !important;
+  color: #ffffff !important;
+}
+
+html .btn-secondary,
+[data-bs-theme] .btn-secondary {
+  --bs-btn-bg: var(--rd-bg-pill);
+  --bs-btn-border-color: var(--rd-border-subtle);
+  --bs-btn-color: var(--rd-text-primary);
+  --bs-btn-hover-bg: var(--rd-bg-pill-hover);
+  --bs-btn-hover-border-color: var(--rd-border-medium);
+  --bs-btn-hover-color: var(--rd-text-primary);
+  --bs-btn-active-bg: var(--rd-bg-pill-hover);
+  --bs-btn-active-border-color: var(--rd-border-medium);
+  --bs-btn-active-color: var(--rd-text-primary);
+  background-color: var(--rd-bg-pill);
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-primary);
+
+  &:hover:not(:disabled),
+  &:active:not(:disabled),
+  &.active:not(:disabled) {
+    background-color: var(--rd-bg-pill-hover) !important;
+    border-color: var(--rd-border-medium) !important;
+    color: var(--rd-text-primary) !important;
+  }
+}
+
+html .btn-outline-secondary,
+[data-bs-theme] .btn-outline-secondary {
+  --bs-btn-color: var(--rd-text-primary);
+  --bs-btn-bg: var(--rd-bg-pill);
+  --bs-btn-border-color: var(--rd-border-subtle);
+  --bs-btn-hover-bg: var(--rd-bg-pill-hover);
+  --bs-btn-hover-border-color: var(--rd-border-medium);
+  --bs-btn-hover-color: var(--rd-text-primary);
+  --bs-btn-active-bg: var(--rd-bg-pill-hover);
+  --bs-btn-active-border-color: var(--rd-border-strong);
+  --bs-btn-active-color: var(--rd-text-primary);
+  background-color: var(--rd-bg-pill);
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-primary);
+
+  &:hover:not(:disabled),
+  &:active:not(:disabled),
+  &.active:not(:disabled),
+  &.show {
+    background-color: var(--rd-bg-pill-hover) !important;
+    border-color: var(--rd-border-medium) !important;
+    color: var(--rd-text-primary) !important;
+  }
+}
+
+.btn-check:checked + .btn-outline-secondary {
+  background-color: var(--rd-accent-soft) !important;
+  border-color: rgba(var(--rd-accent-rgb), 0.38) !important;
+  color: var(--bs-link-color) !important;
+}
+
+html .btn-danger,
+[data-bs-theme] .btn-danger {
+  --bs-btn-bg: var(--rd-danger);
+  --bs-btn-border-color: var(--rd-danger);
+  --bs-btn-color: #ffffff;
   --bs-btn-hover-color: #ffffff;
+  --bs-btn-active-color: #ffffff;
+  background-color: var(--rd-danger);
+  border-color: var(--rd-danger);
+  color: #ffffff !important;
+
+  &:hover:not(:disabled),
+  &:active:not(:disabled) {
+    filter: brightness(0.92);
+    color: #ffffff !important;
+  }
 }
 
+html .btn-outline-danger,
+[data-bs-theme] .btn-outline-danger {
+  --bs-btn-color: var(--rd-danger);
+  --bs-btn-border-color: var(--rd-danger-border);
+  --bs-btn-hover-bg: var(--rd-danger-soft);
+  --bs-btn-hover-border-color: var(--rd-danger);
+  --bs-btn-hover-color: var(--rd-danger);
+  --bs-btn-active-bg: var(--rd-danger);
+  --bs-btn-active-border-color: var(--rd-danger);
+  --bs-btn-active-color: #ffffff;
+  color: var(--rd-danger);
+  border-color: var(--rd-danger-border);
+
+  &:hover:not(:disabled) {
+    background-color: var(--rd-danger-soft) !important;
+    border-color: var(--rd-danger) !important;
+    color: var(--rd-danger) !important;
+  }
+
+  &:active:not(:disabled),
+  &.active {
+    background-color: var(--rd-danger) !important;
+    border-color: var(--rd-danger) !important;
+    color: #ffffff !important;
+  }
+}
+
+html .btn-link,
+[data-bs-theme] .btn-link {
+  color: var(--bs-link-color);
+
+  &:hover:not(:disabled) {
+    color: var(--bs-link-hover-color) !important;
+  }
+
+  &.text-danger,
+  &.text-danger:hover {
+    color: var(--rd-danger) !important;
+  }
+
+  &.text-muted,
+  &.text-body-secondary {
+    color: var(--rd-text-secondary) !important;
+
+    &:hover {
+      color: var(--rd-text-primary) !important;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 2. Modals & Dialogs (Confirm, Edit, Share Links, Email, Save View, Profile, PDF Editor)
+// ----------------------------------------------------------------------------
 .modal-backdrop.show {
   background-color: var(--rd-bg-backdrop);
   opacity: 1 !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
-.modal-content {
+html .modal-content,
+[data-bs-theme] .modal-content {
   background: var(--rd-bg-glass-strong) !important;
   backdrop-filter: var(--rd-blur-lg);
   -webkit-backdrop-filter: var(--rd-blur-lg);
@@ -372,70 +611,236 @@ body {
   color: var(--rd-text-primary);
 }
 
-.modal-header,
-.modal-body,
-.modal-footer {
+html .modal-header,
+html .modal-body,
+html .modal-footer,
+[data-bs-theme] .modal-header,
+[data-bs-theme] .modal-body,
+[data-bs-theme] .modal-footer {
   background-color: transparent !important;
   border-color: var(--rd-border-subtle) !important;
 }
 
-.dropdown-menu {
-  background: var(--rd-bg-glass-strong);
-  backdrop-filter: var(--rd-blur-lg);
-  -webkit-backdrop-filter: var(--rd-blur-lg);
-  border: 1px solid var(--rd-border-subtle);
-  border-radius: var(--rd-radius-md);
-  box-shadow: var(--rd-shadow-floating);
-  padding: 6px;
+.modal-header {
+  padding: 18px 22px 14px;
+  gap: 10px;
+  align-items: center;
 
-  .dropdown-item {
-    border-radius: var(--rd-radius-xs);
-    font-size: 0.8125rem;
-    padding: 6px 10px;
+  .modal-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
     color: var(--rd-text-primary);
+    margin: 0;
+  }
 
-    &:hover,
-    &:focus {
+  .badge.bg-primary {
+    background-color: var(--rd-accent-soft) !important;
+    color: var(--bs-link-color) !important;
+    border-radius: var(--rd-radius-pill);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 9px;
+  }
+}
+
+// Crisp circular close button in modals, alerts, and toasts (theme-aware SVG, no inverted box)
+html .modal .btn-close,
+html .alert .btn-close,
+html .toast .btn-close,
+[data-bs-theme] .modal .btn-close,
+[data-bs-theme] .alert .btn-close,
+[data-bs-theme] .toast .btn-close {
+  --bs-btn-close-bg: var(--rd-btn-close-svg);
+  filter: none !important;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  background-size: 11px 11px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.62;
+  transition: background-color 140ms ease, opacity 140ms ease, box-shadow 140ms ease;
+
+  &:hover {
+    background-color: var(--rd-bg-pill);
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    opacity: 1;
+  }
+}
+
+.modal-header .btn-close {
+  margin: -2px -4px -2px auto;
+}
+
+.modal-body {
+  padding: 18px 22px;
+  font-size: var(--rd-text-body);
+  color: var(--rd-text-primary);
+
+  p {
+    color: var(--rd-text-primary);
+    line-height: 1.5;
+  }
+
+  .text-muted,
+  .text-secondary,
+  .form-text {
+    color: var(--rd-text-secondary) !important;
+  }
+
+  .list-group {
+    --bs-list-group-bg: transparent;
+    --bs-list-group-border-color: var(--rd-border-subtle);
+    --bs-list-group-color: var(--rd-text-primary);
+    --bs-list-group-action-color: var(--rd-text-primary);
+    --bs-list-group-action-hover-bg: var(--rd-bg-pill);
+    --bs-list-group-action-hover-color: var(--rd-text-primary);
+    border-radius: var(--rd-radius-sm);
+
+    .list-group-item {
+      background-color: transparent;
+      border-color: var(--rd-border-subtle);
+      color: var(--rd-text-primary);
+      padding: 11px 14px;
+    }
+
+    .list-group-item-action:hover,
+    .list-group-item-action:focus {
       background-color: var(--rd-bg-pill);
       color: var(--rd-text-primary);
     }
+  }
 
-    &.active,
-    &:active {
-      background-color: var(--rd-accent-soft);
-      color: var(--rd-accent);
+  &.p-0 > .list-group-flush > .list-group-item {
+    padding: 12px 22px;
+  }
+
+  // Tables inside modals (Hotkeys, System Status, Processed Mail)
+  table.table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: var(--rd-bg-surface-subtle);
+    --bs-table-hover-bg: var(--rd-bg-pill);
+    --bs-table-color: var(--rd-text-primary);
+    --bs-table-border-color: var(--rd-border-subtle);
+    margin-bottom: 0;
+    font-size: 0.8125rem;
+
+    th {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--rd-text-tertiary);
+    }
+
+    td,
+    th {
+      padding: 9px 10px;
+      vertical-align: middle;
+    }
+  }
+
+  kbd {
+    font-family: var(--rd-font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--rd-text-primary);
+    background: var(--rd-bg-pill);
+    border: 1px solid var(--rd-border-medium);
+    border-radius: 6px;
+    padding: 2px 7px;
+    box-shadow: 0 1px 0 var(--rd-border-subtle);
+  }
+
+  // Accordions inside modals (Permissions form, 2FA, etc.)
+  .accordion {
+    --bs-accordion-bg: var(--rd-bg-surface-subtle);
+    --bs-accordion-color: var(--rd-text-primary);
+    --bs-accordion-border-color: var(--rd-border-subtle);
+    --bs-accordion-border-radius: var(--rd-radius-sm);
+    --bs-accordion-inner-border-radius: calc(var(--rd-radius-sm) - 1px);
+    --bs-accordion-btn-bg: transparent;
+    --bs-accordion-btn-color: var(--rd-text-primary);
+    --bs-accordion-active-bg: var(--rd-bg-pill);
+    --bs-accordion-active-color: var(--rd-text-primary);
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 3px var(--rd-accent-ring);
+
+    .accordion-item {
+      background-color: var(--rd-bg-surface-subtle);
+      border: 1px solid var(--rd-border-subtle);
+      border-radius: var(--rd-radius-sm);
+      overflow: visible;
+    }
+
+    .accordion-button {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: var(--rd-radius-sm);
+      box-shadow: none;
+
+      &:not(.collapsed) {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        box-shadow: inset 0 -1px 0 var(--rd-border-subtle);
+      }
+
+      &:focus-visible {
+        box-shadow: 0 0 0 3px var(--rd-accent-ring);
+      }
+    }
+
+    .accordion-body {
+      padding: 14px;
     }
   }
 }
 
-.card {
-  background-color: var(--rd-bg-surface);
-  border-color: var(--rd-border-subtle);
-  border-radius: var(--rd-radius-md);
-  box-shadow: var(--rd-shadow-card);
-}
+.modal-footer {
+  padding: 14px 22px 18px;
+  gap: 8px;
 
-.form-control,
-.form-select {
-  background-color: var(--rd-bg-surface-subtle);
-  border-color: var(--rd-border-subtle);
-  color: var(--rd-text-primary);
-  border-radius: var(--rd-radius-sm);
+  &:empty {
+    display: none;
+  }
 
-  &:focus {
-    background-color: var(--rd-bg-surface);
-    border-color: var(--rd-accent);
-    box-shadow: 0 0 0 3px var(--rd-accent-ring);
-    color: var(--rd-text-primary);
+  > .btn,
+  .form-group > .btn {
+    border-radius: var(--rd-radius-pill);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    line-height: 1.3;
+  }
+
+  > .btn-outline-secondary,
+  > .btn-secondary,
+  .form-group > .btn-outline-secondary,
+  .form-group > .btn-secondary {
+    font-weight: 500;
+  }
+
+  > .btn-primary,
+  .form-group > .btn-primary {
+    box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.28);
+  }
+
+  .text-muted,
+  .text-light {
+    color: var(--rd-text-secondary) !important;
   }
 }
 
-.form-check-input:checked {
-  background-color: var(--rd-accent);
-  border-color: var(--rd-accent);
-}
-
-// Custom modal class for Redesign Merge & Progress Dialogs
+// Custom modal widths for Redesign Merge & Progress Dialogs
 .modal-dialog.rd-glass-modal,
 .rd-glass-modal .modal-dialog {
   max-width: 480px;
@@ -444,6 +849,996 @@ body {
 .modal-dialog.rd-glass-modal-sm,
 .rd-progress-modal .modal-dialog {
   max-width: 420px;
+}
+
+// ----------------------------------------------------------------------------
+// 3. Global Dropdown Menus (Topbar Three-Dots, Saved Views, Bulk Overflow, Sidebar, Tables)
+// ----------------------------------------------------------------------------
+html .dropdown-menu,
+[data-bs-theme] .dropdown-menu {
+  --bs-dropdown-bg: var(--rd-bg-glass-strong);
+  --bs-dropdown-color: var(--rd-text-primary);
+  --bs-dropdown-border-color: var(--rd-border-subtle);
+  --bs-dropdown-divider-bg: var(--rd-border-subtle);
+  --bs-dropdown-link-color: var(--rd-text-primary);
+  --bs-dropdown-link-hover-color: var(--rd-text-primary);
+  --bs-dropdown-link-hover-bg: var(--rd-bg-pill);
+  --bs-dropdown-link-active-color: var(--bs-link-color);
+  --bs-dropdown-link-active-bg: var(--rd-accent-soft);
+  --bs-dropdown-link-disabled-color: var(--rd-text-tertiary);
+  --bs-dropdown-header-color: var(--rd-text-tertiary);
+  background: var(--rd-bg-glass-strong);
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle);
+  border-radius: var(--rd-radius-md);
+  box-shadow: var(--rd-shadow-floating), inset 0 1px 0 var(--rd-border-glass) !important;
+  padding: 6px;
+  color: var(--rd-text-primary);
+  font-family: var(--rd-font-sans);
+
+  &.show {
+    animation: rd-overlay-fade-in 120ms ease both;
+  }
+
+  .dropdown-divider {
+    margin: 5px 4px;
+    border-top: 1px solid var(--rd-border-subtle);
+    opacity: 1;
+  }
+
+  .dropdown-header {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--rd-text-tertiary);
+    padding: 6px 10px 4px;
+  }
+
+  .dropdown-item {
+    border-radius: var(--rd-radius-xs);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    padding: 7px 10px;
+    color: var(--rd-text-primary);
+    transition: background-color 120ms ease, color 120ms ease;
+
+    pngx-bs-icon {
+      display: inline-flex;
+      align-items: center;
+      color: var(--rd-text-secondary);
+      flex-shrink: 0;
+      transition: color 120ms ease;
+    }
+
+    &:hover:not(:disabled):not(.disabled),
+    &:focus:not(:disabled):not(.disabled) {
+      background-color: var(--rd-bg-pill);
+      color: var(--rd-text-primary);
+      box-shadow: none;
+
+      pngx-bs-icon {
+        color: var(--rd-text-primary);
+      }
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--rd-accent-ring);
+    }
+
+    &.active,
+    &:active:not(:disabled):not(.disabled) {
+      background-color: var(--rd-accent-soft);
+      color: var(--bs-link-color);
+      font-weight: 600;
+
+      pngx-bs-icon {
+        color: var(--bs-link-color);
+      }
+    }
+
+    &.text-danger {
+      color: var(--rd-danger) !important;
+
+      pngx-bs-icon {
+        color: var(--rd-danger) !important;
+      }
+
+      &:hover,
+      &:focus {
+        background-color: var(--rd-danger-soft);
+        color: var(--rd-danger) !important;
+      }
+    }
+
+    &.disabled,
+    &:disabled {
+      color: var(--rd-text-tertiary);
+      opacity: 0.72;
+      pointer-events: none;
+    }
+  }
+
+  button.dropdown-item,
+  a.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    > pngx-bs-icon.me-2 {
+      margin-right: 0 !important;
+    }
+  }
+
+  // Transparent list groups inside complex dropdowns (filterable, dates, permissions, custom-fields)
+  .list-group {
+    background: transparent;
+  }
+
+  .list-group-item {
+    background: transparent !important;
+    border-color: var(--rd-border-subtle) !important;
+    color: var(--rd-text-primary);
+  }
+
+  .list-group-item-action {
+    border: 0 !important;
+    border-radius: var(--rd-radius-xs);
+    font-size: 0.8125rem;
+    color: var(--rd-text-primary);
+    transition: background-color 120ms ease, color 120ms ease;
+
+    &:hover:not(:disabled),
+    &:focus:not(:disabled) {
+      background: var(--rd-bg-pill) !important;
+      color: var(--rd-text-primary);
+    }
+
+    &.bg-light {
+      background: transparent !important;
+
+      &:hover:not(:disabled) {
+        background: var(--rd-bg-pill) !important;
+      }
+    }
+  }
+}
+
+// Body-appended & inline Redesign Menus (Detail Three-Dots, Sidebar Menu, Saved Views, Bulk Overflow)
+.dropdown-menu.rd-sidebar-menu,
+.dropdown-menu.rd-detail-more-menu {
+  min-width: 232px;
+  z-index: 1060;
+}
+
+.dropdown-menu.rd-views-menu {
+  min-width: 244px;
+  max-height: min(420px, 70vh);
+  overflow-y: auto;
+  z-index: 1055;
+
+  .rd-views-menu__check {
+    margin-left: auto;
+    color: var(--bs-link-color);
+  }
+}
+
+.dropdown-menu.rd-bulk-overflow-menu {
+  min-width: 256px;
+  z-index: 1055;
+
+  > .px-2.py-1 {
+    padding: 0 !important;
+  }
+
+  .rd-overflow-subdropdown {
+    display: block;
+    width: 100%;
+
+    > .btn-group {
+      display: flex;
+      width: 100%;
+
+      > button.dropdown-toggle {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start !important;
+        gap: 8px;
+        padding: 7px 10px !important;
+        border: 0 !important;
+        border-radius: var(--rd-radius-xs) !important;
+        background: transparent !important;
+        color: var(--rd-text-primary) !important;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        line-height: 1.35;
+        text-align: left;
+        box-shadow: none !important;
+
+        pngx-bs-icon {
+          color: var(--rd-text-secondary);
+          flex-shrink: 0;
+        }
+
+        &::after {
+          margin-left: auto !important;
+          opacity: 0.65;
+        }
+
+        &:hover:not(:disabled),
+        &.show,
+        &[aria-expanded='true'] {
+          background: var(--rd-bg-pill) !important;
+          color: var(--rd-text-primary) !important;
+
+          pngx-bs-icon {
+            color: var(--rd-text-primary);
+          }
+        }
+      }
+    }
+  }
+
+  .rd-bulk-download-section {
+    padding: 6px 10px 6px;
+  }
+
+  .rd-bulk-download-heading {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--rd-text-tertiary);
+    margin-bottom: 6px;
+  }
+
+  .form-check {
+    margin-bottom: 4px;
+    min-height: 22px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-check-label {
+      font-size: 0.8125rem;
+      color: var(--rd-text-primary);
+      cursor: pointer;
+    }
+  }
+}
+
+// Global Filterable, Dates, Permissions & Custom Fields Dropdowns (Filter Panel, Bulk Editor, Detail Inspector)
+pngx-filterable-dropdown .dropdown-menu,
+pngx-dates-dropdown .dropdown-menu,
+pngx-permissions-filter-dropdown .dropdown-menu,
+pngx-custom-fields-dropdown .dropdown-menu,
+pngx-custom-fields-query-dropdown .dropdown-menu {
+  padding: 8px !important;
+
+  // All/Any & Include/Exclude segmented pill toggles
+  .list-group-item > .btn-group.btn-group-xs {
+    background: var(--rd-bg-segmented);
+    border: 1px solid var(--rd-border-subtle);
+    border-radius: var(--rd-radius-pill);
+    padding: 2px;
+    gap: 2px;
+
+    > label.btn {
+      border: 0 !important;
+      border-radius: var(--rd-radius-pill) !important;
+      background: transparent !important;
+      color: var(--rd-text-secondary) !important;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      box-shadow: none !important;
+      transition: background-color 140ms ease, color 140ms ease;
+
+      &:hover {
+        color: var(--rd-text-primary) !important;
+      }
+    }
+
+    > input.btn-check:checked + label.btn {
+      background: var(--rd-bg-segmented-active) !important;
+      color: var(--rd-text-primary) !important;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+
+  .input-group-sm > .form-control {
+    border-radius: var(--rd-radius-sm);
+    background: var(--rd-bg-surface-subtle);
+    border: 1px solid var(--rd-border-subtle);
+    color: var(--rd-text-primary);
+    font-size: 12.5px;
+    padding: 5px 10px;
+  }
+
+  pngx-toggleable-dropdown-button {
+    .list-group-item {
+      padding: 5px 8px !important;
+    }
+
+    .selected-icon pngx-bs-icon {
+      color: var(--bs-link-color);
+    }
+
+    .badge {
+      background: var(--rd-bg-surface-subtle) !important;
+      color: var(--rd-text-secondary) !important;
+      border-radius: var(--rd-radius-pill);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .list-group-item-note {
+    padding: 6px 8px 2px !important;
+    border-top: 1px solid var(--rd-border-subtle) !important;
+    color: var(--rd-text-tertiary);
+  }
+
+  // Apply / Create / Extra action footer buttons inside filterable/custom-fields dropdowns
+  button.list-group-item-action.bg-light {
+    margin-top: 4px;
+    padding: 7px 10px !important;
+    border-top: 1px solid var(--rd-border-subtle) !important;
+    font-weight: 600;
+    color: var(--bs-link-color) !important;
+
+    &:hover:not(:disabled) {
+      background: var(--rd-accent-soft) !important;
+      color: var(--bs-link-color) !important;
+    }
+
+    &:disabled {
+      color: var(--rd-text-tertiary) !important;
+      opacity: 0.45;
+    }
+  }
+}
+
+// Document Version Dropdown (Topbar / Detail View)
+pngx-document-version-dropdown {
+  > .btn-group > button.dropdown-toggle {
+    border-radius: var(--rd-radius-pill);
+    background: var(--rd-bg-pill);
+    border: 1px solid var(--rd-border-subtle);
+    color: var(--rd-text-primary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 5px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    &:hover:not(:disabled) {
+      background: var(--rd-bg-pill-hover);
+      border-color: var(--rd-border-medium);
+      color: var(--rd-text-primary);
+    }
+
+    &.show,
+    &[aria-expanded='true'] {
+      background: var(--rd-accent-soft) !important;
+      border-color: rgba(var(--rd-accent-rgb), 0.36) !important;
+      color: var(--bs-link-color) !important;
+    }
+
+    .badge {
+      background: var(--rd-accent-soft) !important;
+      color: var(--bs-link-color) !important;
+      border-radius: var(--rd-radius-pill);
+      font-weight: 700;
+      font-size: 0.6875rem;
+    }
+  }
+
+  .dropdown-menu {
+    min-width: 320px;
+    padding: 8px;
+
+    .dropdown-item.border-top {
+      border-top: 1px solid var(--rd-border-subtle) !important;
+      border-radius: var(--rd-radius-sm);
+      margin-top: 2px;
+      padding: 2px 6px !important;
+    }
+
+    .version-link {
+      color: var(--rd-text-primary) !important;
+      text-decoration: none !important;
+
+      &:hover {
+        color: var(--rd-text-primary) !important;
+      }
+
+      .check pngx-bs-icon[name='check-circle'] {
+        color: var(--bs-link-color);
+      }
+
+      .version-label {
+        background: var(--rd-bg-surface-subtle);
+        border-color: var(--rd-border-subtle);
+        color: var(--rd-text-primary);
+        font-size: 0.8125rem;
+        font-weight: 500;
+      }
+
+      .badge.bg-light {
+        background: var(--rd-bg-pill) !important;
+        color: var(--rd-text-secondary) !important;
+        font-family: var(--rd-font-mono);
+        font-size: 0.6875rem;
+        font-weight: 500;
+        border: 1px solid var(--rd-border-subtle);
+      }
+    }
+  }
+}
+
+// Notifications / Toasts Dropdown
+pngx-toasts-dropdown .dropdown-menu {
+  min-width: 340px;
+  padding: 12px !important;
+
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--rd-text-primary);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 4. Popovers (Confirm-Button, Preview Popup, Color Picker, Info, Tour)
+// ----------------------------------------------------------------------------
+html .popover,
+[data-bs-theme] .popover {
+  --bs-popover-bg: var(--rd-popover-bg);
+  --bs-popover-border-color: var(--rd-border-subtle);
+  --bs-popover-border-radius: var(--rd-radius-md);
+  --bs-popover-header-bg: transparent;
+  --bs-popover-header-color: var(--rd-text-primary);
+  --bs-popover-body-color: var(--rd-text-primary);
+  --bs-popover-body-padding-x: 14px;
+  --bs-popover-body-padding-y: 10px;
+  --bs-popover-header-padding-x: 14px;
+  --bs-popover-header-padding-y: 10px;
+  background: var(--rd-popover-bg) !important;
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle) !important;
+  border-radius: var(--rd-radius-md) !important;
+  box-shadow: var(--rd-shadow-floating), inset 0 1px 0 var(--rd-border-glass) !important;
+  color: var(--rd-text-primary);
+  font-family: var(--rd-font-sans);
+  font-size: 0.8125rem;
+
+  .popover-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--rd-border-subtle) !important;
+    color: var(--rd-text-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-top-left-radius: var(--rd-radius-md);
+    border-top-right-radius: var(--rd-radius-md);
+
+    &::before {
+      border-bottom-color: transparent !important;
+    }
+  }
+
+  .popover-body {
+    color: var(--rd-text-primary);
+    line-height: 1.45;
+  }
+
+  &.popover-slim .popover-body {
+    padding: 8px 12px;
+    font-weight: 500;
+
+    .btn-link.text-danger {
+      font-weight: 700;
+      padding: 2px 8px !important;
+      margin-left: 4px !important;
+      border-radius: var(--rd-radius-pill);
+      background: var(--rd-danger-soft);
+      text-decoration: none;
+
+      &:hover {
+        background: var(--rd-danger-soft-hover);
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.bs-popover-top > .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^='top'] > .popover-arrow::after {
+  border-top-color: var(--rd-popover-arrow-bg) !important;
+}
+
+.bs-popover-bottom > .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^='bottom'] > .popover-arrow::after {
+  border-bottom-color: var(--rd-popover-arrow-bg) !important;
+}
+
+.bs-popover-start > .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^='left'] > .popover-arrow::after {
+  border-left-color: var(--rd-popover-arrow-bg) !important;
+}
+
+.bs-popover-end > .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^='right'] > .popover-arrow::after {
+  border-right-color: var(--rd-popover-arrow-bg) !important;
+}
+
+.bs-popover-top > .popover-arrow::before,
+.bs-popover-auto[data-popper-placement^='top'] > .popover-arrow::before {
+  border-top-color: var(--rd-border-medium) !important;
+}
+
+.bs-popover-bottom > .popover-arrow::before,
+.bs-popover-auto[data-popper-placement^='bottom'] > .popover-arrow::before {
+  border-bottom-color: var(--rd-border-medium) !important;
+}
+
+.bs-popover-start > .popover-arrow::before,
+.bs-popover-auto[data-popper-placement^='left'] > .popover-arrow::before {
+  border-left-color: var(--rd-border-medium) !important;
+}
+
+.bs-popover-end > .popover-arrow::before,
+.bs-popover-auto[data-popper-placement^='right'] > .popover-arrow::before {
+  border-right-color: var(--rd-border-medium) !important;
+}
+
+// ----------------------------------------------------------------------------
+// 5. ngb-datepicker (Calendar Popup in Date Filters & Date Inputs)
+// ----------------------------------------------------------------------------
+html ngb-datepicker,
+[data-bs-theme] ngb-datepicker {
+  background: var(--rd-bg-glass-strong) !important;
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle) !important;
+  border-radius: var(--rd-radius-md) !important;
+  box-shadow: var(--rd-shadow-floating), inset 0 1px 0 var(--rd-border-glass) !important;
+  padding: 10px !important;
+  color: var(--rd-text-primary);
+  font-family: var(--rd-font-sans);
+
+  .ngb-dp-header,
+  .ngb-dp-weekdays,
+  .ngb-dp-month,
+  .ngb-dp-months {
+    background-color: transparent !important;
+  }
+
+  .ngb-dp-header {
+    padding: 2px 0 8px;
+  }
+
+  .ngb-dp-navigation-select {
+    gap: 6px;
+
+    > .form-select {
+      height: 30px;
+      padding: 2px 26px 2px 10px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: var(--rd-radius-xs);
+      background-color: var(--rd-bg-pill);
+      border-color: var(--rd-border-subtle);
+      color: var(--rd-text-primary);
+    }
+  }
+
+  .ngb-dp-arrow {
+    .ngb-dp-arrow-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      color: var(--rd-text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background-color 120ms ease, color 120ms ease;
+
+      &:hover:not(:disabled) {
+        background-color: var(--rd-bg-pill);
+        color: var(--rd-text-primary);
+      }
+
+      &:focus-visible {
+        box-shadow: 0 0 0 3px var(--rd-accent-ring);
+      }
+    }
+
+    .ngb-dp-navigation-chevron {
+      border-color: currentColor;
+      border-width: 0.16em 0.16em 0 0;
+      width: 0.55em;
+      height: 0.55em;
+    }
+  }
+
+  .ngb-dp-weekdays {
+    border-bottom: 1px solid var(--rd-border-subtle);
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+
+  .ngb-dp-weekday {
+    font-style: normal;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--rd-text-tertiary) !important;
+  }
+
+  .ngb-dp-day,
+  .ngb-dp-week-number,
+  .ngb-dp-weekday {
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  .ngb-dp-day {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    [ngbDatepickerDayView],
+    .btn-light {
+      width: 2rem;
+      height: 2rem;
+      line-height: 2rem;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      background-color: transparent !important;
+      border: 0 !important;
+      color: var(--rd-text-primary) !important;
+      transition: background-color 110ms ease, color 110ms ease;
+
+      &:hover {
+        background-color: var(--rd-bg-pill) !important;
+        color: var(--rd-text-primary) !important;
+      }
+
+      &.text-muted,
+      &.outside {
+        color: var(--rd-text-tertiary) !important;
+        opacity: 0.65;
+      }
+
+      &.bg-primary,
+      &.active,
+      &.bg-primary:hover,
+      &.active:hover {
+        background-color: var(--rd-accent) !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.35);
+      }
+    }
+
+    &.ngb-dp-today [ngbDatepickerDayView]:not(.bg-primary):not(.active),
+    &.ngb-dp-today .btn-light:not(.bg-primary):not(.active) {
+      box-shadow: inset 0 0 0 1.5px var(--rd-accent);
+      color: var(--bs-link-color) !important;
+      font-weight: 600;
+    }
+
+    &.ngb-dp-today [ngbDatepickerDayView].bg-primary,
+    &.ngb-dp-today [ngbDatepickerDayView].active,
+    &.ngb-dp-today .btn-light.bg-primary,
+    &.ngb-dp-today .btn-light.active {
+      background-color: var(--rd-accent) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.35);
+    }
+
+    &:focus-visible [ngbDatepickerDayView] {
+      box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    }
+  }
+
+  // Footer ("Today" / "Close")
+  .btn-group-xs.border-top {
+    border-top: 1px solid var(--rd-border-subtle) !important;
+    padding: 8px 2px 0 !important;
+    margin-top: 6px;
+    gap: 8px;
+
+    > .btn {
+      border-radius: var(--rd-radius-pill) !important;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 6. Floating Toasts
+// ----------------------------------------------------------------------------
+html .toast,
+[data-bs-theme] .toast {
+  border: 1px solid var(--rd-border-subtle);
+  border-radius: var(--rd-radius-md);
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  box-shadow: var(--rd-shadow-floating), inset 0 1px 0 var(--rd-border-glass);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--rd-text-primary);
+
+  .toast-body {
+    padding: 12px 14px;
+  }
+
+  .btn-close {
+    width: 24px;
+    height: 24px;
+    background-size: 9px 9px;
+    margin-top: -2px;
+  }
+
+  &.toast-list-item {
+    border-radius: var(--rd-radius-sm);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 7. Global ng-select & .ng-dropdown-panel (Modals, Edit Dialogs, Filters, Overlays)
+// ----------------------------------------------------------------------------
+html .ng-select,
+[data-bs-theme] .ng-select {
+  .ng-select-container {
+    background-color: var(--rd-bg-surface-subtle) !important;
+    border: 1px solid var(--rd-border-subtle) !important;
+    border-radius: var(--rd-radius-sm);
+    color: var(--rd-text-primary) !important;
+    min-height: 36px;
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      box-shadow 140ms ease;
+
+    .ng-value-container {
+      .ng-placeholder {
+        color: var(--rd-text-tertiary);
+      }
+
+      .ng-input > input {
+        background: transparent !important;
+        color: var(--rd-text-primary) !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .ng-arrow-wrapper .ng-arrow {
+      border-color: var(--rd-text-tertiary) transparent transparent;
+    }
+
+    .ng-clear-wrapper {
+      color: var(--rd-text-tertiary);
+
+      &:hover {
+        color: var(--rd-text-primary);
+      }
+    }
+  }
+
+  &.ng-select-focused > .ng-select-container,
+  &.ng-select-opened > .ng-select-container {
+    background-color: var(--rd-bg-surface) !important;
+    border-color: var(--rd-accent) !important;
+    box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+
+    .ng-arrow-wrapper .ng-arrow {
+      border-color: transparent transparent var(--rd-text-secondary);
+    }
+  }
+
+  &.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: var(--rd-bg-pill);
+    border: 1px solid var(--rd-border-subtle);
+    border-radius: var(--rd-radius-xs);
+    color: var(--rd-text-primary);
+
+    .ng-value-icon.left {
+      border-right-color: var(--rd-border-subtle);
+      color: var(--rd-text-secondary);
+
+      &:hover {
+        background-color: var(--rd-danger-soft);
+        color: var(--rd-danger);
+      }
+    }
+  }
+}
+
+// Keep tag picker transparent so pngx-tag renders its colored pill directly
+.paperless-input-tags {
+  .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+}
+
+html .ng-dropdown-panel,
+[data-bs-theme] .ng-dropdown-panel,
+body > .ng-dropdown-panel {
+  background: var(--rd-bg-glass-strong) !important;
+  backdrop-filter: var(--rd-blur-lg);
+  -webkit-backdrop-filter: var(--rd-blur-lg);
+  border: 1px solid var(--rd-border-subtle) !important;
+  border-radius: var(--rd-radius-md) !important;
+  box-shadow: var(--rd-shadow-floating), inset 0 1px 0 var(--rd-border-glass) !important;
+  padding: 4px;
+  margin-top: 4px;
+  overflow: hidden;
+  z-index: 1080 !important;
+
+  &.ng-select-top {
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+
+  .ng-dropdown-panel-items {
+    .ng-option {
+      background-color: transparent !important;
+      color: var(--rd-text-primary) !important;
+      border-radius: var(--rd-radius-xs);
+      font-size: 0.8125rem;
+      padding: 7px 10px;
+      margin: 1px 0;
+      transition: background-color 110ms ease, color 110ms ease;
+
+      small.text-muted,
+      .text-muted {
+        color: var(--rd-text-tertiary) !important;
+      }
+
+      &.ng-option-marked,
+      &:not(.ng-option-selected):hover {
+        background-color: var(--rd-bg-pill) !important;
+        color: var(--rd-text-primary) !important;
+      }
+
+      &.ng-option-selected,
+      &.ng-option-selected.ng-option-marked {
+        background-color: var(--rd-accent-soft) !important;
+        color: var(--bs-link-color) !important;
+        font-weight: 600;
+      }
+
+      &.ng-option-disabled {
+        color: var(--rd-text-tertiary) !important;
+        opacity: 0.58;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 8. Global Cards, Form Controls, Input Groups, Switches & Alerts
+// ----------------------------------------------------------------------------
+html .card,
+[data-bs-theme] .card {
+  background-color: var(--rd-bg-surface);
+  border-color: var(--rd-border-subtle);
+  border-radius: var(--rd-radius-md);
+  box-shadow: var(--rd-shadow-card);
+}
+
+.form-control:not(.btn):not(.rd-search-control),
+.form-select:not(.is-invalid):not(:disabled) {
+  background-color: var(--rd-bg-surface-subtle);
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-primary);
+  border-radius: var(--rd-radius-sm);
+  font-size: 0.84375rem;
+
+  &::placeholder {
+    color: var(--rd-text-tertiary);
+  }
+
+  &:focus {
+    background-color: var(--rd-bg-surface);
+    border-color: var(--rd-accent);
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+    color: var(--rd-text-primary);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: var(--rd-bg-pill);
+    color: var(--rd-text-secondary);
+    opacity: 0.82;
+  }
+}
+
+.form-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--rd-text-primary);
+}
+
+.input-group-text {
+  background-color: var(--rd-bg-pill);
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.input-group > .btn-outline-secondary {
+  background-color: var(--rd-bg-pill);
+  border-color: var(--rd-border-subtle);
+  color: var(--rd-text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--rd-bg-pill-hover);
+    border-color: var(--rd-border-medium);
+    color: var(--rd-text-primary);
+  }
+}
+
+.form-check-input {
+  background-color: var(--rd-bg-surface-subtle);
+  border-color: var(--rd-border-medium);
+
+  &:checked {
+    background-color: var(--rd-accent);
+    border-color: var(--rd-accent);
+  }
+
+  &:focus {
+    border-color: var(--rd-accent);
+    box-shadow: 0 0 0 3px var(--rd-accent-ring);
+  }
+}
+
+.alert {
+  border-radius: var(--rd-radius-sm);
+  font-size: 0.8125rem;
+}
+
+html .alert-danger,
+[data-bs-theme] .alert-danger {
+  background-color: var(--rd-danger-soft);
+  border-color: var(--rd-danger-border);
+  color: var(--rd-danger);
+}
+
+html .alert-primary,
+[data-bs-theme] .alert-primary {
+  background-color: var(--rd-accent-soft);
+  border-color: rgba(var(--rd-accent-rgb), 0.28);
+  color: var(--bs-link-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-menu.show {
+    animation: none !important;
+  }
 }
 
 // Ensure crisp dark mode document thumbnails without inverting crisp white document sheets
@@ -881,42 +2276,10 @@ a.rd-detail-pill__btn {
   }
 }
 
-// Body-appended ng-select overlays (e.g. DocumentLink custom field typeahead)
+// Body-appended ng-select overlays (e.g. DocumentLink custom field typeahead) allow wrapping long titles
 body > .ng-dropdown-panel {
-  background-color: var(--rd-bg-surface) !important;
-  border: 1px solid var(--rd-border-subtle) !important;
-  border-radius: var(--rd-radius-sm) !important;
-  box-shadow: var(--rd-shadow-floating) !important;
-  overflow: hidden;
-  z-index: 1080 !important;
-
   .ng-dropdown-panel-items .ng-option {
-    background-color: transparent !important;
-    color: var(--rd-text-primary) !important;
-    font-size: 12.5px;
-    padding: 7px 10px;
     white-space: normal;
-
-    small.text-muted {
-      color: var(--rd-text-tertiary) !important;
-    }
-
-    &.ng-option-marked,
-    &:hover {
-      background-color: var(--rd-bg-pill) !important;
-      color: var(--rd-text-primary) !important;
-    }
-
-    &.ng-option-selected,
-    &.ng-option-selected.ng-option-marked {
-      background-color: var(--rd-accent-soft) !important;
-      color: var(--rd-accent) !important;
-      font-weight: 600;
-    }
-
-    &.ng-option-disabled {
-      color: var(--rd-text-tertiary) !important;
-    }
   }
 }
 

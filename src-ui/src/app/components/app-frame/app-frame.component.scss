@@ -160,6 +160,24 @@
   display: none;
 }
 
+.rd-detail-pill__btn.show,
+.rd-detail-pill__btn[aria-expanded='true'] {
+  background: var(--rd-accent-soft);
+  color: var(--bs-link-color);
+
+  &:hover:not(:disabled) {
+    background: var(--rd-accent-soft-hover);
+    color: var(--bs-link-color);
+  }
+}
+
+.rd-nav-history-pill__btn:focus-visible,
+.rd-detail-pill__btn:focus-visible,
+.rd-view-toggle__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2.5px var(--rd-accent-ring);
+}
+
 .rd-inspector-toggle {
   display: inline-flex;
   align-items: center;
