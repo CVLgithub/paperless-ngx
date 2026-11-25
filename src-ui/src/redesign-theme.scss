@@ -2300,3 +2300,138 @@ html .tooltip,
     box-shadow: var(--rd-shadow-floating), 0 0 0 1px var(--rd-tooltip-border);
   }
 }
+
+// ----------------------------------------------------------------------------
+// 9. Pagination (ngb-pagination — Document List, Management Lists, Trash, Tasks)
+// ----------------------------------------------------------------------------
+html ngb-pagination,
+[data-bs-theme] ngb-pagination {
+  display: inline-flex;
+  align-items: center;
+}
+
+html ul.pagination,
+[data-bs-theme] ul.pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  padding: 4px;
+  border-radius: var(--rd-radius-pill);
+  background: var(--rd-bg-glass);
+  backdrop-filter: var(--rd-blur-md);
+  -webkit-backdrop-filter: var(--rd-blur-md);
+  border: 1px solid var(--rd-border-subtle);
+  box-shadow: var(--rd-shadow-sm), inset 0 1px 0 var(--rd-border-glass);
+  font-variant-numeric: tabular-nums;
+
+  &.pagination-sm {
+    padding: 3px;
+    gap: 2px;
+
+    .page-link {
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      font-size: 0.78125rem;
+    }
+  }
+
+  .page-item {
+    display: inline-flex;
+    align-items: center;
+
+    &:first-child .page-link,
+    &:last-child .page-link {
+      border-radius: var(--rd-radius-pill) !important;
+    }
+  }
+
+  .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+    margin-left: 0 !important;
+    border: 0 !important;
+    border-radius: var(--rd-radius-pill) !important;
+    background-color: transparent !important;
+    color: var(--rd-text-secondary) !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    box-shadow: none;
+    transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+
+    pngx-bs-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &:hover {
+      background-color: var(--rd-bg-pill-hover) !important;
+      color: var(--rd-text-primary) !important;
+    }
+
+    &:focus {
+      background-color: transparent !important;
+      color: var(--rd-text-secondary) !important;
+      box-shadow: none !important;
+    }
+
+    &:focus-visible {
+      outline: none;
+      background-color: var(--rd-bg-pill) !important;
+      color: var(--rd-text-primary) !important;
+      box-shadow: 0 0 0 3px var(--rd-accent-ring) !important;
+    }
+  }
+
+  .page-item.active .page-link,
+  .page-item.active .page-link:hover,
+  .page-item.active .page-link:focus {
+    background-color: var(--rd-accent) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.34) !important;
+  }
+
+  .page-item.active .page-link:focus-visible {
+    box-shadow: 0 2px 8px rgba(var(--rd-accent-rgb), 0.34), 0 0 0 3px var(--rd-accent-ring) !important;
+  }
+
+  .page-item.disabled .page-link,
+  .page-item.disabled .page-link:hover,
+  .page-item.disabled .page-link:focus {
+    background-color: transparent !important;
+    color: var(--rd-text-tertiary) !important;
+    opacity: 0.45;
+    box-shadow: none !important;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+html .rd-pagination-bar ul.pagination,
+[data-bs-theme] .rd-pagination-bar ul.pagination {
+  padding: 4px;
+  gap: 3px;
+  background: var(--rd-bg-glass-strong);
+  box-shadow: var(--rd-shadow-md), inset 0 1px 0 var(--rd-border-glass);
+
+  &.pagination-sm {
+    padding: 4px;
+    gap: 3px;
+
+    .page-link {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 10px;
+      font-size: 0.8125rem;
+    }
+  }
+}
+

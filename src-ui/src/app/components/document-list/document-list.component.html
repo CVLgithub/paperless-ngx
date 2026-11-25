@@ -354,7 +354,14 @@
             aria-label="Seitennavigation"
             i18n-aria-label
             size="sm"
-          ></ngb-pagination>
+          >
+            <ng-template ngbPaginationPrevious>
+              <pngx-bs-icon name="chevron-left" width="13" height="13"></pngx-bs-icon>
+            </ng-template>
+            <ng-template ngbPaginationNext>
+              <pngx-bs-icon name="chevron-right" width="13" height="13"></pngx-bs-icon>
+            </ng-template>
+          </ngb-pagination>
         </div>
       }
     }
