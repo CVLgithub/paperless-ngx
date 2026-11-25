@@ -1,0 +1,175 @@
+@let items = versionInbox.items();
+@let unreadCount = versionInbox.unreadCount();
+@let isLoading = versionInbox.loading();
+@let isLoaded = versionInbox.loaded();
+@let errorMsg = versionInbox.error();
+
+<div
+  class="rd-version-inbox"
+  ngbDropdown
+  #inboxDropdown="ngbDropdown"
+  placement="bottom-end"
+  autoClose="outside"
+  (openChange)="onOpenChange($event)"
+>
+  <button
+    type="button"
+    class="rd-version-inbox__trigger"
+    [class.rd-version-inbox__trigger--open]="isOpen()"
+    [class.rd-version-inbox__trigger--unread]="unreadCount > 0"
+    id="versionInboxDropdown"
+    ngbDropdownToggle
+    [title]="triggerAriaLabel()"
+    [attr.aria-label]="triggerAriaLabel()"
+  >
+    <pngx-bs-icon name="bell" width="0.95rem" height="0.95rem" aria-hidden="true"></pngx-bs-icon>
+    @if (unreadCount > 0) {
+      <span class="rd-version-inbox__badge" aria-hidden="true">{{ unreadBadgeText() }}</span>
+    }
+  </button>
+
+  <div
+    ngbDropdownMenu
+    class="rd-version-inbox__menu"
+    aria-labelledby="versionInboxDropdown"
+  >
+    <div class="rd-version-inbox__header">
+      <div class="rd-version-inbox__heading">
+        <span class="rd-version-inbox__title" i18n>Versions-Inbox</span>
+        @if (unreadCount > 0) {
+          <span class="rd-version-inbox__unread-pill">{{ unreadCount }} <ng-container i18n>neu</ng-container></span>
+        }
+      </div>
+
+      <div class="rd-version-inbox__header-actions">
+        @if (unreadCount > 0) {
+          <button
+            type="button"
+            class="rd-version-inbox__mark-all"
+            (click)="onMarkAllAsRead($event)"
+          >
+            <pngx-bs-icon name="check2-all" width="0.82rem" height="0.82rem" aria-hidden="true"></pngx-bs-icon>
+            <span i18n>Alle gelesen</span>
+          </button>
+        }
+        <button
+          type="button"
+          class="rd-version-inbox__icon-btn"
+          [class.is-spinning]="isLoading"
+          [disabled]="isLoading"
+          (click)="onRefresh($event)"
+          title="Aktualisieren"
+          i18n-title
+          aria-label="Aktualisieren"
+          i18n-aria-label
+        >
+          <pngx-bs-icon name="arrow-clockwise" width="0.82rem" height="0.82rem" aria-hidden="true"></pngx-bs-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="rd-version-inbox__body">
+      @if (isLoading && items.length === 0) {
+        <div class="rd-version-inbox__state">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span i18n>Lade Versionsänderungen …</span>
+        </div>
+      } @else if (errorMsg && items.length === 0) {
+        <div class="rd-version-inbox__state rd-version-inbox__state--error">
+          <pngx-bs-icon name="exclamation-circle-fill" width="1.15rem" height="1.15rem" aria-hidden="true"></pngx-bs-icon>
+          <span>{{ errorMsg }}</span>
+          <button
+            type="button"
+            class="rd-btn-neutral rd-version-inbox__retry"
+            (click)="onRefresh($event)"
+            i18n
+          >
+            Erneut versuchen
+          </button>
+        </div>
+      } @else if (isLoaded && items.length === 0) {
+        <div class="rd-version-inbox__state">
+          <span class="rd-version-inbox__empty-icon" aria-hidden="true">
+            <pngx-bs-icon name="layers" width="1.15rem" height="1.15rem"></pngx-bs-icon>
+          </span>
+          <span class="rd-version-inbox__empty-title" i18n>Keine Versionsänderungen</span>
+          <span class="rd-version-inbox__empty-hint" i18n>
+            Dokumente mit mehreren Versionen erscheinen hier automatisch.
+          </span>
+        </div>
+      } @else {
+        <div class="rd-version-inbox__list" role="list">
+          @for (item of items; track item.documentId) {
+            @let docTitle = item.title | documentTitle;
+            <div
+              class="rd-version-inbox__item"
+              [class.rd-version-inbox__item--unread]="item.unread"
+              role="listitem"
+            >
+              <a
+                class="rd-version-inbox__item-link"
+                [routerLink]="['/documents', item.documentId]"
+                (click)="onOpenItem(item, inboxDropdown)"
+              >
+                <span
+                  class="rd-version-inbox__dot"
+                  [class.rd-version-inbox__dot--visible]="item.unread"
+                  aria-hidden="true"
+                ></span>
+
+                <span class="rd-version-inbox__item-content">
+                  <span class="rd-version-inbox__item-title" [title]="docTitle">
+                    {{ docTitle }}
+                  </span>
+
+                  <span class="rd-version-inbox__item-meta">
+                    <span
+                      class="rd-version-inbox__version-pill"
+                      [class.rd-version-inbox__version-pill--unread]="item.unread"
+                      [attr.aria-label]="getVersionAriaLabel(item)"
+                    >
+                      <pngx-bs-icon name="layers" width="0.65rem" height="0.65rem" aria-hidden="true"></pngx-bs-icon>
+                      <span>v{{ item.versionCount }}</span>
+                    </span>
+
+                    @if (item.latestVersionLabel) {
+                      <span
+                        class="rd-version-inbox__label"
+                        [title]="item.latestVersionLabel"
+                      >
+                        {{ item.latestVersionLabel }}
+                      </span>
+                    }
+
+                    @if (item.latestAdded) {
+                      <span
+                        class="rd-version-inbox__time"
+                        [title]="item.latestAdded | customDate:'medium'"
+                      >
+                        {{ item.latestAdded | customDate:'relative' }}
+                      </span>
+                    }
+                  </span>
+                </span>
+              </a>
+
+              @if (item.unread) {
+                <button
+                  type="button"
+                  class="rd-version-inbox__mark-read"
+                  (click)="onMarkItemAsRead(item, $event)"
+                  title="Als gelesen markieren"
+                  i18n-title
+                  aria-label="Als gelesen markieren"
+                  i18n-aria-label
+                >
+                  <pngx-bs-icon name="check" width="0.88rem" height="0.88rem" aria-hidden="true"></pngx-bs-icon>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

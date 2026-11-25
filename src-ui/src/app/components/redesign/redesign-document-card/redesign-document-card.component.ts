@@ -14,6 +14,11 @@ import { Tag } from 'src/app/data/tag'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  getDocumentLatestVersion,
+  getDocumentVersionCount,
+  VersionInboxService,
+} from 'src/app/services/version-inbox.service'
 
 export type ThumbLoadState = 'loading' | 'loaded' | 'error'
 
@@ -28,6 +33,9 @@ const MAX_TAG_DOTS = 5
 })
 export class RedesignDocumentCardComponent {
   private readonly documentService = inject(DocumentService)
+  private readonly versionInbox = inject(VersionInboxService, {
+    optional: true,
+  })
 
   readonly document = input.required<Document>()
   readonly selected = input(false)
@@ -52,6 +60,30 @@ export class RedesignDocumentCardComponent {
     const typeId = this.document().document_type
     if (!typeId) return ''
     return this.documentTypeMap().get(typeId)?.name ?? ''
+  })
+
+  readonly versionCount = computed(() =>
+    getDocumentVersionCount(this.document())
+  )
+
+  readonly hasUnreadVersion = computed(
+    () => this.versionInbox?.isDocumentUnread(this.document()) ?? false
+  )
+
+  readonly versionTooltip = computed(() => {
+    const count = this.versionCount()
+    if (count <= 1) return ''
+    const parts = [$localize`${count} Versionen`]
+    const latestLabel = getDocumentLatestVersion(
+      this.document()
+    )?.version_label?.trim()
+    if (latestLabel) {
+      parts.push(latestLabel)
+    }
+    if (this.hasUnreadVersion()) {
+      parts.push($localize`Neue Version`)
+    }
+    return parts.join(' · ')
   })
 
   readonly resolvedTags = computed<Tag[]>(() => {

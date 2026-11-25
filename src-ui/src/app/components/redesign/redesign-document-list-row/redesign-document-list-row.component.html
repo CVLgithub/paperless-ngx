@@ -43,8 +43,24 @@
   </div>
 
   <div class="rd-list-row__main">
-    <div class="rd-list-row__title" [title]="docTitle">
-      {{ docTitle }}
+    <div class="rd-list-row__title-row">
+      <div class="rd-list-row__title" [title]="docTitle">
+        {{ docTitle }}
+      </div>
+      @if (versionCount() > 1) {
+        <span
+          class="rd-list-row__version"
+          [class.rd-list-row__version--unread]="hasUnreadVersion()"
+          [title]="versionTooltip()"
+          [attr.aria-label]="versionTooltip()"
+        >
+          @if (hasUnreadVersion()) {
+            <span class="rd-list-row__version-dot" aria-hidden="true"></span>
+          }
+          <pngx-bs-icon name="layers" width="0.65rem" height="0.65rem" aria-hidden="true"></pngx-bs-icon>
+          <span>v{{ versionCount() }}</span>
+        </span>
+      }
     </div>
     @if (correspondent) {
       <div class="rd-list-row__correspondent">{{ correspondent }}</div>

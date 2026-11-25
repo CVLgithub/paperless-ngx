@@ -93,6 +93,9 @@
         <!-- Mode: Document List Controls -->
         @if (topbar.mode() === 'document-list' && topbar.listConfig(); as listCfg) {
           <pngx-global-search class="rd-topbar__search"></pngx-global-search>
+          <pngx-redesign-version-inbox
+            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
+          ></pngx-redesign-version-inbox>
 
           <!-- Grid / List Segmented Pill -->
           <div class="rd-view-toggle rd-glass-pill" role="group" aria-label="Darstellung wechseln">
@@ -286,6 +289,9 @@
         <!-- Mode: Default (Settings, Workflows, Mail, Tasks, Attributes, etc.) -->
         @else {
           <pngx-global-search class="rd-topbar__search"></pngx-global-search>
+          <pngx-redesign-version-inbox
+            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
+          ></pngx-redesign-version-inbox>
           @if (aiEnabled) {
             <pngx-chat></pngx-chat>
           }

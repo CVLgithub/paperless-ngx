@@ -28,10 +28,12 @@ const LIST_DEFAULT_DISPLAY_FIELDS: DisplayField[] = DEFAULT_DISPLAY_FIELDS.map(
 /**
  * Document fields requested for the document list. Restricting the payload
  * spares the backend serializing (and prefetching) content, notes, custom
- * fields, versions etc. for every row. Every consumer of `documents` must be
- * covered here:
- * - redesign card / list row: id, title, created, tags, document_type,
- *   correspondent, page_count (thumb / preview URLs are built from the id)
+ * fields, etc. for every row. `versions` is already prefetched by
+ * DocumentViewSet.get_queryset() for page_count, so including it adds no extra
+ * DB queries. Every consumer of `documents` must be covered here:
+ * - redesign card / list row: id, title, created, modified, tags,
+ *   document_type, correspondent, page_count, versions (thumb / preview URLs
+ *   are built from the id)
  * - recency grouping (redesign-document-groups): added, created
  * - bulk editor: owner + user_can_change (permission checks),
  *   archived_file_name (email dialog), title (share link bundle dialog)
@@ -42,10 +44,12 @@ export const DOCUMENT_LIST_FIELDS: string[] = [
   'title',
   'created',
   'added',
+  'modified',
   'tags',
   'document_type',
   'correspondent',
   'page_count',
+  'versions',
   'owner',
   'user_can_change',
   'archived_file_name',

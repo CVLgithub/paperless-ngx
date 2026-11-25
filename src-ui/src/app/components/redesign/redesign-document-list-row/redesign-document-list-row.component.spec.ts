@@ -7,6 +7,7 @@ import { DocumentType } from 'src/app/data/document-type'
 import { Tag } from 'src/app/data/tag'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { VersionInboxService } from 'src/app/services/version-inbox.service'
 import { RedesignDocumentListRowComponent } from './redesign-document-list-row.component'
 
 const tags: Tag[] = [
@@ -208,5 +209,66 @@ describe('RedesignDocumentListRowComponent', () => {
 
     fixture.nativeElement.querySelector('.rd-list-row__check').click()
     expect(toggleSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('shows a version badge only when a document has multiple versions and reacts to read state', () => {
+    localStorage.clear()
+    expect(fixture.nativeElement.querySelector('.rd-list-row__version')).toBeNull()
+
+    fixture.componentRef.setInput(
+      'document',
+      doc({
+        versions: [
+          {
+            id: 1,
+            added: '2026-11-20T10:00:00Z' as unknown as Date,
+            is_root: true,
+          },
+        ],
+      })
+    )
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector('.rd-list-row__version')).toBeNull()
+
+    fixture.componentRef.setInput(
+      'document',
+      doc({
+        id: 88,
+        versions: [
+          {
+            id: 883,
+            added: '2026-11-25T10:00:00Z' as unknown as Date,
+            version_label: 'Korrektur',
+            is_root: false,
+          },
+          {
+            id: 882,
+            added: '2026-11-10T10:00:00Z' as unknown as Date,
+            is_root: false,
+          },
+          {
+            id: 88,
+            added: '2026-11-01T10:00:00Z' as unknown as Date,
+            is_root: true,
+          },
+        ],
+      })
+    )
+    fixture.detectChanges()
+
+    const badge: HTMLElement =
+      fixture.nativeElement.querySelector('.rd-list-row__version')
+    expect(badge).not.toBeNull()
+    expect(badge.textContent.trim()).toBe('v3')
+    expect(badge.classList).toContain('rd-list-row__version--unread')
+    expect(badge.getAttribute('title')).toContain('3 Versionen')
+    expect(badge.getAttribute('title')).toContain('Korrektur')
+
+    const versionInbox = TestBed.inject(VersionInboxService)
+    versionInbox.markAsRead(88, 883)
+    fixture.detectChanges()
+
+    expect(badge.classList).not.toContain('rd-list-row__version--unread')
+    localStorage.clear()
   })
 })

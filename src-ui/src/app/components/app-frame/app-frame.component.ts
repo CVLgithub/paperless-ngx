@@ -77,6 +77,7 @@ import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profil
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { RedesignSidebarComponent } from '../redesign/redesign-sidebar/redesign-sidebar.component'
 import { RedesignTopbarService } from '../redesign/redesign-topbar.service'
+import { RedesignVersionInboxComponent } from '../redesign/redesign-version-inbox/redesign-version-inbox.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
@@ -109,6 +110,7 @@ const SCROLL_THRESHOLD = 16
     SwitchComponent,
     UploadStatusTrayComponent,
     RedesignSidebarComponent,
+    RedesignVersionInboxComponent,
   ],
 })
 export class AppFrameComponent

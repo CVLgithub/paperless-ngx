@@ -75,6 +75,20 @@
     </h3>
     <div class="rd-doc-card__meta">
       <span class="rd-doc-card__date">{{ doc.created | customDate:'mediumDate' }}</span>
+      @if (versionCount() > 1) {
+        <span
+          class="rd-doc-card__version"
+          [class.rd-doc-card__version--unread]="hasUnreadVersion()"
+          [title]="versionTooltip()"
+          [attr.aria-label]="versionTooltip()"
+        >
+          @if (hasUnreadVersion()) {
+            <span class="rd-doc-card__version-dot" aria-hidden="true"></span>
+          }
+          <pngx-bs-icon name="layers" width="0.65rem" height="0.65rem" aria-hidden="true"></pngx-bs-icon>
+          <span>v{{ versionCount() }}</span>
+        </span>
+      }
       @if (tags.length > 0) {
         <span class="rd-doc-card__dots" aria-label="Tags">
           @for (tag of tags; track tag.id) {

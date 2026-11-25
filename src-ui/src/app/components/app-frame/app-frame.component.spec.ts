@@ -907,4 +907,28 @@ describe('AppFrameComponent', () => {
     saveNextBtn.nativeElement.click()
     expect(onSaveAndNext).toHaveBeenCalledTimes(1)
   })
+
+  it('should render the version inbox next to global search in default and document-list topbar modes', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    const topbar = TestBed.inject(RedesignTopbarService)
+
+    // Default mode
+    topbar.reset()
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.css('pngx-global-search + pngx-redesign-version-inbox'))
+    ).not.toBeNull()
+
+    // Document-list mode
+    topbar.setListConfig({
+      displayMode: 'grid',
+      selectionMode: false,
+      onSetDisplayMode: jest.fn(),
+      onToggleSelectionMode: jest.fn(),
+    })
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.css('pngx-global-search + pngx-redesign-version-inbox'))
+    ).not.toBeNull()
+  })
 })
