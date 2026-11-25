@@ -2,6 +2,7 @@ import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import {
   Component,
+  DOCUMENT,
   effect,
   ElementRef,
   inject,
@@ -149,9 +150,12 @@ import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import {
+  PDF_ZOOM_MAX,
+  PDF_ZOOM_MIN,
   PdfRenderMode,
   PdfZoomLevel,
   PdfZoomScale,
+  PdfZoomValue,
   PngxPdfDocumentProxy,
 } from '../common/pdf-viewer/pdf-viewer.types'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
@@ -163,6 +167,10 @@ import { DocumentBarcodesComponent } from './document-barcodes/document-barcodes
 import { DocumentHistoryComponent } from './document-history/document-history.component'
 import { DocumentVersionDropdownComponent } from './document-version-dropdown/document-version-dropdown.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
+
+interface SafariGestureEvent extends Event {
+  scale: number
+}
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -261,6 +269,7 @@ export class DocumentDetailComponent
   private readonly websocketStatusService = inject(WebsocketStatusService)
   private readonly topbar = inject(RedesignTopbarService)
   private readonly notesService = inject(DocumentNotesService)
+  private readonly domDocument = inject(DOCUMENT)
   private readonly useNativePdfViewerSetting = this.settings.getSignal<boolean>(
     SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
   )
@@ -302,8 +311,20 @@ export class DocumentDetailComponent
     this.topbarTemplateVersion.update((v) => v + 1)
   }
 
-  @ViewChild('viewerStage')
   viewerStageRef?: ElementRef<HTMLElement>
+
+  @ViewChild('viewerStage')
+  set viewerStage(el: ElementRef<HTMLElement> | undefined) {
+    if (this.viewerStageRef?.nativeElement === el?.nativeElement) {
+      return
+    }
+    this.detachPdfZoomListeners()
+    this.viewerStageRef = el
+    if (el) {
+      this.attachPdfZoomListeners(el.nativeElement)
+    }
+  }
+
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
@@ -365,8 +386,23 @@ export class DocumentDetailComponent
 
   readonly previewCurrentPage = signal(1)
   readonly previewNumPages = signal<number>(undefined)
-  readonly previewZoomSetting = signal<PdfZoomLevel>(PdfZoomLevel.One)
+  readonly previewZoomSetting = signal<PdfZoomValue>(PdfZoomLevel.One)
   readonly previewZoomScale = signal<PdfZoomScale>(PdfZoomScale.PageWidth)
+
+  private static readonly ZOOM_THROTTLE_MS = 48
+  private static readonly WHEEL_DELTA_CLAMP = 20
+  private static readonly WHEEL_ZOOM_SENSITIVITY = 0.005
+
+  private zoomListenerTarget: HTMLElement | null = null
+  private keydownListenerAttached = false
+  private preciseZoomFactor = 1
+  private pendingZoomTarget: number | null = null
+  private zoomThrottleTimer: ReturnType<typeof setTimeout> | null = null
+  private lastZoomAppliedAt = 0
+  private isSafariGestureActive = false
+  private gestureStartZoom = 1
+  private pinchStartDistance: number | null = null
+  private pinchStartZoom = 1
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -664,6 +700,7 @@ export class DocumentDetailComponent
   private loadDocument(documentId: number, forceRemote: boolean = false): void {
     let redirectedToRoot = false
     this.isDirtySignal.set(false)
+    this.resetZoomGestureState()
     this.closeIncomingUpdateModal()
     this.pendingIncomingUpdate = null
     this.selectedVersionId.set(documentId)
@@ -1067,6 +1104,7 @@ export class DocumentDetailComponent
         .subscribe(() => this.scheduleCustomFieldTextareaResize())
     }
 
+    this.attachPdfZoomKeydownListener()
     this.syncTopbarConfig()
   }
 
@@ -1078,6 +1116,8 @@ export class DocumentDetailComponent
       cancelAnimationFrame(this.customFieldResizeFrame)
       this.customFieldResizeFrame = null
     }
+    this.detachPdfZoomListeners()
+    this.detachPdfZoomKeydownListener()
     this.topbar.reset()
     this.cleanupPrintDocument()
     this.unsubscribeNotifier.next(this)
@@ -1872,16 +1912,36 @@ export class DocumentDetailComponent
     }
   }
 
-  setZoom(setting: PdfZoomScale | PdfZoomLevel) {
+  get isPdfViewerActive(): boolean {
+    return (
+      !!this.document() &&
+      this.archiveContentRenderType === ContentRenderType.PDF &&
+      !this.useNativePdfViewer &&
+      !this.requiresPassword
+    )
+  }
+
+  setZoom(setting: PdfZoomScale | PdfZoomValue) {
+    this.clearPendingZoomUpdate()
     if (
       setting === PdfZoomScale.PageFit ||
       setting === PdfZoomScale.PageWidth
     ) {
       this.previewZoomScale.set(setting)
       this.previewZoomSetting.set(PdfZoomLevel.One)
+      this.preciseZoomFactor = 1
       return
     }
-    this.previewZoomSetting.set(setting)
+    const parsed = Number(setting)
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      this.previewZoomSetting.set(PdfZoomLevel.One)
+      this.previewZoomScale.set(PdfZoomScale.PageWidth)
+      this.preciseZoomFactor = 1
+      return
+    }
+    const clamped = this.clampZoomFactor(parsed)
+    this.preciseZoomFactor = clamped
+    this.previewZoomSetting.set(this.formatZoomSetting(clamped))
     this.previewZoomScale.set(PdfZoomScale.PageWidth)
   }
 
@@ -1896,35 +1956,432 @@ export class DocumentDetailComponent
     return this.previewZoomSetting()
   }
 
-  getZoomSettingTitle(setting: PdfZoomScale | PdfZoomLevel): string {
+  getZoomSettingTitle(setting: PdfZoomScale | PdfZoomValue): string {
     switch (setting) {
       case PdfZoomScale.PageFit:
         return $localize`Page Fit`
-      default:
-        return `${parseFloat(setting) * 100}%`
+      case PdfZoomScale.PageWidth:
+        return '100%'
+      default: {
+        const numeric = Number(setting)
+        return `${Math.round((Number.isFinite(numeric) ? numeric : 1) * 100)}%`
+      }
     }
   }
 
   increaseZoom(): void {
+    this.clearPendingZoomUpdate()
     const zoomLevels = Object.values(PdfZoomLevel)
-    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting())
     if (this.previewZoomScale() === PdfZoomScale.PageFit) {
-      currentIndex = zoomLevels.indexOf(PdfZoomLevel.One)
+      this.previewZoomScale.set(PdfZoomScale.PageWidth)
+      this.previewZoomSetting.set(PdfZoomLevel.OneAndHalf)
+      this.preciseZoomFactor = parseFloat(PdfZoomLevel.OneAndHalf)
+      return
     }
+    const currentNumeric = this.getNumericZoomFactor()
+    const nextLevel =
+      zoomLevels.find((level) => parseFloat(level) > currentNumeric + 0.001) ??
+      zoomLevels[zoomLevels.length - 1]
     this.previewZoomScale.set(PdfZoomScale.PageWidth)
-    this.previewZoomSetting.set(
-      zoomLevels[Math.min(zoomLevels.length - 1, currentIndex + 1)]
-    )
+    this.previewZoomSetting.set(nextLevel)
+    this.preciseZoomFactor = parseFloat(nextLevel)
   }
 
   decreaseZoom(): void {
+    this.clearPendingZoomUpdate()
     const zoomLevels = Object.values(PdfZoomLevel)
-    let currentIndex = zoomLevels.indexOf(this.previewZoomSetting())
     if (this.previewZoomScale() === PdfZoomScale.PageFit) {
-      currentIndex = zoomLevels.indexOf(PdfZoomLevel.ThreeQuarters)
+      this.previewZoomScale.set(PdfZoomScale.PageWidth)
+      this.previewZoomSetting.set(PdfZoomLevel.Half)
+      this.preciseZoomFactor = parseFloat(PdfZoomLevel.Half)
+      return
     }
+    const currentNumeric = this.getNumericZoomFactor()
+    const prevLevel =
+      [...zoomLevels]
+        .reverse()
+        .find((level) => parseFloat(level) < currentNumeric - 0.001) ??
+      zoomLevels[0]
     this.previewZoomScale.set(PdfZoomScale.PageWidth)
-    this.previewZoomSetting.set(zoomLevels[Math.max(0, currentIndex - 1)])
+    this.previewZoomSetting.set(prevLevel)
+    this.preciseZoomFactor = parseFloat(prevLevel)
+  }
+
+  resetZoom(): void {
+    const configuredDefault = this.settings.get(
+      SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING
+    ) as PdfZoomScale | PdfZoomLevel
+    if (
+      configuredDefault === PdfZoomScale.PageFit ||
+      configuredDefault === PdfZoomScale.PageWidth
+    ) {
+      this.setZoom(configuredDefault)
+      return
+    }
+    this.resetZoomToHundred()
+  }
+
+  isAtMinZoom(): boolean {
+    return (
+      this.previewZoomScale() !== PdfZoomScale.PageFit &&
+      this.getNumericZoomFactor() <= PDF_ZOOM_MIN + 0.001
+    )
+  }
+
+  isAtMaxZoom(): boolean {
+    return (
+      this.previewZoomScale() !== PdfZoomScale.PageFit &&
+      this.getNumericZoomFactor() >= PDF_ZOOM_MAX - 0.001
+    )
+  }
+
+  private getNumericZoomFactor(): number {
+    const numeric = Number(this.previewZoomSetting())
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : 1
+  }
+
+  private getCurrentPreciseZoom(): number {
+    if (this.previewZoomScale() === PdfZoomScale.PageFit) {
+      return 1
+    }
+    if (this.pendingZoomTarget !== null) {
+      return this.preciseZoomFactor
+    }
+    const displayed = this.getNumericZoomFactor()
+    if (Math.abs(this.preciseZoomFactor - displayed) > 0.02) {
+      this.preciseZoomFactor = displayed
+    }
+    return this.preciseZoomFactor
+  }
+
+  private clampZoomFactor(factor: number): number {
+    return Math.min(PDF_ZOOM_MAX, Math.max(PDF_ZOOM_MIN, factor))
+  }
+
+  private formatZoomSetting(factor: number): PdfZoomValue {
+    const rounded = Math.round(this.clampZoomFactor(factor) * 100) / 100
+    for (const preset of Object.values(PdfZoomLevel)) {
+      if (Math.abs(rounded - parseFloat(preset)) < 0.001) {
+        return preset
+      }
+    }
+    return String(rounded)
+  }
+
+  private applyZoomFactor(factor: number): void {
+    const clamped = this.clampZoomFactor(factor)
+    this.preciseZoomFactor = clamped
+    const formatted = this.formatZoomSetting(clamped)
+    if (this.previewZoomScale() !== PdfZoomScale.PageWidth) {
+      this.previewZoomScale.set(PdfZoomScale.PageWidth)
+    }
+    if (this.previewZoomSetting() !== formatted) {
+      this.previewZoomSetting.set(formatted)
+    }
+  }
+
+  private scheduleZoomUpdate(targetZoom: number): void {
+    const now = Date.now()
+    const elapsed = now - this.lastZoomAppliedAt
+    if (
+      this.zoomThrottleTimer === null &&
+      elapsed >= DocumentDetailComponent.ZOOM_THROTTLE_MS
+    ) {
+      this.applyZoomFactor(targetZoom)
+      this.lastZoomAppliedAt = now
+      return
+    }
+    this.pendingZoomTarget = targetZoom
+    if (this.zoomThrottleTimer === null) {
+      const remaining = Math.max(
+        0,
+        DocumentDetailComponent.ZOOM_THROTTLE_MS - elapsed
+      )
+      this.zoomThrottleTimer = setTimeout(() => {
+        this.zoomThrottleTimer = null
+        this.flushPendingZoomUpdate()
+      }, remaining)
+    }
+  }
+
+  private flushPendingZoomUpdate(): void {
+    if (this.zoomThrottleTimer !== null) {
+      clearTimeout(this.zoomThrottleTimer)
+      this.zoomThrottleTimer = null
+    }
+    if (this.pendingZoomTarget !== null) {
+      const target = this.pendingZoomTarget
+      this.pendingZoomTarget = null
+      this.applyZoomFactor(target)
+      this.lastZoomAppliedAt = Date.now()
+    }
+  }
+
+  private clearPendingZoomUpdate(): void {
+    if (this.zoomThrottleTimer !== null) {
+      clearTimeout(this.zoomThrottleTimer)
+      this.zoomThrottleTimer = null
+    }
+    this.pendingZoomTarget = null
+  }
+
+  private resetZoomGestureState(): void {
+    this.clearPendingZoomUpdate()
+    this.isSafariGestureActive = false
+    this.pinchStartDistance = null
+  }
+
+  private attachPdfZoomListeners(target: HTMLElement): void {
+    this.zoomListenerTarget = target
+    target.addEventListener('wheel', this.onViewerWheel, { passive: false })
+    target.addEventListener(
+      'gesturestart',
+      this.onViewerGestureStart as EventListener,
+      { passive: false }
+    )
+    target.addEventListener(
+      'gesturechange',
+      this.onViewerGestureChange as EventListener,
+      { passive: false }
+    )
+    target.addEventListener(
+      'gestureend',
+      this.onViewerGestureEnd as EventListener,
+      { passive: false }
+    )
+    target.addEventListener('touchstart', this.onViewerTouchStart, {
+      passive: true,
+    })
+    target.addEventListener('touchmove', this.onViewerTouchMove, {
+      passive: false,
+    })
+    target.addEventListener('touchend', this.onViewerTouchEnd, {
+      passive: true,
+    })
+    target.addEventListener('touchcancel', this.onViewerTouchEnd, {
+      passive: true,
+    })
+  }
+
+  private detachPdfZoomListeners(): void {
+    this.resetZoomGestureState()
+    const target = this.zoomListenerTarget
+    if (!target) {
+      return
+    }
+    target.removeEventListener('wheel', this.onViewerWheel)
+    target.removeEventListener(
+      'gesturestart',
+      this.onViewerGestureStart as EventListener
+    )
+    target.removeEventListener(
+      'gesturechange',
+      this.onViewerGestureChange as EventListener
+    )
+    target.removeEventListener(
+      'gestureend',
+      this.onViewerGestureEnd as EventListener
+    )
+    target.removeEventListener('touchstart', this.onViewerTouchStart)
+    target.removeEventListener('touchmove', this.onViewerTouchMove)
+    target.removeEventListener('touchend', this.onViewerTouchEnd)
+    target.removeEventListener('touchcancel', this.onViewerTouchEnd)
+    this.zoomListenerTarget = null
+  }
+
+  private attachPdfZoomKeydownListener(): void {
+    if (this.keydownListenerAttached || !this.domDocument) {
+      return
+    }
+    this.domDocument.addEventListener('keydown', this.onDocumentKeyDown)
+    this.keydownListenerAttached = true
+  }
+
+  private detachPdfZoomKeydownListener(): void {
+    if (!this.keydownListenerAttached || !this.domDocument) {
+      return
+    }
+    this.domDocument.removeEventListener('keydown', this.onDocumentKeyDown)
+    this.keydownListenerAttached = false
+  }
+
+  private readonly onViewerWheel = (event: WheelEvent): void => {
+    if (!this.isPdfViewerActive) {
+      return
+    }
+    if (!event.ctrlKey && !event.metaKey) {
+      return
+    }
+    event.preventDefault()
+    if (this.isSafariGestureActive || event.deltaY === 0) {
+      return
+    }
+    let delta = event.deltaY
+    if (event.deltaMode === 1) {
+      // DOM_DELTA_LINE
+      delta *= 16
+    } else if (event.deltaMode === 2) {
+      // DOM_DELTA_PAGE
+      delta *= 100
+    }
+    const clampedDelta = Math.max(
+      -DocumentDetailComponent.WHEEL_DELTA_CLAMP,
+      Math.min(DocumentDetailComponent.WHEEL_DELTA_CLAMP, delta)
+    )
+    const factor = Math.exp(
+      -clampedDelta * DocumentDetailComponent.WHEEL_ZOOM_SENSITIVITY
+    )
+    const nextZoom = this.clampZoomFactor(this.getCurrentPreciseZoom() * factor)
+    this.preciseZoomFactor = nextZoom
+    this.scheduleZoomUpdate(nextZoom)
+  }
+
+  private readonly onViewerGestureStart = (event: Event): void => {
+    if (!this.isPdfViewerActive) {
+      return
+    }
+    event.preventDefault()
+    this.isSafariGestureActive = true
+    this.gestureStartZoom = this.getCurrentPreciseZoom()
+  }
+
+  private readonly onViewerGestureChange = (event: Event): void => {
+    if (!this.isPdfViewerActive) {
+      return
+    }
+    event.preventDefault()
+    const gestureEvent = event as SafariGestureEvent
+    if (!Number.isFinite(gestureEvent.scale) || gestureEvent.scale <= 0) {
+      return
+    }
+    if (!this.isSafariGestureActive) {
+      this.isSafariGestureActive = true
+      this.gestureStartZoom = this.getCurrentPreciseZoom()
+    }
+    const nextZoom = this.clampZoomFactor(
+      this.gestureStartZoom * gestureEvent.scale
+    )
+    this.preciseZoomFactor = nextZoom
+    this.scheduleZoomUpdate(nextZoom)
+  }
+
+  private readonly onViewerGestureEnd = (event: Event): void => {
+    if (!this.isSafariGestureActive) {
+      return
+    }
+    event.preventDefault()
+    this.isSafariGestureActive = false
+    this.flushPendingZoomUpdate()
+  }
+
+  private readonly onViewerTouchStart = (event: TouchEvent): void => {
+    if (!this.isPdfViewerActive) {
+      return
+    }
+    if (event.touches.length === 2) {
+      const distance = this.getTouchDistance(event.touches[0], event.touches[1])
+      if (distance > 0) {
+        this.pinchStartDistance = distance
+        this.pinchStartZoom = this.getCurrentPreciseZoom()
+      }
+      return
+    }
+    this.pinchStartDistance = null
+  }
+
+  private readonly onViewerTouchMove = (event: TouchEvent): void => {
+    if (!this.isPdfViewerActive || event.touches.length !== 2) {
+      return
+    }
+    event.preventDefault()
+    if (this.isSafariGestureActive) {
+      return
+    }
+    const distance = this.getTouchDistance(event.touches[0], event.touches[1])
+    if (distance <= 0) {
+      return
+    }
+    if (this.pinchStartDistance === null) {
+      this.pinchStartDistance = distance
+      this.pinchStartZoom = this.getCurrentPreciseZoom()
+      return
+    }
+    const scale = distance / this.pinchStartDistance
+    const nextZoom = this.clampZoomFactor(this.pinchStartZoom * scale)
+    this.preciseZoomFactor = nextZoom
+    this.scheduleZoomUpdate(nextZoom)
+  }
+
+  private readonly onViewerTouchEnd = (event: TouchEvent): void => {
+    if (event.touches.length < 2 && this.pinchStartDistance !== null) {
+      this.pinchStartDistance = null
+      this.flushPendingZoomUpdate()
+    }
+  }
+
+  private getTouchDistance(first: Touch, second: Touch): number {
+    return Math.hypot(
+      second.clientX - first.clientX,
+      second.clientY - first.clientY
+    )
+  }
+
+  private readonly onDocumentKeyDown = (event: KeyboardEvent): void => {
+    if (!this.isPdfViewerActive) {
+      return
+    }
+    if ((!event.ctrlKey && !event.metaKey) || event.altKey) {
+      return
+    }
+    if (this.modalService.hasOpenModals()) {
+      return
+    }
+    if (this.isEditableElement(event.target)) {
+      return
+    }
+    if (
+      event.key === '+' ||
+      event.code === 'NumpadAdd' ||
+      (event.key === '=' && event.code !== 'Digit0')
+    ) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.increaseZoom()
+      return
+    }
+    if (
+      event.key === '-' ||
+      event.key === '_' ||
+      event.code === 'NumpadSubtract'
+    ) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.decreaseZoom()
+      return
+    }
+    if ((event.key === '0' || event.code === 'Numpad0') && !event.shiftKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.resetZoom()
+    }
+  }
+
+  private isEditableElement(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) {
+      return false
+    }
+    if (target.isContentEditable) {
+      return true
+    }
+    const tagName = target.tagName
+    if (
+      tagName === 'INPUT' ||
+      tagName === 'TEXTAREA' ||
+      tagName === 'SELECT'
+    ) {
+      return true
+    }
+    return !!target.closest('[contenteditable="true"], [contenteditable=""]')
   }
 
   get showPermissions(): boolean {
@@ -2508,14 +2965,16 @@ export class DocumentDetailComponent
     if (this.previewZoomScale() === PdfZoomScale.PageFit) {
       return $localize`Passend`
     }
-    const numeric = parseFloat(this.previewZoomSetting())
+    const numeric = Number(this.previewZoomSetting())
     if (!Number.isFinite(numeric)) return '100 %'
     return `${Math.round(numeric * 100)} %`
   }
 
   resetZoomToHundred(): void {
+    this.clearPendingZoomUpdate()
     this.previewZoomScale.set(PdfZoomScale.PageWidth)
     this.previewZoomSetting.set(PdfZoomLevel.One)
+    this.preciseZoomFactor = 1
   }
 
   toggleFullscreen(): void {

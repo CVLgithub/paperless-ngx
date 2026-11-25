@@ -62,7 +62,12 @@
 </ng-template>
 
 <div class="rd-detail-layout" [class.is-inspector-closed]="!inspectorOpen()">
-  <section class="rd-viewer-stage" #viewerStage #pdfPreview>
+  <section
+    class="rd-viewer-stage"
+    [class.is-pdf-zoom-active]="isPdfViewerActive"
+    #viewerStage
+    #pdfPreview
+  >
     @if (
       document() &&
       archiveContentRenderType === ContentRenderType.PDF &&
@@ -172,6 +177,7 @@
             type="button"
             class="rd-viewer-pill-btn"
             (click)="decreaseZoom()"
+            [disabled]="isAtMinZoom()"
             aria-label="Verkleinern"
             i18n-aria-label
             title="Verkleinern"
@@ -192,6 +198,7 @@
             type="button"
             class="rd-viewer-pill-btn"
             (click)="increaseZoom()"
+            [disabled]="isAtMaxZoom()"
             aria-label="Vergrößern"
             i18n-aria-label
             title="Vergrößern"

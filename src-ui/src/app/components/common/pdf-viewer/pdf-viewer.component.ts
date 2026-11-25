@@ -28,6 +28,7 @@ import {
   PdfRenderMode,
   PdfZoomLevel,
   PdfZoomScale,
+  PdfZoomValue,
   PngxPdfDocumentProxy,
 } from './pdf-viewer.types'
 import { getLoadedPdfJs, loadPdfJs, PdfJsModules } from './pdfjs-loader'
@@ -51,7 +52,7 @@ export class PngxPdfViewerComponent
   @Input() renderMode: PdfRenderMode = PdfRenderMode.All
   @Input() selectable = true
   @Input() searchQuery = ''
-  @Input() zoom: PdfZoomLevel = PdfZoomLevel.One
+  @Input() zoom: PdfZoomValue = PdfZoomLevel.One
   @Input() zoomScale: PdfZoomScale = PdfZoomScale.PageWidth
 
   @Output() afterLoadComplete = new EventEmitter<PngxPdfDocumentProxy>()
@@ -361,10 +362,31 @@ export class PngxPdfViewerComponent
     if (this.pdfViewer.pagesCount === 0) {
       return
     }
-    const zoomFactor = Number(this.zoom) || 1
+    const containerEl = this.container.nativeElement
+    const prevScrollWidth = containerEl.scrollWidth
+    const centerXRatio =
+      prevScrollWidth > 0 && containerEl.clientWidth > 0
+        ? (containerEl.scrollLeft + containerEl.clientWidth / 2) /
+          prevScrollWidth
+        : 0.5
+
+    const parsedZoom = Number(this.zoom)
+    const zoomFactor =
+      Number.isFinite(parsedZoom) && parsedZoom > 0 ? parsedZoom : 1
     this.pdfViewer.currentScaleValue = this.zoomScale
     if (zoomFactor !== 1) {
       this.pdfViewer.currentScale = this.pdfViewer.currentScale * zoomFactor
+    }
+
+    if (
+      prevScrollWidth > 0 &&
+      containerEl.clientWidth > 0 &&
+      containerEl.scrollWidth > containerEl.clientWidth
+    ) {
+      containerEl.scrollLeft = Math.max(
+        0,
+        centerXRatio * containerEl.scrollWidth - containerEl.clientWidth / 2
+      )
     }
   }
 

@@ -454,4 +454,75 @@ describe('PngxPdfViewerComponent', () => {
 
     expect(initSpy).toHaveBeenCalled()
   })
+
+  it('applies fine-grained numeric and string zoom values', async () => {
+    await initComponent()
+
+    const viewer = (component as any).pdfViewer as PDFViewer
+    viewer.currentScale = 1
+    component.zoom = '1.25'
+    ;(component as any).applyScale()
+    expect(viewer.currentScale).toBeCloseTo(1.25)
+
+    viewer.currentScale = 1
+    component.zoom = 0.85
+    ;(component as any).applyScale()
+    expect(viewer.currentScale).toBeCloseTo(0.85)
+  })
+
+  it('falls back to 1 when zoom is zero or negative', async () => {
+    await initComponent()
+
+    const viewer = (component as any).pdfViewer as PDFViewer
+    viewer.currentScale = 2
+    component.zoom = '-0.5'
+    ;(component as any).applyScale()
+    expect(viewer.currentScale).toBe(2)
+
+    component.zoom = 0
+    ;(component as any).applyScale()
+    expect(viewer.currentScale).toBe(2)
+  })
+
+  it('preserves horizontal scroll center ratio across scale updates', async () => {
+    await initComponent()
+
+    const containerEl = (component as any).container
+      .nativeElement as HTMLDivElement
+    let simulatedScrollWidth = 1000
+    Object.defineProperty(containerEl, 'clientWidth', {
+      configurable: true,
+      get: () => 500,
+    })
+    Object.defineProperty(containerEl, 'scrollWidth', {
+      configurable: true,
+      get: () => simulatedScrollWidth,
+    })
+    // Centered horizontally: (250 + 250) / 1000 = 0.5
+    containerEl.scrollLeft = 250
+
+    const viewer = (component as any).pdfViewer as PDFViewer
+    const originalSetter = Object.getOwnPropertyDescriptor(
+      viewer,
+      'currentScale'
+    )
+    let scale = 1
+    Object.defineProperty(viewer, 'currentScale', {
+      configurable: true,
+      get: () => scale,
+      set: (val: number) => {
+        scale = val
+        simulatedScrollWidth = Math.round(1000 * val)
+      },
+    })
+
+    component.zoom = '2'
+    ;(component as any).applyScale()
+
+    // New scrollWidth is 2000; center 0.5 => scrollLeft = 0.5 * 2000 - 250 = 750
+    expect(containerEl.scrollLeft).toBe(750)
+    if (originalSetter) {
+      Object.defineProperty(viewer, 'currentScale', originalSetter)
+    }
+  })
 })

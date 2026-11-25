@@ -3336,4 +3336,383 @@ describe('DocumentDetailComponent', () => {
     expect(errorToastSpy).not.toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
   })
+
+  const initPdfDocumentForZoom = () => {
+    initNormally()
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: 'file.pdf',
+      mime_type: 'application/pdf',
+    }))
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
+    component.setZoom(PdfZoomLevel.One)
+    fixture.detectChanges()
+  }
+
+  it('should zoom PDF viewer on Ctrl/Cmd+wheel without affecting normal scroll', () => {
+    initPdfDocumentForZoom()
+
+    const stage = component.viewerStageRef.nativeElement
+
+    // Normal scroll without modifier must not be prevented or change zoom
+    const normalWheel = new WheelEvent('wheel', {
+      deltaY: -100,
+      cancelable: true,
+      bubbles: true,
+    })
+    stage.dispatchEvent(normalWheel)
+    expect(normalWheel.defaultPrevented).toBe(false)
+    expect(component.previewZoomSetting()).toEqual('1')
+
+    // Ctrl + wheel up zooms in and prevents browser zoom
+    const zoomInWheel = new WheelEvent('wheel', {
+      deltaY: -100,
+      ctrlKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    stage.dispatchEvent(zoomInWheel)
+    expect(zoomInWheel.defaultPrevented).toBe(true)
+    const zoomedIn = Number(component.previewZoomSetting())
+    expect(zoomedIn).toBeGreaterThan(1)
+    expect(component.getZoomDisplayPercent()).toBe(
+      `${Math.round(zoomedIn * 100)} %`
+    )
+
+    // Stepping with + / - buttons stays in sync from fine-grained zoom values
+    component.setZoom('1.2')
+    expect(component.getZoomDisplayPercent()).toBe('120 %')
+    component.increaseZoom()
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.OneAndHalf)
+    component.setZoom('1.2')
+    component.decreaseZoom()
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.One)
+
+    // Cmd + wheel down zooms out and prevents browser zoom
+    jest.useFakeTimers()
+    try {
+      jest.advanceTimersByTime(100)
+      const zoomOutWheel = new WheelEvent('wheel', {
+        deltaY: 100,
+        metaKey: true,
+        cancelable: true,
+        bubbles: true,
+      })
+      stage.dispatchEvent(zoomOutWheel)
+      expect(zoomOutWheel.defaultPrevented).toBe(true)
+      expect(Number(component.previewZoomSetting())).toBeLessThan(1)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('should accumulate and throttle rapid trackpad pinch wheel events and clamp bounds', () => {
+    jest.useFakeTimers()
+    try {
+      initPdfDocumentForZoom()
+
+      const stage = component.viewerStageRef.nativeElement
+
+      // Leading event applies immediately
+      const first = new WheelEvent('wheel', {
+        deltaY: -10,
+        ctrlKey: true,
+        cancelable: true,
+      })
+      stage.dispatchEvent(first)
+      expect(first.defaultPrevented).toBe(true)
+      const afterFirst = Number(component.previewZoomSetting())
+      expect(afterFirst).toBeGreaterThan(1)
+
+      // Rapid subsequent events within throttle window are accumulated, not applied immediately
+      for (let i = 0; i < 6; i++) {
+        const evt = new WheelEvent('wheel', {
+          deltaY: -10,
+          ctrlKey: true,
+          cancelable: true,
+        })
+        stage.dispatchEvent(evt)
+        expect(evt.defaultPrevented).toBe(true)
+      }
+      expect(Number(component.previewZoomSetting())).toBe(afterFirst)
+
+      // After throttle interval, accumulated zoom is applied
+      jest.advanceTimersByTime(60)
+      const afterFlush = Number(component.previewZoomSetting())
+      expect(afterFlush).toBeGreaterThan(afterFirst)
+
+      // Clamp to maximum zoom (300%)
+      for (let i = 0; i < 40; i++) {
+        stage.dispatchEvent(
+          new WheelEvent('wheel', {
+            deltaY: -120,
+            ctrlKey: true,
+            cancelable: true,
+          })
+        )
+      }
+      jest.advanceTimersByTime(60)
+      expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.Three)
+      expect(component.isAtMaxZoom()).toBe(true)
+
+      // Clamp to minimum zoom (25%)
+      for (let i = 0; i < 60; i++) {
+        stage.dispatchEvent(
+          new WheelEvent('wheel', {
+            deltaY: 120,
+            ctrlKey: true,
+            cancelable: true,
+          })
+        )
+      }
+      jest.advanceTimersByTime(60)
+      expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.Quarter)
+      expect(component.isAtMinZoom()).toBe(true)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('should handle Safari gesture events and two-finger touch pinch on PDF viewer', () => {
+    jest.useFakeTimers()
+    try {
+      initPdfDocumentForZoom()
+
+      const stage = component.viewerStageRef.nativeElement
+
+      // Safari gesturestart / gesturechange / gestureend
+      const gestureStart = new Event('gesturestart', { cancelable: true })
+      Object.defineProperty(gestureStart, 'scale', { value: 1 })
+      stage.dispatchEvent(gestureStart)
+      expect(gestureStart.defaultPrevented).toBe(true)
+
+      // Wheel during active Safari gesture must preventDefault but not double-zoom
+      const concurrentWheel = new WheelEvent('wheel', {
+        deltaY: -100,
+        ctrlKey: true,
+        cancelable: true,
+      })
+      stage.dispatchEvent(concurrentWheel)
+      expect(concurrentWheel.defaultPrevented).toBe(true)
+      expect(component.previewZoomSetting()).toEqual('1')
+
+      jest.advanceTimersByTime(60)
+      const gestureChange = new Event('gesturechange', { cancelable: true })
+      Object.defineProperty(gestureChange, 'scale', { value: 1.4 })
+      stage.dispatchEvent(gestureChange)
+      expect(gestureChange.defaultPrevented).toBe(true)
+      expect(Number(component.previewZoomSetting())).toBeCloseTo(1.4, 2)
+
+      const gestureEnd = new Event('gestureend', { cancelable: true })
+      stage.dispatchEvent(gestureEnd)
+      expect(gestureEnd.defaultPrevented).toBe(true)
+
+      // Single-finger touchmove must not be prevented
+      component.setZoom(PdfZoomLevel.One)
+      const singleTouchMove = new Event('touchmove', { cancelable: true })
+      Object.defineProperty(singleTouchMove, 'touches', {
+        value: [{ clientX: 100, clientY: 100 }],
+      })
+      stage.dispatchEvent(singleTouchMove)
+      expect(singleTouchMove.defaultPrevented).toBe(false)
+      expect(component.previewZoomSetting()).toEqual('1')
+
+      // Two-finger pinch zooms proportionally
+      jest.advanceTimersByTime(60)
+      const pinchStart = new Event('touchstart', { cancelable: true })
+      Object.defineProperty(pinchStart, 'touches', {
+        value: [
+          { clientX: 0, clientY: 0 },
+          { clientX: 100, clientY: 0 },
+        ],
+      })
+      stage.dispatchEvent(pinchStart)
+
+      const pinchMove = new Event('touchmove', { cancelable: true })
+      Object.defineProperty(pinchMove, 'touches', {
+        value: [
+          { clientX: 0, clientY: 0 },
+          { clientX: 160, clientY: 0 },
+        ],
+      })
+      stage.dispatchEvent(pinchMove)
+      expect(pinchMove.defaultPrevented).toBe(true)
+      expect(Number(component.previewZoomSetting())).toBeCloseTo(1.6, 2)
+
+      const pinchEnd = new Event('touchend', { cancelable: true })
+      Object.defineProperty(pinchEnd, 'touches', { value: [] })
+      stage.dispatchEvent(pinchEnd)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('should intercept Ctrl/Cmd + +, -, 0 keyboard zoom when PDF viewer is active and focus is not in an input', () => {
+    initPdfDocumentForZoom()
+
+    // Ctrl + '+' zooms in
+    const zoomInKey = new KeyboardEvent('keydown', {
+      key: '+',
+      ctrlKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    document.dispatchEvent(zoomInKey)
+    expect(zoomInKey.defaultPrevented).toBe(true)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.OneAndHalf)
+
+    // Cmd + '=' (US layout zoom in) zooms in further
+    const zoomInEquals = new KeyboardEvent('keydown', {
+      key: '=',
+      code: 'Equal',
+      metaKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    document.dispatchEvent(zoomInEquals)
+    expect(zoomInEquals.defaultPrevented).toBe(true)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.Two)
+
+    // Ctrl + '-' zooms out
+    const zoomOutKey = new KeyboardEvent('keydown', {
+      key: '-',
+      ctrlKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    document.dispatchEvent(zoomOutKey)
+    expect(zoomOutKey.defaultPrevented).toBe(true)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.OneAndHalf)
+
+    // Ctrl + '0' resets to configured default (PageFit when configured)
+    settingsService.set(
+      SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
+      PdfZoomScale.PageFit
+    )
+    const resetFitKey = new KeyboardEvent('keydown', {
+      key: '0',
+      code: 'Digit0',
+      ctrlKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    document.dispatchEvent(resetFitKey)
+    expect(resetFitKey.defaultPrevented).toBe(true)
+    expect(component.previewZoomScale()).toEqual(PdfZoomScale.PageFit)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.One)
+
+    // Ctrl + '0' resets to 100% PageWidth when configured as default
+    settingsService.set(
+      SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
+      PdfZoomScale.PageWidth
+    )
+    component.setZoom(PdfZoomLevel.Two)
+    const resetWidthKey = new KeyboardEvent('keydown', {
+      key: '0',
+      code: 'Digit0',
+      metaKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    document.dispatchEvent(resetWidthKey)
+    expect(resetWidthKey.defaultPrevented).toBe(true)
+    expect(component.previewZoomScale()).toEqual(PdfZoomScale.PageWidth)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.One)
+
+    // Ignored when target is an editable field (input / textarea)
+    const titleTextarea = fixture.nativeElement.querySelector(
+      '.rd-title-input'
+    ) as HTMLTextAreaElement
+    expect(titleTextarea).not.toBeNull()
+    const inputZoomKey = new KeyboardEvent('keydown', {
+      key: '+',
+      ctrlKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    titleTextarea.dispatchEvent(inputZoomKey)
+    expect(inputZoomKey.defaultPrevented).toBe(false)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.One)
+
+    // Ignored when a modal is open
+    const hasModalsSpy = jest
+      .spyOn(modalService, 'hasOpenModals')
+      .mockReturnValue(true)
+    const modalZoomKey = new KeyboardEvent('keydown', {
+      key: '+',
+      ctrlKey: true,
+      cancelable: true,
+      bubbles: true,
+    })
+    document.dispatchEvent(modalZoomKey)
+    expect(modalZoomKey.defaultPrevented).toBe(false)
+    expect(component.previewZoomSetting()).toEqual(PdfZoomLevel.One)
+    hasModalsSpy.mockRestore()
+  })
+
+  it('should not intercept zoom gestures or shortcuts when PDF viewer is inactive or after destroy', () => {
+    initPdfDocumentForZoom()
+
+    const stage = component.viewerStageRef.nativeElement
+
+    // Non-PDF document (e.g. image) must not be intercepted
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: null,
+      mime_type: 'image/png',
+    }))
+    const imageWheel = new WheelEvent('wheel', {
+      deltaY: -100,
+      ctrlKey: true,
+      cancelable: true,
+    })
+    stage.dispatchEvent(imageWheel)
+    expect(imageWheel.defaultPrevented).toBe(false)
+    expect(component.previewZoomSetting()).toEqual('1')
+
+    // Restore PDF, disable PDF viewer via native viewer setting
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: 'file.pdf',
+      mime_type: 'application/pdf',
+    }))
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
+    const nativeWheel = new WheelEvent('wheel', {
+      deltaY: -100,
+      ctrlKey: true,
+      cancelable: true,
+    })
+    stage.dispatchEvent(nativeWheel)
+    expect(nativeWheel.defaultPrevented).toBe(false)
+    expect(component.previewZoomSetting()).toEqual('1')
+
+    const nativeKey = new KeyboardEvent('keydown', {
+      key: '+',
+      ctrlKey: true,
+      cancelable: true,
+    })
+    document.dispatchEvent(nativeKey)
+    expect(nativeKey.defaultPrevented).toBe(false)
+    expect(component.previewZoomSetting()).toEqual('1')
+
+    // Re-enable PDF viewer, then destroy component -> listeners must be cleaned up
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
+    component.ngOnDestroy()
+
+    const afterDestroyWheel = new WheelEvent('wheel', {
+      deltaY: -100,
+      ctrlKey: true,
+      cancelable: true,
+    })
+    stage.dispatchEvent(afterDestroyWheel)
+    expect(afterDestroyWheel.defaultPrevented).toBe(false)
+
+    const afterDestroyKey = new KeyboardEvent('keydown', {
+      key: '+',
+      ctrlKey: true,
+      cancelable: true,
+    })
+    document.dispatchEvent(afterDestroyKey)
+    expect(afterDestroyKey.defaultPrevented).toBe(false)
+  })
 })
