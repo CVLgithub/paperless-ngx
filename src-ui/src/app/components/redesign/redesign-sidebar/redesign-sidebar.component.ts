@@ -27,6 +27,7 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_IS_IN_INBOX,
 } from 'src/app/data/filter-rule-type'
+import { SavedView } from 'src/app/data/saved-view'
 import { Tag } from 'src/app/data/tag'
 import {
   SETTINGS_KEYS,
@@ -344,5 +345,11 @@ export class RedesignSidebarComponent implements OnInit {
 
   getCorrespondentColor(id: number): string {
     return CORRESPONDENT_PALETTE[id % CORRESPONDENT_PALETTE.length]
+  }
+
+  getSavedViewTooltip(view: SavedView): string {
+    const count = this.savedViewService.getDocumentCount(view)
+    const name = view.name ?? ''
+    return count !== null && count !== undefined ? `${name} (${count})` : name
   }
 }
