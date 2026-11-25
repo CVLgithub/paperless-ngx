@@ -151,4 +151,107 @@ describe('PDFEditorComponent', () => {
     expect(component.pdfSrc).toBe('preview-version')
     expect(previewSpy).toHaveBeenCalledWith(3, false, 10)
   })
+
+  it('should load the PDF once and destroy resources cleanly on unmount', async () => {
+    const pdfjsLoader = await import('../pdf-viewer/pdfjs-loader')
+    const destroySpy = jest.fn().mockResolvedValue(undefined)
+    const cleanupSpy = jest.fn()
+    const renderSpy = jest.fn().mockReturnValue({
+      promise: Promise.resolve(),
+      cancel: jest.fn(),
+    })
+    const getPageSpy = jest.fn().mockImplementation((pageNum: number) =>
+      Promise.resolve({
+        pageNumber: pageNum,
+        getViewport: ({ scale }: { scale: number }) => ({
+          width: 600 * scale,
+          height: 800 * scale,
+        }),
+        render: renderSpy,
+        cleanup: cleanupSpy,
+      })
+    )
+    const mockPdf = { numPages: 3, getPage: getPageSpy }
+    const getDocumentSpy = jest.fn().mockReturnValue({
+      promise: Promise.resolve(mockPdf),
+      destroy: destroySpy,
+    })
+
+    const loadPdfJsSpy = jest.spyOn(pdfjsLoader, 'loadPdfJs').mockResolvedValue({
+      lib: {
+        AnnotationMode: { DISABLE: 0 },
+        GlobalWorkerOptions: { workerSrc: '' },
+        getDocument: getDocumentSpy,
+      },
+      viewer: {},
+    } as any)
+
+    const origToDataURL = HTMLCanvasElement.prototype.toDataURL
+    const origToBlob = HTMLCanvasElement.prototype.toBlob
+    const origIO = globalThis.IntersectionObserver
+    HTMLCanvasElement.prototype.toBlob = undefined as any
+    HTMLCanvasElement.prototype.toDataURL = jest
+      .fn()
+      .mockReturnValue('data:image/jpeg;base64,thumb')
+    globalThis.IntersectionObserver = class {
+      constructor(private readonly cb: IntersectionObserverCallback) {}
+      observe(target: Element) {
+        const pageNum = Number((target as HTMLElement).dataset['page'])
+        this.cb(
+          [
+            {
+              isIntersecting: pageNum <= 2,
+              target,
+            } as IntersectionObserverEntry,
+          ],
+          this as unknown as IntersectionObserver
+        )
+      }
+      unobserve() {}
+      disconnect() {}
+      takeRecords() {
+        return []
+      }
+    } as unknown as typeof IntersectionObserver
+
+    try {
+      const documentService = TestBed.inject(DocumentService)
+      jest
+        .spyOn(documentService, 'getPreviewUrl')
+        .mockReturnValue('http://localhost/api/documents/19/preview/')
+
+      component.documentID.set(19)
+      fixture.detectChanges()
+
+      // Allow async document load and sequential page render ticks to complete
+      for (let i = 0; i < 10; i++) {
+        await new Promise((r) => setTimeout(r, 15))
+        fixture.detectChanges()
+      }
+
+      expect(getDocumentSpy).toHaveBeenCalledTimes(1)
+      expect(component.totalPages).toBe(3)
+      expect(component.pages.length).toBe(3)
+      expect(component.pages[0].thumbnailUrl).toBe(
+        'data:image/jpeg;base64,thumb'
+      )
+      expect(component.pages[1].thumbnailUrl).toBe(
+        'data:image/jpeg;base64,thumb'
+      )
+      expect(component.pages[2].thumbnailUrl).toBeUndefined()
+      expect(renderSpy).toHaveBeenCalledTimes(2)
+      expect(renderSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ annotationMode: 0 })
+      )
+      expect(cleanupSpy).toHaveBeenCalledTimes(2)
+
+      fixture.destroy()
+      expect(destroySpy).toHaveBeenCalledTimes(1)
+    } finally {
+      HTMLCanvasElement.prototype.toDataURL = origToDataURL
+      HTMLCanvasElement.prototype.toBlob = origToBlob
+      globalThis.IntersectionObserver = origIO
+      loadPdfJsSpy.mockRestore()
+    }
+  })
 })

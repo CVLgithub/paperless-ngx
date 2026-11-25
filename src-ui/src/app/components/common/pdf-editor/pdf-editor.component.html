@@ -1,12 +1,11 @@
-<pngx-pdf-viewer class="visually-hidden" [src]="pdfSrc" [renderMode]="PdfRenderMode.Single" [page]="1" [selectable]="false" (afterLoadComplete)="pdfLoaded($event)"></pngx-pdf-viewer>
 <div class="modal-header">
   <h4 class="modal-title">{{ title }}</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
 </div>
-<div class="modal-body">
+<div class="modal-body" #modalBody>
   <div class="btn-toolbar mb-2">
     <div class="btn-group me-3">
-      <button class="btn btn-sm btn-secondary" (click)="selectAll()" title="Select all pages" i18n-title>
+      <button class="btn btn-sm btn-secondary" (click)="selectAll()" [disabled]="pages.length === 0" title="Select all pages" i18n-title>
         <pngx-bs-icon name="check-all"></pngx-bs-icon>
       </button>
       <button class="btn btn-sm btn-secondary" (click)="deselectAll()" [disabled]="!hasSelection()" title="Deselect all pages" i18n-title>
@@ -25,9 +24,19 @@
       </button>
     </div>
   </div>
+  @if (isLoadingDocument()) {
+    <div class="pdf-editor-status">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      <span i18n>Seiten werden geladen …</span>
+    </div>
+  } @else if (loadError()) {
+    <div class="alert alert-danger mb-0" role="alert" i18n>
+      PDF konnte nicht geladen werden.
+    </div>
+  }
   <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-2 row-cols-md-5">
     @for (p of pages; track p.page; let i = $index) {
-      <div class="page-item rounded p-2" cdkDrag (click)="toggleSelection(i)" [class.selected]="p.selected">
+      <div #pageItem [attr.data-page]="p.page" class="page-item rounded p-2" cdkDrag (click)="toggleSelection(i)" [class.selected]="p.selected">
         <div class="btn-toolbar hover-actions z-10">
           <div class="btn-group me-2">
             <button class="btn btn-sm btn-dark" (click)="rotate(i, true); $event.stopPropagation()" title="Rotate page counter-clockwise" i18n-title>
@@ -53,18 +62,19 @@
           </div>
         </div>
         <div class="pdf-viewer-container w-100" [class.selected]="p.selected">
-          @defer (on viewport) {
-            @if (!p.loaded) {
-              <div class="placeholder-glow w-100 h-100 z-10">
-                <span class="placeholder w-100 h-100"></span>
-              </div>
-            }
-            <pngx-pdf-viewer class="fade" [class.show]="p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [renderMode]="PdfRenderMode.Single" (rendered)="p.loaded = true"></pngx-pdf-viewer>
-          } @placeholder {
-            <div class="placeholder-glow w-100 h-100 z-10">
-              <span class="placeholder w-100 h-100"></span>
-            </div>
+          @if (p.thumbnailUrl) {
+            <img
+              class="pdf-page-thumb"
+              [class.is-rotated-sideways]="p.rotate === 90 || p.rotate === 270"
+              [style.transform]="'rotate(' + p.rotate + 'deg)'"
+              [src]="p.thumbnailUrl"
+              [alt]="'Seite ' + p.page"
+              draggable="false"
+            />
+          } @else {
+            <div class="pdf-page-skeleton" aria-hidden="true"></div>
           }
+          <span class="pdf-page-badge">{{ p.page }}</span>
         </div>
         @if (p.splitAfter) {
           <div class="split-after rounded position-absolute top-0 end-0 bg-dark text-uppercase text-center h-100 px-1 small fw-bold">&mdash; <span i18n>Split here</span> &mdash;</div>
