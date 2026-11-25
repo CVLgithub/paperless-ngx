@@ -101,6 +101,9 @@
   --rd-success: #16a34a;
   --rd-page-badge-bg: rgba(28, 28, 32, 0.8);
   --rd-page-badge-text: #ffffff;
+  --rd-tooltip-bg: #1c1c1e;
+  --rd-tooltip-color: #ffffff;
+  --rd-tooltip-border: rgba(255, 255, 255, 0.1);
 
   // Shadows (Light)
   --rd-shadow-panel: 0 2px 10px rgba(0, 0, 0, 0.04), 0 10px 28px rgba(0, 0, 0, 0.055);
@@ -177,6 +180,9 @@
   --rd-success: #22c55e;
   --rd-page-badge-bg: rgba(16, 16, 20, 0.85);
   --rd-page-badge-text: #f5f5f7;
+  --rd-tooltip-bg: #2c2c32;
+  --rd-tooltip-color: #f5f5f7;
+  --rd-tooltip-border: rgba(255, 255, 255, 0.14);
 
   --rd-shadow-panel: 0 2px 12px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.42);
   --rd-shadow-pill: 0 1px 4px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -911,5 +917,23 @@ body > .ng-dropdown-panel {
     &.ng-option-disabled {
       color: var(--rd-text-tertiary) !important;
     }
+  }
+}
+
+// High-contrast Bootstrap / ng-bootstrap tooltips in both light and dark themes
+// Overrides theme.scss's dark-mode `--bs-tooltip-bg: #000` (which inherits dark `--bs-body-bg` text)
+html .tooltip,
+[data-bs-theme] body .tooltip {
+  --bs-tooltip-bg: var(--rd-tooltip-bg);
+  --bs-tooltip-color: var(--rd-tooltip-color);
+  --bs-tooltip-opacity: 1;
+  --bs-tooltip-border-radius: var(--rd-radius-xs);
+  --bs-tooltip-font-size: 0.78125rem;
+  --bs-tooltip-padding-x: 0.6rem;
+  --bs-tooltip-padding-y: 0.32rem;
+
+  .tooltip-inner {
+    font-weight: 500;
+    box-shadow: var(--rd-shadow-floating), 0 0 0 1px var(--rd-tooltip-border);
   }
 }
