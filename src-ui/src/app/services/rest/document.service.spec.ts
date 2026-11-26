@@ -433,6 +433,18 @@ describe(`DocumentService`, () => {
     )
   })
 
+  it('should return the correct preview tab URL with optional original and version params', () => {
+    expect(service.getPreviewTabUrl(documents[0].id)).toEqual(
+      `/preview/${documents[0].id}`
+    )
+    expect(service.getPreviewTabUrl(documents[0].id, true)).toEqual(
+      `/preview/${documents[0].id}?original=true`
+    )
+    expect(service.getPreviewTabUrl(documents[0].id, false, 123)).toEqual(
+      `/preview/${documents[0].id}?version=123`
+    )
+  })
+
   it('should return the correct thumb URL for a single document', () => {
     let url = service.getThumbUrl(documents[0].id)
     expect(url).toEqual(

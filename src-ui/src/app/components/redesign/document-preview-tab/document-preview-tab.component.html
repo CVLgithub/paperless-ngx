@@ -1,0 +1,13 @@
+@if (safePreviewUrl(); as url) {
+  <iframe
+    #previewFrame
+    class="rd-preview-tab__frame"
+    [src]="url"
+    [title]="pageTitle()"
+    (load)="onFrameLoad()"
+  ></iframe>
+} @else if (invalidId()) {
+  <div class="rd-preview-tab__error" role="alert" i18n>
+    Dokument konnte nicht geladen werden.
+  </div>
+}

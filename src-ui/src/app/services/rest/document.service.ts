@@ -231,6 +231,25 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return url.toString()
   }
 
+  getPreviewTabUrl(
+    id: number,
+    original: boolean = false,
+    versionID: number = null
+  ): string {
+    const base =
+      typeof document !== 'undefined' && document.baseURI
+        ? document.baseURI
+        : `${window.location.origin}/`
+    const url = new URL(`preview/${id}`, base)
+    if (original) {
+      url.searchParams.set('original', 'true')
+    }
+    if (versionID) {
+      url.searchParams.set('version', versionID.toString())
+    }
+    return `${url.pathname}${url.search}`
+  }
+
   getThumbUrl(id: number, versionID: number = null): string {
     let url = new URL(this.getResourceUrl(id, 'thumb'))
     if (versionID) {

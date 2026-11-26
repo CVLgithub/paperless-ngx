@@ -455,6 +455,7 @@ export class DocumentDetailComponent
     this.documentId()
     this.document()
     this.title()
+    this.selectedVersionId()
     this.inspectorOpen()
     this.topbarTemplateVersion()
     this.syncTopbarConfig()
@@ -2889,7 +2890,13 @@ export class DocumentDetailComponent
       canEdit: this.userCanEdit,
       isDirty: this.isDirtySignal(),
       isSaving: this.networkActive(),
-      previewUrl: doc?.id ? this.documentsService.getPreviewUrl(doc.id) : null,
+      previewUrl: doc?.id
+        ? this.documentsService.getPreviewTabUrl(
+            doc.id,
+            false,
+            this.getSelectedNonLatestVersionId()
+          )
+        : null,
       canDelete:
         this.userIsOwner &&
         this.permissionsService.currentUserCan(

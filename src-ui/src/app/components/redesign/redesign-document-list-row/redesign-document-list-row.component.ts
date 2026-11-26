@@ -54,7 +54,7 @@ export class RedesignDocumentListRowComponent {
   )
 
   readonly previewUrl = computed(() =>
-    this.documentService.getPreviewUrl(this.document().id)
+    this.documentService.getPreviewTabUrl(this.document().id)
   )
 
   readonly correspondentName = computed(() => {

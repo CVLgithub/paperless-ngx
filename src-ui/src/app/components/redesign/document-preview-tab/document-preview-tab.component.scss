@@ -1,0 +1,32 @@
+:host {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--rd-bg-canvas, #151517);
+  z-index: 1050;
+}
+
+.rd-preview-tab__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.rd-preview-tab__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--rd-text-secondary);
+  font-size: var(--rd-text-body);
+}

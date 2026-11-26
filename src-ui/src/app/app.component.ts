@@ -63,6 +63,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (/(?:^|\/)preview\/\d+(?:\/|$)/.test(window.location?.pathname ?? '')) {
+      return
+    }
     this.websocketStatusService.connect()
     // pdf.js is lazy loaded; warm it up so the first document preview is fast
     prefetchPdfJsWhenIdle()

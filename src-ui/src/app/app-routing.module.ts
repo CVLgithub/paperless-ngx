@@ -15,6 +15,21 @@ import {
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
+    path: 'preview/:id',
+    loadComponent: () =>
+      import('./components/redesign/document-preview-tab/document-preview-tab.component').then(
+        (m) => m.DocumentPreviewTabComponent
+      ),
+    canActivate: [PermissionsGuard],
+    data: {
+      requiredPermission: {
+        action: PermissionAction.View,
+        type: PermissionType.Document,
+      },
+      componentName: 'DocumentPreviewTabComponent',
+    },
+  },
+  {
     path: '',
     component: AppFrameComponent,
     canDeactivate: [DirtyDocGuard],

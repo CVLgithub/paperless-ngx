@@ -31,7 +31,7 @@ const doc = (overrides: Partial<Document> = {}): Document =>
 describe('RedesignDocumentListRowComponent', () => {
   let fixture: ComponentFixture<RedesignDocumentListRowComponent>
   let component: RedesignDocumentListRowComponent
-  let documentService: { getThumbUrl: jest.Mock; getPreviewUrl: jest.Mock }
+  let documentService: { getThumbUrl: jest.Mock; getPreviewTabUrl: jest.Mock }
 
   const img = (): HTMLImageElement =>
     fixture.debugElement.query(By.css('img.rd-list-row__thumb')).nativeElement
@@ -44,7 +44,7 @@ describe('RedesignDocumentListRowComponent', () => {
   beforeEach(async () => {
     documentService = {
       getThumbUrl: jest.fn((id: number) => `/api/documents/${id}/thumb/`),
-      getPreviewUrl: jest.fn((id: number) => `/api/documents/${id}/preview/`),
+      getPreviewTabUrl: jest.fn((id: number) => `/preview/${id}`),
     }
 
     await TestBed.configureTestingModule({
@@ -92,7 +92,7 @@ describe('RedesignDocumentListRowComponent', () => {
     fixture.detectChanges()
     fixture.detectChanges()
     expect(documentService.getThumbUrl).toHaveBeenCalledTimes(1)
-    expect(documentService.getPreviewUrl).toHaveBeenCalledTimes(1)
+    expect(documentService.getPreviewTabUrl).toHaveBeenCalledTimes(1)
     const resolved = component.resolvedTags()
     expect(resolved.map((t) => t.id)).toEqual([2])
     expect(component.resolvedTags()).toBe(resolved)
@@ -129,7 +129,7 @@ describe('RedesignDocumentListRowComponent', () => {
       fixture.nativeElement
         .querySelector('.rd-list-row__preview')
         .getAttribute('href')
-    ).toBe('/api/documents/2/preview/')
+    ).toBe('/preview/2')
   })
 
   it('updates names when taxonomy maps are replaced', () => {
