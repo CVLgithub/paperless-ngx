@@ -1,6 +1,7 @@
 .rd-shell {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--rd-bg-canvas);
   color: var(--rd-text-primary);
   overflow-x: clip;
@@ -75,6 +76,7 @@
   position: sticky;
   top: 0;
   z-index: 1020;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -315,13 +317,13 @@
 
 .rd-main {
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   padding: 8px 24px 36px 16px;
   min-width: 0;
 
   &--detail {
     padding: 4px 16px 12px 12px;
-    display: flex;
-    flex-direction: column;
     height: calc(100vh - var(--rd-topbar-height));
     overflow: hidden;
   }

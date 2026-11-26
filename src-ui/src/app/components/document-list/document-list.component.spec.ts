@@ -1287,4 +1287,39 @@ describe('DocumentListComponent', () => {
     expect(component.hasHiddenActiveCorrespondent).toBeFalsy()
     offsetTopSpy.mockRestore()
   })
+
+  it('should render pagination bar inside .rd-documents-content while reloading and when paginated', () => {
+    const responseSubject = new Subject<any>()
+    jest
+      .spyOn(documentService, 'listFiltered')
+      .mockReturnValue(responseSubject.asObservable())
+    jest.spyOn(documentListService, 'pageSize', 'get').mockReturnValue(25)
+
+    // Simulate restored collectionSize from previous session while documents are still loading
+    ;(documentListService as any).activeListViewState.collectionSize = 80
+    ;(documentListService as any).activeListViewState.documents = []
+    documentListService.reload()
+
+    fixture.detectChanges()
+
+    const content = fixture.debugElement.query(By.css('.rd-documents-content'))
+    expect(content).not.toBeNull()
+    expect(documentListService.isReloading).toBeTruthy()
+    expect(content.query(By.css('.rd-empty-state'))).toBeNull()
+    const paginationBar = content.query(By.css('.rd-pagination-bar'))
+    expect(paginationBar).not.toBeNull()
+    expect(paginationBar.query(By.css('ngb-pagination'))).not.toBeNull()
+
+    // When reload resolves with fewer documents than pageSize, pagination bar hides
+    responseSubject.next({
+      count: 10,
+      results: docs,
+      all: docs.map((d) => d.id),
+    })
+    responseSubject.complete()
+    fixture.detectChanges()
+
+    expect(documentListService.isReloading).toBeFalsy()
+    expect(content.query(By.css('.rd-pagination-bar'))).toBeNull()
+  })
 })

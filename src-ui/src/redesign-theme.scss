@@ -2322,7 +2322,7 @@ html ul.pagination,
   backdrop-filter: var(--rd-blur-md);
   -webkit-backdrop-filter: var(--rd-blur-md);
   border: 1px solid var(--rd-border-subtle);
-  box-shadow: var(--rd-shadow-sm), inset 0 1px 0 var(--rd-border-glass);
+  box-shadow: var(--rd-shadow-pill), inset 0 1px 0 var(--rd-border-glass);
   font-variant-numeric: tabular-nums;
 
   &.pagination-sm {
@@ -2420,7 +2420,7 @@ html .rd-pagination-bar ul.pagination,
   padding: 4px;
   gap: 3px;
   background: var(--rd-bg-glass-strong);
-  box-shadow: var(--rd-shadow-md), inset 0 1px 0 var(--rd-border-glass);
+  box-shadow: var(--rd-shadow-panel), inset 0 1px 0 var(--rd-border-glass);
 
   &.pagination-sm {
     padding: 4px;
